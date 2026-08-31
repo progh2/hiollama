@@ -19,7 +19,9 @@
 - **GPU**: RTX 2060 6GB (NVIDIA 드라이버 551.61 이상)
 - **모델**: `qwen2.5-coder:3b` (1.9GB) — 코딩 전용, 6GB에 여유롭게 적재
 - **VS Code**: 1.127 이상 + 공식 Ollama 확장 (GitHub 로그인·Copilot 구독 불필요)
-- 모델은 수업 중 다운로드하지 않고 **넷클래스/USB로 사전 배포** (`blobs` + `manifests`)
+- 모델 확보는 두 경로를 모두 안내: **넷클래스/USB 사전 배포**(`blobs` + `manifests`, 권장) 또는 `ollama pull qwen2.5-coder:3b` 직접 다운로드
+
+> ⚠️ `gemma4:e2b`는 이름이 "2B"지만 실제 용량 **7.2GB** (MatFormer, effective 파라미터 표기) + thinking 모드로 매우 느림 → 6GB 카드에 부적합
 
 ## 수업 설계 메모
 

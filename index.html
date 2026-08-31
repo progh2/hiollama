@@ -425,7 +425,7 @@
 <!-- ===================== 실습 1: 설치 ===================== -->
 <section id="install">
   <h2><span class="num">실습 ①</span>설치하기 <span class="muted" style="font-size:17px;font-weight:400">· 15분</span></h2>
-  <p class="sub">파일은 이미 나눠드렸습니다. 인터넷에서 받지 마세요 — 18명이 동시에 받으면 수업이 끝납니다.</p>
+  <p class="sub">Ollama를 깔고, 모델을 가져오고, 잘 되는지 확인합니다.</p>
 
   <div class="step">
     <span class="n">STEP 1</span>
@@ -438,26 +438,47 @@
 
   <div class="step">
     <span class="n">STEP 2</span>
-    <h3>Ollama 종료</h3>
-    <p>작업표시줄 아이콘을 <strong>우클릭 → Quit</strong>. 모델 파일을 넣는 동안은 꺼져 있어야 합니다.</p>
-  </div>
+    <h3>모델 가져오기 — 가장 중요한 단계</h3>
+    <p>두 가지 방법이 있습니다. <strong>조교 안내에 따라 하나만</strong> 하세요.</p>
 
-  <div class="step">
-    <span class="n">STEP 3</span>
-    <h3>모델 파일 복사 — 가장 중요한 단계</h3>
-    <p>배포된 <code class="inline">blobs</code>와 <code class="inline">manifests</code> 두 폴더를 아래 경로에 통째로 붙여넣습니다.</p>
-    <div class="code"><button class="copy">복사</button>%USERPROFILE%\.ollama\models</div>
-    <p class="muted">탐색기 주소창에 그대로 붙여넣으면 해당 폴더로 이동합니다. 폴더가 없으면 만드세요.</p>
+    <h4>■ 방법 A · 배포 파일 복사 <span style="color:var(--ok)">(권장 — 훨씬 빠릅니다)</span></h4>
+    <ol>
+      <li>작업표시줄 Ollama 아이콘 <strong>우클릭 → Quit</strong> (복사하는 동안 꺼져 있어야 합니다)</li>
+      <li>배포된 <code class="inline">blobs</code>, <code class="inline">manifests</code> 두 폴더를 아래 경로에 통째로 붙여넣기
+        <div class="code"><button class="copy">복사</button>%USERPROFILE%\.ollama\models</div>
+        <span class="muted">탐색기 주소창에 붙여넣으면 해당 폴더로 이동합니다. 없으면 만드세요.</span>
+      </li>
+      <li>시작 메뉴에서 <strong>Ollama 다시 실행</strong></li>
+    </ol>
     <div class="box danger">
       <span class="t">🔴 가장 많이 하는 실수</span>
       <strong><code class="inline">manifests</code> 폴더를 빠뜨리는 것.</strong>
       <code class="inline">blobs</code>만 복사하면 파일은 다 있는데 모델 목록에 아무것도 안 뜹니다.
       원인을 찾기 어려우니 <strong>두 폴더 다 복사했는지 지금 확인하세요.</strong>
     </div>
+
+    <h4>■ 방법 B · 직접 다운로드</h4>
+    <p>인터넷에서 바로 받습니다. <strong>Ollama가 켜져 있어야</strong> 합니다.</p>
+    <p><kbd>Win</kbd>+<kbd>R</kbd> → <code class="inline">cmd</code> → 엔터. 검은 창에 입력:</p>
+    <div class="code"><button class="copy">복사</button>ollama pull qwen2.5-coder:3b</div>
+    <p>진행률이 표시되고, <strong>1.9GB</strong>라 회선 상태에 따라 몇 분 걸립니다.
+       <code class="inline">success</code>가 뜨면 완료입니다.</p>
+
+    <div class="box warn">
+      <span class="t">18명이 동시에 받으면 느려집니다</span>
+      교육장 회선을 다 같이 나눠 쓰게 됩니다. <strong>조교가 방법 A를 안내했다면 그쪽을 쓰세요.</strong>
+      직접 받아야 한다면, 다 받을 때까지 기다리지 말고 먼저 끝난 사람부터 다음 단계로 넘어가면 됩니다.
+    </div>
+
+    <div class="box tip">
+      <span class="t">저사양 PC용 대체 모델</span>
+      점검 결과 VRAM이 부족하다고 나왔다면 더 작은 모델을 받으세요.
+      <div class="code" style="margin-top:8px"><button class="copy">복사</button>ollama pull qwen2.5-coder:1.5b</div>
+    </div>
   </div>
 
   <div class="step">
-    <span class="n">STEP 4</span>
+    <span class="n">STEP 3</span>
     <h3>환경변수 2개 설정</h3>
     <p>메모리를 아껴서 더 긴 대화를 가능하게 하는 설정입니다.</p>
     <p><kbd>Win</kbd> 키 → <strong>"환경 변수"</strong> 검색 → <strong>계정의 환경 변수 편집</strong> → 새로 만들기로 두 개 추가:</p>
@@ -467,15 +488,27 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
   </div>
 
   <div class="step">
-    <span class="n">STEP 5</span>
+    <span class="n">STEP 4</span>
     <h3>확인</h3>
     <p><kbd>Win</kbd>+<kbd>R</kbd> → <code class="inline">cmd</code> → 엔터. 검은 창에 입력:</p>
     <div class="code"><button class="copy">복사</button>ollama list</div>
-    <p>모델 이름이 한 줄 뜨면 <strong>성공입니다.</strong> 아무것도 안 뜨면 STEP 3의 <code class="inline">manifests</code>를 확인하세요.</p>
+    <p><code class="inline">qwen2.5-coder:3b</code>가 뜨면 <strong>성공입니다.</strong>
+       아무것도 안 뜨면 STEP 2의 <code class="inline">manifests</code>를 확인하세요.</p>
     <p>그래픽카드를 제대로 쓰는지도 확인해 둡시다:</p>
     <div class="code"><button class="copy">복사</button>nvidia-smi</div>
     <p class="muted">카드 이름과 메모리(6GB 내외), 드라이버 버전이 나옵니다. 드라이버가 <strong>551.61 미만</strong>이면 그래픽카드를 못 쓰고 매우 느려집니다 — 조교에게 알려주세요.</p>
   </div>
+
+  <h3>모델 관리 명령어 정리</h3>
+  <table>
+    <tr><th style="width:44%">명령어</th><th>하는 일</th></tr>
+    <tr><td><code class="inline">ollama pull &lt;모델&gt;</code></td><td>모델 내려받기</td></tr>
+    <tr><td><code class="inline">ollama list</code></td><td>가진 모델 목록</td></tr>
+    <tr><td><code class="inline">ollama run &lt;모델&gt;</code></td><td>대화 시작</td></tr>
+    <tr><td><code class="inline">ollama ps</code></td><td>지금 돌아가는 모델 · GPU 사용률</td></tr>
+    <tr><td><code class="inline">ollama rm &lt;모델&gt;</code></td><td>모델 삭제 (디스크 확보)</td></tr>
+    <tr><td><code class="inline">ollama show &lt;모델&gt;</code></td><td>모델 정보 (크기·컨텍스트 등)</td></tr>
+  </table>
 </section>
 
 <!-- ===================== 실습 2: CLI ===================== -->
@@ -483,8 +516,8 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
   <h2><span class="num">실습 ②</span>첫 대화 <span class="muted" style="font-size:17px;font-weight:400">· 10분</span></h2>
   <p class="sub">VS Code로 가기 전에, 검은 창에서 직접 말을 걸어봅니다.</p>
 
-  <p>아래 <code class="inline">모델명</code> 자리에 <code class="inline">ollama list</code>에서 본 이름을 넣으세요.</p>
-  <div class="code"><button class="copy">복사</button>ollama run 모델명</div>
+  <div class="code"><button class="copy">복사</button>ollama run qwen2.5-coder:3b</div>
+  <p class="muted">다른 모델을 받았다면 <code class="inline">ollama list</code>에 뜬 이름으로 바꿔 넣으세요.</p>
 
   <p>잠깐 로딩된 뒤 프롬프트가 뜹니다. 아무거나 물어보세요.</p>
   <div class="prompt"><span class="label">해볼 것</span><button class="copy">복사</button>자바스크립트에서 배열의 중복을 제거하는 가장 짧은 방법은?</div>
@@ -668,7 +701,7 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
     </tr>
     <tr>
       <td><strong>ollama list에 아무것도 없다</strong></td>
-      <td><code class="inline">manifests</code> 폴더를 복사했는지 확인 (설치 STEP 3)</td>
+      <td><code class="inline">manifests</code> 폴더를 복사했는지 확인 (설치 STEP 2). 직접 받았다면 <code class="inline">ollama pull</code>이 <code class="inline">success</code>로 끝났는지 확인</td>
     </tr>
     <tr>
       <td><strong>VS Code에 모델이 안 보인다</strong></td>
@@ -720,11 +753,18 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
     집 PC에도 똑같이 설치할 수 있습니다. 이게 서버로 실습하지 않은 이유입니다.
   </p>
   <ul>
-    <li>모델 받기 — 인터넷이 되는 곳에서 <code class="inline">ollama pull 모델명</code></li>
+    <li>모델 받기 — <code class="inline">ollama pull &lt;모델명&gt;</code></li>
     <li>모델 찾기 — <strong>ollama.com/search</strong> 에서 크기·용도별로 탐색</li>
     <li>내 PC가 더 좋은 그래픽카드라면 <strong>더 큰 모델</strong>에 도전 (VRAM의 60~70% 이내)</li>
     <li>공식 문서 — <strong>docs.ollama.com</strong></li>
   </ul>
+
+  <h4>집 PC 사양별로 받아볼 모델</h4>
+  <div class="code"><button class="copy">복사</button>ollama pull qwen2.5-coder:3b      # 1.9GB - 6GB VRAM (오늘 쓴 것)
+ollama pull qwen2.5-coder:7b      # 4.7GB - 8GB VRAM 이상
+ollama pull qwen2.5-coder:14b     # 9.0GB - 12GB VRAM 이상
+ollama pull gemma3:4b             # 3.3GB - 범용 대화용</div>
+  <p class="muted">기준: 모델 용량이 <strong>내 VRAM의 60~70% 이내</strong>여야 여유 있게 돕니다.</p>
 
   <h3>더 나아가고 싶다면</h3>
   <ul>
