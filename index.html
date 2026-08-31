@@ -145,6 +145,11 @@
     padding:12px 22px; font-size:16.5px; font-weight:700; cursor:pointer; font-family:inherit;
   }
   button.dl:hover{background:#1a5ed0}
+  .pc{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:20px 0}
+  .pc .box{margin:0}
+  .pc ul{padding-left:20px; margin:0}
+  .pc li{margin:5px 0; font-size:16px}
+  @media (max-width:720px){ .pc{grid-template-columns:1fr} }
   .muted{color:var(--muted)}
   footer{padding:40px 0; color:var(--muted); font-size:15px; text-align:center}
 
@@ -307,17 +312,88 @@
     이게 양자화(Quantization)이고, 이름 뒤의 <code class="inline">Q4</code>, <code class="inline">Q8</code>이 그 표시입니다.
   </p>
   <table>
-    <tr><th>표기</th><th>용량</th><th>품질</th></tr>
-    <tr><td>F16 (원본)</td><td>4B 모델 = 약 8GB</td><td>100%</td></tr>
-    <tr class="hi"><td><strong>Q4</strong></td><td>4B 모델 = <strong>약 2.5GB</strong></td><td>거의 그대로 ← 표준</td></tr>
-    <tr><td>Q8</td><td>4B 모델 = 약 4.5GB</td><td>사실상 원본</td></tr>
+    <tr><th>표기</th><th class="c">4B 모델 기준</th><th>품질</th></tr>
+    <tr><td>F16 (원본)</td><td class="c">약 8GB</td><td>100%</td></tr>
+    <tr><td>Q8</td><td class="c">약 4.5GB</td><td>사실상 원본</td></tr>
+    <tr class="hi"><td><strong>Q4</strong></td><td class="c"><strong>약 2.5GB</strong></td><td>거의 그대로 ← <strong>표준</strong></td></tr>
+    <tr><td>Q3 이하</td><td class="c">더 작음</td><td>눈에 띄게 나빠짐 ⚠️</td></tr>
   </table>
-  <div class="box tip">
-    <span class="t">기억할 규칙</span>
-    같은 용량이라면 <strong>"작은 모델을 고품질로" 보다 "큰 모델을 Q4로"</strong>가 거의 항상 낫습니다.
+
+  <div class="pc">
+    <div class="box ok">
+      <span class="t">✅ 좋은 점</span>
+      <ul>
+        <li><strong>안 돌아가던 모델이 돌아갑니다</strong> — 8GB짜리가 2.5GB가 되니까</li>
+        <li><strong>더 빨라집니다</strong> — 읽어야 할 데이터가 적어지니 글자가 빨리 나옵니다</li>
+        <li>같은 그래픽카드에 <strong>한 등급 큰 모델</strong>을 넣을 수 있습니다</li>
+      </ul>
+    </div>
+    <div class="box warn">
+      <span class="t">⚠️ 나쁜 점</span>
+      <ul>
+        <li><strong>품질이 조금 깎입니다</strong> — Q4까지는 대부분 티가 안 납니다</li>
+        <li><strong>고르게 깎이지 않습니다</strong> — 긴 코드, 복잡한 추론, 계산에서 먼저 티가 납니다</li>
+        <li><strong>Q3 아래로 가면 급격히 무너집니다</strong> — 용량은 조금 줄고 품질은 많이 잃습니다</li>
+      </ul>
+    </div>
   </div>
 
-  <h3>③ VRAM — 그래픽카드 메모리가 천장입니다</h3>
+  <div class="box tip">
+    <span class="t">외워둘 규칙 2가지</span>
+    <ol style="margin-bottom:0">
+      <li>같은 용량이라면 <strong>"작은 모델을 Q8로" 보다 "큰 모델을 Q4로"</strong>가 거의 항상 낫습니다</li>
+      <li><strong>Q4 아래로는 내려가지 마세요.</strong> 얻는 것보다 잃는 게 큽니다</li>
+    </ol>
+  </div>
+
+  <div class="box">
+    <span class="t">헷갈리기 쉬움 — 두 가지 양자화는 다릅니다</span>
+    설치할 때 넣은 <code class="inline">OLLAMA_KV_CACHE_TYPE = q8_0</code>은 <strong>모델을 압축하는 게 아닙니다.</strong>
+    <strong>대화 내용을 기억해두는 공간(KV 캐시)</strong>을 압축하는 설정이에요.
+    이걸 켜면 같은 VRAM으로 <strong>더 긴 대화</strong>가 가능해집니다. 모델 품질과는 무관합니다.
+  </div>
+
+  <h3>③ 멀티모달 — 글만 읽나, 그림도 보나</h3>
+  <p>
+    모델에 따라 <strong>이미지나 소리까지 이해</strong>하는 것들이 있습니다.
+    <code class="inline">gemma3:4b</code>는 그림을 보고, <code class="inline">qwen2.5-coder:3b</code>는 글만 읽습니다.
+  </p>
+
+  <div class="pc">
+    <div class="box ok">
+      <span class="t">✅ 멀티모달의 매력</span>
+      <ul>
+        <li><strong>디자인 시안 사진을 주고 "이렇게 만들어줘"</strong> — 바이브코딩과 직결됩니다</li>
+        <li>에러 화면을 <strong>스크린샷으로</strong> 보여주며 물어보기</li>
+        <li>표·차트·손글씨 메모를 읽어서 정리</li>
+      </ul>
+    </div>
+    <div class="box warn">
+      <span class="t">⚠️ 공짜가 아닙니다</span>
+      <ul>
+        <li><strong>같은 크기면 글 실력이 떨어집니다</strong> — 한정된 파라미터를 그림 이해에도 나눠 쓰니까요</li>
+        <li>이미지 처리 부품이 <strong>VRAM을 추가로</strong> 먹습니다</li>
+        <li>사진 한 장이 <strong>글자 수천 개 분량</strong>을 차지해서 대화가 금방 꽉 찹니다</li>
+      </ul>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>비교</th><th class="c">qwen2.5-coder:3b</th><th class="c">gemma3:4b</th></tr>
+    <tr><td>이미지 이해</td><td class="c">❌</td><td class="c">✅</td></tr>
+    <tr><td>코드 작성</td><td class="c"><strong>강함</strong></td><td class="c">보통</td></tr>
+    <tr><td>한국어 대화</td><td class="c">보통</td><td class="c"><strong>자연스러움</strong></td></tr>
+    <tr><td>용량</td><td class="c">1.9GB</td><td class="c">3.3GB</td></tr>
+  </table>
+
+  <div class="box tip">
+    <span class="t">그래서 오늘은 글만 읽는 모델을 씁니다</span>
+    우리 목적은 <strong>코드 만들기</strong>입니다. 6GB라는 한정된 공간에
+    <strong>그림 보는 능력에 자리를 내주는 것보다, 코딩에 전부 쓰는 게</strong> 낫습니다.
+    "기능이 많은 쪽이 좋다"가 아니라 <strong>"내 목적에 맞는 쪽이 좋다"</strong>는 게 모델 선택의 핵심입니다.
+  </div>
+
+  <h3>④ VRAM — 그래픽카드 메모리가 천장입니다</h3>
   <p>
     모델은 <strong>그래픽카드 메모리(VRAM)에 통째로 올라가야</strong> 빠릅니다.
     안 들어가면 일부가 일반 메모리로 밀려나면서 <strong>몇 배로 느려집니다.</strong>
