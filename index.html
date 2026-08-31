@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>로컬 LLM으로 바이브코딩 — 100분 실습</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1a1d21; --muted:#5b6572; --line:#e2e6ea;
+    --accent:#1f6feb; --accent-bg:#eef4ff;
+    --warn:#b45309; --warn-bg:#fff8ec;
+    --danger:#b91c1c; --danger-bg:#fef2f2;
+    --ok:#15803d; --ok-bg:#f0fdf4;
+    --code-bg:#1e2430; --code-fg:#e6edf3;
+    --radius:10px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth; scroll-padding-top:70px}
+  body{
+    margin:0; background:var(--bg); color:var(--fg);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic","맑은 고딕",
+                "Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    font-size:18px; line-height:1.75; word-break:keep-all;
+  }
+  .wrap{max-width:980px; margin:0 auto; padding:0 24px 120px}
+
+  /* ---- nav ---- */
+  nav{
+    position:sticky; top:0; z-index:50; background:rgba(255,255,255,.96);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
+  }
+  nav .inner{max-width:980px; margin:0 auto; padding:10px 24px; display:flex; gap:6px; flex-wrap:wrap}
+  nav a{
+    font-size:14px; text-decoration:none; color:var(--muted);
+    padding:5px 11px; border-radius:99px; white-space:nowrap;
+  }
+  nav a:hover{background:var(--accent-bg); color:var(--accent)}
+
+  /* ---- hero ---- */
+  header.hero{padding:64px 0 40px; border-bottom:3px solid var(--fg); margin-bottom:8px}
+  header.hero .eyebrow{color:var(--accent); font-weight:700; font-size:15px; letter-spacing:.08em}
+  header.hero h1{font-size:44px; line-height:1.25; margin:12px 0 16px; letter-spacing:-.02em}
+  header.hero p.lead{font-size:20px; color:var(--muted); margin:0}
+
+  section{padding:52px 0; border-bottom:1px solid var(--line)}
+  section > h2{
+    font-size:30px; margin:0 0 8px; letter-spacing:-.02em;
+    display:flex; align-items:baseline; gap:12px;
+  }
+  section > h2 .num{
+    font-size:15px; color:#fff; background:var(--fg); border-radius:99px;
+    padding:3px 11px; font-weight:700; letter-spacing:0;
+  }
+  section > p.sub{color:var(--muted); margin:0 0 28px; font-size:17px}
+  h3{font-size:21px; margin:34px 0 10px; letter-spacing:-.01em}
+  h4{font-size:17px; margin:22px 0 6px; color:var(--muted)}
+  p{margin:0 0 14px}
+  ul,ol{margin:0 0 16px; padding-left:22px}
+  li{margin:6px 0}
+  strong{font-weight:700}
+  a{color:var(--accent)}
+
+  /* ---- boxes ---- */
+  .box{border-radius:var(--radius); padding:16px 20px; margin:20px 0; border:1px solid var(--line)}
+  .box p:last-child, .box ul:last-child, .box ol:last-child{margin-bottom:0}
+  .box .t{font-weight:700; margin-bottom:6px; display:block}
+  .tip{background:var(--accent-bg); border-color:#c7dbff}
+  .tip .t{color:var(--accent)}
+  .warn{background:var(--warn-bg); border-color:#f5d9a8}
+  .warn .t{color:var(--warn)}
+  .danger{background:var(--danger-bg); border-color:#f6c9c9}
+  .danger .t{color:var(--danger)}
+  .ok{background:var(--ok-bg); border-color:#bbe8c8}
+  .ok .t{color:var(--ok)}
+
+  /* ---- code ---- */
+  .code{
+    position:relative; background:var(--code-bg); color:var(--code-fg);
+    border-radius:var(--radius); padding:16px 56px 16px 18px; margin:14px 0;
+    font-family:ui-monospace,SFMono-Regular,Consolas,"D2Coding",monospace;
+    font-size:15.5px; line-height:1.65; white-space:pre-wrap; overflow-wrap:anywhere;
+  }
+  code.inline{
+    background:#eef1f5; padding:2px 7px; border-radius:5px; font-size:.92em;
+    font-family:ui-monospace,SFMono-Regular,Consolas,"D2Coding",monospace;
+  }
+  .copy{
+    position:absolute; top:10px; right:10px; border:1px solid #3a4557; background:#2b3444;
+    color:#cbd5e1; border-radius:6px; padding:4px 10px; font-size:12.5px; cursor:pointer;
+    font-family:inherit;
+  }
+  .copy:hover{background:#3a4557; color:#fff}
+  .copy.done{background:var(--ok); border-color:var(--ok); color:#fff}
+
+  /* ---- prompt card ---- */
+  .prompt{
+    background:#fbfcfe; border:2px solid var(--accent); border-radius:var(--radius);
+    padding:18px 56px 18px 20px; margin:16px 0; position:relative;
+    font-size:16.5px; line-height:1.7; white-space:pre-wrap;
+  }
+  .prompt .copy{background:var(--accent); border-color:var(--accent); color:#fff; top:12px}
+  .prompt .copy:hover{background:#1a5ed0}
+  .prompt .label{
+    position:absolute; top:-11px; left:16px; background:var(--accent); color:#fff;
+    font-size:12px; font-weight:700; padding:2px 10px; border-radius:99px; letter-spacing:.04em;
+  }
+
+  /* ---- table ---- */
+  table{width:100%; border-collapse:collapse; margin:18px 0; font-size:16.5px}
+  th,td{border:1px solid var(--line); padding:10px 13px; text-align:left; vertical-align:top}
+  th{background:#f6f8fa; font-weight:700; font-size:15.5px}
+  td.c,th.c{text-align:center}
+  tr.hi td{background:var(--ok-bg); font-weight:600}
+
+  /* ---- timeline ---- */
+  .tl{display:grid; grid-template-columns:auto 1fr; gap:0 18px; margin:20px 0}
+  .tl .t{font-weight:700; color:var(--accent); padding:9px 0; white-space:nowrap; font-variant-numeric:tabular-nums}
+  .tl .d{padding:9px 0; border-bottom:1px solid var(--line)}
+  .tl .t{border-bottom:1px solid var(--line)}
+
+  /* ---- steps ---- */
+  .step{border-left:3px solid var(--accent); padding:2px 0 2px 22px; margin:26px 0}
+  .step .n{
+    display:inline-block; background:var(--accent); color:#fff; font-size:13px; font-weight:700;
+    border-radius:99px; padding:2px 11px; margin-bottom:6px;
+  }
+  .step h3{margin:6px 0 8px}
+
+  /* ---- menu grid ---- */
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(215px,1fr)); gap:12px; margin:20px 0}
+  .card{border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; background:#fbfcfe}
+  .card b{display:block; font-size:17px; margin-bottom:4px}
+  .card span{font-size:14.5px; color:var(--muted); line-height:1.6}
+
+  kbd{
+    background:#f6f8fa; border:1px solid #ccd3da; border-bottom-width:2px; border-radius:5px;
+    padding:1px 7px; font-size:14px; font-family:inherit; font-weight:600;
+  }
+
+  details{border:1px solid var(--line); border-radius:var(--radius); padding:12px 16px; margin:20px 0; background:#fbfcfe}
+  details summary{cursor:pointer; font-weight:700; color:var(--accent); font-size:16px}
+  details[open] summary{margin-bottom:8px}
+  button.dl{
+    background:var(--accent); color:#fff; border:none; border-radius:8px;
+    padding:12px 22px; font-size:16.5px; font-weight:700; cursor:pointer; font-family:inherit;
+  }
+  button.dl:hover{background:#1a5ed0}
+  .muted{color:var(--muted)}
+  footer{padding:40px 0; color:var(--muted); font-size:15px; text-align:center}
+
+  @media (max-width:640px){
+    body{font-size:16.5px}
+    header.hero h1{font-size:31px}
+    section>h2{font-size:24px}
+    .wrap{padding:0 16px 80px}
+    nav .inner{padding:8px 16px}
+  }
+  @media print{
+    nav{display:none} .copy{display:none}
+    section{break-inside:avoid; padding:24px 0}
+    body{font-size:12pt}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="inner">
+  <a href="#goal">오늘의 목표</a>
+  <a href="#llm">LLM이란</a>
+  <a href="#why">왜 로컬인가</a>
+  <a href="#kinds">모델의 종류</a>
+  <a href="#ollama">Ollama</a>
+  <a href="#check">⓪ 점검</a>
+  <a href="#install">① 설치</a>
+  <a href="#cli">② 첫 대화</a>
+  <a href="#vscode">③ VS Code</a>
+  <a href="#vibe">④ 바이브코딩</a>
+  <a href="#menu">확장 과제</a>
+  <a href="#trouble">문제 해결</a>
+  <a href="#next">집에서</a>
+</div></nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">100분 실습 · 내 컴퓨터에서 돌리는 AI</div>
+  <h1>로컬 LLM으로<br>바이브코딩 시작하기</h1>
+  <p class="lead">인터넷도, 결제도, 구독도 없이 — 내 PC의 그래픽카드로 AI를 돌려서 코드를 만들어 봅니다.</p>
+</header>
+
+<!-- ===================== 목표 ===================== -->
+<section id="goal">
+  <h2><span class="num">시작</span>오늘의 목표</h2>
+  <p class="sub">끝나고 나면 이 세 가지를 할 수 있게 됩니다.</p>
+
+  <ol>
+    <li><strong>내 PC에 LLM을 설치</strong>하고 실행할 수 있다</li>
+    <li><strong>VS Code에서 그 LLM과 대화</strong>하며 코드를 만들 수 있다</li>
+    <li><strong>로컬 AI가 무엇을 잘하고 무엇을 못 하는지</strong> 직접 겪어서 안다</li>
+  </ol>
+
+  <h3>오늘의 타임라인</h3>
+  <div class="tl">
+    <div class="t">0–15분</div><div class="d">Ollama 설치 + 모델 복사</div>
+    <div class="t">15–25분</div><div class="d">터미널에서 첫 대화</div>
+    <div class="t">25–40분</div><div class="d">VS Code 연결</div>
+    <div class="t">40–70분</div><div class="d"><strong>바이브코딩</strong> — 따라하기 → 내 것 만들기</div>
+    <div class="t">70–90분</div><div class="d">발표</div>
+    <div class="t">90–100분</div><div class="d">정리 — 로컬 AI의 쓸모와 한계</div>
+  </div>
+
+  <div class="box tip">
+    <span class="t">이 페이지 사용법</span>
+    위쪽 메뉴로 언제든 이동할 수 있습니다. 회색 상자의 <strong>복사</strong> 버튼을 누르면
+    명령어나 프롬프트가 클립보드에 들어갑니다. 진도를 놓쳐도 혼자 따라올 수 있어요.
+  </div>
+</section>
+
+<!-- ===================== LLM이란 ===================== -->
+<section id="llm">
+  <h2><span class="num">1</span>LLM이 뭔가요?</h2>
+  <p class="sub">Large Language Model — 커다란 언어 모델.</p>
+
+  <h3>하는 일은 딱 하나입니다: 다음 단어 맞히기</h3>
+  <p>
+    <em>"오늘 아침에 밥을 ___"</em> 다음에 올 말을 맞히는 것.
+    이 단순한 작업을 <strong>인터넷 전체 분량의 글</strong>로 어마어마하게 훈련시켰더니,
+    번역도 하고 요약도 하고 코드도 짜는 물건이 나왔습니다.
+  </p>
+  <p>
+    그래서 LLM은 <strong>"알고 있는 것"이 아니라 "그럴듯한 것"을 내놓습니다.</strong>
+    이게 오늘 실습 내내 체감하게 될 핵심 성질입니다. 자신 있게 틀린 답을 말하는 이유이기도 하고요.
+  </p>
+
+  <h3>파라미터 — 모델의 "크기"</h3>
+  <p>
+    모델 이름에 붙는 <strong>4B, 7B, 70B</strong>의 B는 Billion(10억), 즉 <strong>파라미터 개수</strong>입니다.
+    뇌세포 개수 같은 거라고 생각하면 얼추 맞습니다.
+  </p>
+
+  <table>
+    <tr><th>크기</th><th>비유</th><th>어디서 도나</th></tr>
+    <tr><td><strong>1B~4B</strong></td><td>간단한 일은 척척, 복잡한 건 헤맴</td><td>노트북, 게이밍 PC ← <strong>오늘 우리</strong></td></tr>
+    <tr><td><strong>7B~14B</strong></td><td>웬만한 건 해냄</td><td>좋은 그래픽카드 (12~24GB)</td></tr>
+    <tr><td><strong>30B~70B</strong></td><td>꽤 똑똑함</td><td>전문가용 장비</td></tr>
+    <tr><td><strong>200B+</strong></td><td>ChatGPT, Claude 급</td><td>데이터센터 — 개인은 불가능</td></tr>
+  </table>
+
+  <div class="box warn">
+    <span class="t">미리 알아두기</span>
+    오늘 쓸 모델은 <strong>가장 작은 축</strong>입니다. ChatGPT를 기대하면 실망합니다.
+    대신 <strong>내 컴퓨터에서, 공짜로, 인터넷 없이</strong> 돕니다. 그 대가를 오늘 직접 확인해 봅시다.
+  </div>
+</section>
+
+<!-- ===================== 왜 로컬인가 ===================== -->
+<section id="why">
+  <h2><span class="num">2</span>왜 굳이 내 PC에서?</h2>
+  <p class="sub">ChatGPT 놔두고 왜 이 고생을 하는가.</p>
+
+  <table>
+    <tr><th></th><th>클라우드 (ChatGPT, Claude)</th><th>로컬 (오늘 우리)</th></tr>
+    <tr><td><strong>성능</strong></td><td>압도적</td><td>제한적</td></tr>
+    <tr><td><strong>비용</strong></td><td>쓸수록 과금</td><td class="hi">전기값만</td></tr>
+    <tr><td><strong>인터넷</strong></td><td>반드시 필요</td><td class="hi">없어도 됨</td></tr>
+    <tr><td><strong>내 데이터</strong></td><td>서버로 전송됨</td><td class="hi">PC 밖으로 안 나감</td></tr>
+    <tr><td><strong>사용 제한</strong></td><td>횟수·속도 제한</td><td class="hi">없음</td></tr>
+    <tr><td><strong>서비스 종료</strong></td><td>회사 사정에 좌우</td><td class="hi">내 파일이라 영향 없음</td></tr>
+  </table>
+
+  <h3>현실에서 로컬이 답인 경우</h3>
+  <ul>
+    <li><strong>회사 소스코드</strong> — 외부 AI에 붙여넣는 순간 유출입니다. 실제로 금지된 회사가 많습니다</li>
+    <li><strong>병원 기록, 개인정보, 미공개 연구</strong> — 법적으로 못 내보내는 데이터</li>
+    <li><strong>인터넷이 없는 환경</strong> — 폐쇄망, 공장, 군, 비행기</li>
+    <li><strong>대량 반복 처리</strong> — 10만 건 분류를 API로 돌리면 요금이 폭발합니다</li>
+  </ul>
+
+  <div class="box tip">
+    <span class="t">오늘의 진짜 학습 목표</span>
+    "로컬이 좋다"가 아니라 <strong>"어떤 일에 로컬을 쓰고 어떤 일에 클라우드를 쓸지 판단할 줄 아는 것"</strong>입니다.
+    양쪽을 다 써본 사람만 판단할 수 있습니다.
+  </div>
+</section>
+
+<!-- ===================== 종류 ===================== -->
+<section id="kinds">
+  <h2><span class="num">3</span>모델에도 종류가 있습니다</h2>
+  <p class="sub">모델을 고를 때 봐야 하는 세 가지 축.</p>
+
+  <h3>① 용도 — 범용이냐 코딩 특화냐</h3>
+  <table>
+    <tr><th>종류</th><th>용도</th></tr>
+    <tr><td><strong>범용 (Instruct/Chat)</strong></td><td>일상 대화, 글쓰기, 요약</td></tr>
+    <tr class="hi"><td><strong>코더 (Coder)</strong></td><td>코드 생성·설명·수정 ← <strong>오늘 이걸 씁니다</strong></td></tr>
+    <tr><td><strong>임베딩 (Embedding)</strong></td><td>문서 검색용. 대화는 못 함</td></tr>
+    <tr><td><strong>비전 (Vision)</strong></td><td>이미지를 보고 설명</td></tr>
+  </table>
+  <p>
+    <strong>같은 4B라도 코더 모델이 코딩을 훨씬 잘합니다.</strong>
+    크기만 보고 고르면 안 되는 이유입니다.
+  </p>
+
+  <h3>② 양자화 — 모델을 압축하는 기술</h3>
+  <p>
+    원본 모델은 숫자 하나를 16비트로 저장합니다. 이걸 <strong>4비트로 줄이면 용량이 1/4</strong>이 되죠.
+    이게 양자화(Quantization)이고, 이름 뒤의 <code class="inline">Q4</code>, <code class="inline">Q8</code>이 그 표시입니다.
+  </p>
+  <table>
+    <tr><th>표기</th><th>용량</th><th>품질</th></tr>
+    <tr><td>F16 (원본)</td><td>4B 모델 = 약 8GB</td><td>100%</td></tr>
+    <tr class="hi"><td><strong>Q4</strong></td><td>4B 모델 = <strong>약 2.5GB</strong></td><td>거의 그대로 ← 표준</td></tr>
+    <tr><td>Q8</td><td>4B 모델 = 약 4.5GB</td><td>사실상 원본</td></tr>
+  </table>
+  <div class="box tip">
+    <span class="t">기억할 규칙</span>
+    같은 용량이라면 <strong>"작은 모델을 고품질로" 보다 "큰 모델을 Q4로"</strong>가 거의 항상 낫습니다.
+  </div>
+
+  <h3>③ VRAM — 그래픽카드 메모리가 천장입니다</h3>
+  <p>
+    모델은 <strong>그래픽카드 메모리(VRAM)에 통째로 올라가야</strong> 빠릅니다.
+    안 들어가면 일부가 일반 메모리로 밀려나면서 <strong>몇 배로 느려집니다.</strong>
+  </p>
+  <table>
+    <tr><th>내 그래픽카드</th><th>돌릴 수 있는 모델</th></tr>
+    <tr class="hi"><td><strong>RTX 2060 (6GB)</strong> ← 실습실 PC</td><td><strong>4B Q4</strong> (약 2.5GB) 안정 / 7B는 아슬아슬</td></tr>
+    <tr><td>RTX 3080 (12GB)</td><td>8B~14B</td></tr>
+    <tr><td>RTX 3090 / A5000 (24GB)</td><td>14B~32B</td></tr>
+  </table>
+  <p class="muted">
+    참고로 우리 실습실 2060의 메모리 속도는 초당 336GB입니다.
+    이 숫자가 <strong>글자가 찍혀 나오는 속도</strong>를 결정합니다.
+  </p>
+
+  <h3>오늘 쓸 모델과 후보들</h3>
+  <table>
+    <tr><th>모델</th><th class="c">용량</th><th>성격</th></tr>
+    <tr class="hi"><td><strong>qwen2.5-coder:3b</strong></td><td class="c"><strong>1.9GB</strong></td><td><strong>코딩 전용.</strong> 작지만 코드는 잘 씀 ← 오늘 이것</td></tr>
+    <tr><td>qwen2.5-coder:7b</td><td class="c">4.7GB</td><td>더 잘하지만 6GB엔 아슬아슬</td></tr>
+    <tr><td>gemma3:4b</td><td class="c">3.3GB</td><td>범용. 대화·한국어가 더 자연스러움</td></tr>
+    <tr><td>qwen2.5-coder:1.5b</td><td class="c">1.0GB</td><td>저사양 PC용 예비</td></tr>
+  </table>
+
+  <div class="box danger">
+    <span class="t">🔴 이름에 속지 마세요 — 대표적인 함정</span>
+    <code class="inline">gemma4:e2b</code>는 이름이 "2B"라서 작아 보이지만 <strong>실제 용량은 7.2GB</strong>입니다.
+    "E"는 <em>effective(유효)</em> 파라미터라는 뜻이라, 실제로 저장되는 크기는 훨씬 큽니다.
+    <strong>모델을 고를 때는 이름이 아니라 GB 용량을 보세요.</strong>
+  </div>
+
+  <div class="box tip">
+    <span class="t">같은 크기면 "전용 모델"이 이깁니다</span>
+    <code class="inline">qwen2.5-coder:3b</code>는 3B밖에 안 되지만 <strong>코딩만 훈련받아서</strong>
+    비슷한 크기의 범용 모델보다 코드를 훨씬 잘 씁니다. 크기가 전부가 아닙니다.
+  </div>
+</section>
+
+<!-- ===================== Ollama ===================== -->
+<section id="ollama">
+  <h2><span class="num">4</span>Ollama가 하는 일</h2>
+  <p class="sub">모델을 내 PC에서 굴리기 쉽게 만들어주는 프로그램.</p>
+
+  <p>원래 로컬 LLM은 설정이 지옥이었습니다. Ollama는 이걸 <strong>명령어 한 줄</strong>로 만들었습니다.</p>
+  <ul>
+    <li><strong>모델 관리</strong> — 내려받고, 목록 보고, 지우고</li>
+    <li><strong>실행</strong> — 그래픽카드 설정을 알아서 해줌</li>
+    <li><strong>API 서버</strong> — 실행하면 <code class="inline">localhost:11434</code>에 서버가 자동으로 뜹니다</li>
+  </ul>
+  <p>
+    세 번째가 핵심입니다. 이 포트 덕분에 <strong>VS Code가 내 PC 안의 AI에 접속</strong>할 수 있습니다.
+    오늘 우리가 할 일이 정확히 이겁니다.
+  </p>
+
+  <div class="code">[ VS Code ]  ──▶  localhost:11434  ──▶  [ Ollama ]  ──▶  [ RTX 2060 ]
+   내가 쓰는 곳          내 PC 안                프로그램          실제 연산</div>
+</section>
+
+<!-- ===================== 실습 0: 점검 ===================== -->
+<section id="check">
+  <h2><span class="num">실습 ⓪</span>내 PC 점검 <span class="muted" style="font-size:17px;font-weight:400">· 3분</span></h2>
+  <p class="sub">설치 전에 이 PC가 준비됐는지 한 번에 확인합니다.</p>
+
+  <p>아래 두 파일을 <strong>같은 폴더에</strong> 내려받고 <code class="inline">run-check.bat</code>을 더블클릭하세요.</p>
+
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin:20px 0">
+    <button class="dl" data-src="bat-src" data-name="run-check.bat" data-crlf="1">⬇ run-check.bat</button>
+    <button class="dl" data-src="ps1-src" data-name="check-env.ps1" data-bom="1">⬇ check-env.ps1</button>
+  </div>
+
+  <h3>무엇을 확인하나</h3>
+  <table>
+    <tr><th style="width:34%">항목</th><th>통과 기준</th></tr>
+    <tr><td><strong>Windows 버전</strong></td><td>10 22H2 이상</td></tr>
+    <tr><td><strong>그래픽카드 · VRAM</strong></td><td>RTX 2060 / 6GB 확인</td></tr>
+    <tr><td><strong>NVIDIA 드라이버</strong></td><td><strong>551.61 이상</strong> — 미만이면 그래픽카드를 못 씁니다</td></tr>
+    <tr><td><strong>디스크 여유</strong></td><td>10GB 이상</td></tr>
+    <tr><td><strong>VS Code</strong></td><td>1.127 이상</td></tr>
+    <tr><td><strong>Ollama</strong></td><td>설치 여부 · 서버 응답 · 보유 모델</td></tr>
+  </table>
+
+  <p>마지막에 <strong>권장 모델 등급</strong>까지 알려주고, 결과를 같은 폴더에
+     <code class="inline">check-PC이름-날짜.txt</code>로 저장합니다.</p>
+
+  <div class="box ok">
+    <span class="t">초록색 [OK]만 있으면 통과</span>
+    빨간 <strong>[경고]</strong>가 뜨면 그 줄을 조교에게 보여주세요.
+    특히 <strong>드라이버 551.61 미만</strong>은 수업 전에 반드시 해결해야 합니다.
+  </div>
+
+  <div class="box warn">
+    <span class="t">실행이 막힐 때</span>
+    <code class="inline">run-check.bat</code>은 스크립트 실행 정책을 우회하도록 만들어져 있습니다.
+    그래도 막히면 창이 순식간에 닫히는 경우인데, 이때는
+    <strong>PowerShell을 직접 열고</strong> 아래를 붙여넣으세요.
+    <div class="code" style="margin-top:10px"><button class="copy">복사</button>powershell -NoProfile -ExecutionPolicy Bypass -File .\check-env.ps1</div>
+  </div>
+
+  <details>
+    <summary>전체 소스 보기 (check-env.ps1)</summary>
+    <div class="code" style="max-height:420px; overflow:auto"><button class="copy">복사</button><span id="ps1-view"></span></div>
+  </details>
+</section>
+
+<!-- ===================== 실습 1: 설치 ===================== -->
+<section id="install">
+  <h2><span class="num">실습 ①</span>설치하기 <span class="muted" style="font-size:17px;font-weight:400">· 15분</span></h2>
+  <p class="sub">파일은 이미 나눠드렸습니다. 인터넷에서 받지 마세요 — 18명이 동시에 받으면 수업이 끝납니다.</p>
+
+  <div class="step">
+    <span class="n">STEP 1</span>
+    <h3>Ollama 설치</h3>
+    <p>배포된 <code class="inline">OllamaSetup.exe</code>를 실행하고 기본값으로 진행하세요.</p>
+    <div class="box ok"><span class="t">관리자 권한 필요 없습니다</span>
+      내 계정 안에 설치되므로 실습실 PC의 권한 제한과 무관합니다.</div>
+    <p>설치가 끝나면 작업표시줄 오른쪽에 <strong>Ollama 아이콘</strong>이 생깁니다.</p>
+  </div>
+
+  <div class="step">
+    <span class="n">STEP 2</span>
+    <h3>Ollama 종료</h3>
+    <p>작업표시줄 아이콘을 <strong>우클릭 → Quit</strong>. 모델 파일을 넣는 동안은 꺼져 있어야 합니다.</p>
+  </div>
+
+  <div class="step">
+    <span class="n">STEP 3</span>
+    <h3>모델 파일 복사 — 가장 중요한 단계</h3>
+    <p>배포된 <code class="inline">blobs</code>와 <code class="inline">manifests</code> 두 폴더를 아래 경로에 통째로 붙여넣습니다.</p>
+    <div class="code"><button class="copy">복사</button>%USERPROFILE%\.ollama\models</div>
+    <p class="muted">탐색기 주소창에 그대로 붙여넣으면 해당 폴더로 이동합니다. 폴더가 없으면 만드세요.</p>
+    <div class="box danger">
+      <span class="t">🔴 가장 많이 하는 실수</span>
+      <strong><code class="inline">manifests</code> 폴더를 빠뜨리는 것.</strong>
+      <code class="inline">blobs</code>만 복사하면 파일은 다 있는데 모델 목록에 아무것도 안 뜹니다.
+      원인을 찾기 어려우니 <strong>두 폴더 다 복사했는지 지금 확인하세요.</strong>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="n">STEP 4</span>
+    <h3>환경변수 2개 설정</h3>
+    <p>메모리를 아껴서 더 긴 대화를 가능하게 하는 설정입니다.</p>
+    <p><kbd>Win</kbd> 키 → <strong>"환경 변수"</strong> 검색 → <strong>계정의 환경 변수 편집</strong> → 새로 만들기로 두 개 추가:</p>
+    <div class="code"><button class="copy">복사</button>OLLAMA_FLASH_ATTENTION = 1
+OLLAMA_KV_CACHE_TYPE   = q8_0</div>
+    <p><strong>추가한 뒤 Ollama를 다시 실행하세요.</strong> (시작 메뉴에서 Ollama 실행)</p>
+  </div>
+
+  <div class="step">
+    <span class="n">STEP 5</span>
+    <h3>확인</h3>
+    <p><kbd>Win</kbd>+<kbd>R</kbd> → <code class="inline">cmd</code> → 엔터. 검은 창에 입력:</p>
+    <div class="code"><button class="copy">복사</button>ollama list</div>
+    <p>모델 이름이 한 줄 뜨면 <strong>성공입니다.</strong> 아무것도 안 뜨면 STEP 3의 <code class="inline">manifests</code>를 확인하세요.</p>
+    <p>그래픽카드를 제대로 쓰는지도 확인해 둡시다:</p>
+    <div class="code"><button class="copy">복사</button>nvidia-smi</div>
+    <p class="muted">카드 이름과 메모리(6GB 내외), 드라이버 버전이 나옵니다. 드라이버가 <strong>551.61 미만</strong>이면 그래픽카드를 못 쓰고 매우 느려집니다 — 조교에게 알려주세요.</p>
+  </div>
+</section>
+
+<!-- ===================== 실습 2: CLI ===================== -->
+<section id="cli">
+  <h2><span class="num">실습 ②</span>첫 대화 <span class="muted" style="font-size:17px;font-weight:400">· 10분</span></h2>
+  <p class="sub">VS Code로 가기 전에, 검은 창에서 직접 말을 걸어봅니다.</p>
+
+  <p>아래 <code class="inline">모델명</code> 자리에 <code class="inline">ollama list</code>에서 본 이름을 넣으세요.</p>
+  <div class="code"><button class="copy">복사</button>ollama run 모델명</div>
+
+  <p>잠깐 로딩된 뒤 프롬프트가 뜹니다. 아무거나 물어보세요.</p>
+  <div class="prompt"><span class="label">해볼 것</span><button class="copy">복사</button>자바스크립트에서 배열의 중복을 제거하는 가장 짧은 방법은?</div>
+
+  <h3>관찰해 볼 것 세 가지</h3>
+  <ol>
+    <li><strong>속도</strong> — 글자가 실시간으로 찍혀 나옵니다. 이게 내 2060이 계산하고 있는 속도입니다</li>
+    <li><strong>인터넷을 꺼도 됩니다</strong> — 랜선을 뽑고 다시 물어보세요. 똑같이 답합니다</li>
+    <li><strong>한국어 vs 영어</strong> — 같은 질문을 영어로도 던져보세요. <strong>영어 답변 품질이 대체로 더 좋습니다.</strong> 작은 모델일수록 차이가 큽니다</li>
+  </ol>
+
+  <p>나가려면:</p>
+  <div class="code"><button class="copy">복사</button>/bye</div>
+
+  <div class="box tip">
+    <span class="t">지금 무슨 일이 일어났나</span>
+    방금 <strong>내 PC의 그래픽카드가 AI를 돌렸습니다.</strong>
+    서버도, 계정도, 결제도, 인터넷도 없이요. 이게 오늘 수업의 전부이자 핵심입니다.
+  </div>
+</section>
+
+<!-- ===================== 실습 3: VS Code ===================== -->
+<section id="vscode">
+  <h2><span class="num">실습 ③</span>VS Code에 연결 <span class="muted" style="font-size:17px;font-weight:400">· 15분</span></h2>
+  <p class="sub">이제 개발 도구 안에서 AI를 씁니다.</p>
+
+  <div class="step">
+    <span class="n">STEP 1</span>
+    <h3>Ollama 확장 설치</h3>
+    <p>VS Code 왼쪽의 <strong>확장(Extensions)</strong> 아이콘 → <strong>Ollama</strong> 검색 →
+       게시자가 <strong>Ollama</strong>인 공식 확장을 설치.</p>
+    <div class="box warn">
+      <span class="t">검색하면 나오는 옛날 글에 주의</span>
+      "Manage Models에서 Ollama 선택"이라고 안내하는 자료가 많은데, <strong>그 방식은 더 이상 지원되지 않습니다.</strong>
+      반드시 <strong>공식 Ollama 확장</strong>을 설치하세요. VS Code는 <strong>1.127 이상</strong>이어야 합니다.
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="n">STEP 2</span>
+    <h3>채팅 열고 모델 선택</h3>
+    <p>채팅 창을 열고, 입력칸 아래쪽 <strong>모델 선택기</strong>를 클릭 →
+       <strong>Ollama</strong> 항목에서 우리 모델을 고릅니다.</p>
+    <div class="box ok">
+      <span class="t">GitHub 로그인도, Copilot 구독도 필요 없습니다</span>
+      로컬 모델은 계정 없이, 인터넷 없이 동작합니다. 결제 정보도 필요 없습니다.
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="n">STEP 3</span>
+    <h3>연결 확인</h3>
+    <p>채팅에 아무거나 쳐보세요. 답이 오면 연결 성공입니다.</p>
+    <p class="muted">모델이 안 보이면 → 작업표시줄에 Ollama가 켜져 있는지, <code class="inline">ollama list</code>에 모델이 뜨는지 확인.</p>
+  </div>
+</section>
+
+<!-- ===================== 실습 4: 바이브코딩 ===================== -->
+<section id="vibe">
+  <h2><span class="num">실습 ④</span>바이브코딩 맛보기 <span class="muted" style="font-size:17px;font-weight:400">· 30분</span></h2>
+  <p class="sub">코드를 직접 쓰지 않고, <strong>말로 시켜서</strong> 프로그램을 만듭니다.</p>
+
+  <h3>바이브코딩의 루프</h3>
+  <div class="code">① 말로 요청  →  ② 코드 받기  →  ③ 붙여넣고 실행  →  ④ 보고 다시 요청
+                                                              ↑______________|</div>
+  <p>
+    핵심은 <strong>한 번에 완벽한 걸 기대하지 않는 것</strong>입니다.
+    빨리 만들고, 보고, 고치라고 시킵니다. 이 반복이 바이브코딩입니다.
+  </p>
+
+  <h3>왜 "HTML 파일 하나"인가</h3>
+  <ul>
+    <li>설치할 게 없습니다 — 더블클릭하면 브라우저에서 바로 실행</li>
+    <li>결과가 <strong>눈에 보입니다</strong> — 됐는지 안 됐는지 즉시 판단</li>
+    <li>파일이 하나라 작은 모델도 감당할 수 있는 크기</li>
+  </ul>
+
+  <!-- 따라하기 -->
+  <h3 style="margin-top:40px">▶ 따라하기 — 강사와 함께</h3>
+
+  <div class="prompt"><span class="label">프롬프트 1 · 만들기</span><button class="copy">복사</button>가위바위보 게임을 만들어줘.
+
+조건:
+- HTML, CSS, JavaScript를 파일 하나에 모두 넣어줘
+- 외부 라이브러리나 CDN은 절대 사용하지 마
+- 버튼 3개(가위/바위/보)를 누르면 컴퓨터가 랜덤으로 내고 승패를 표시
+- 전체 코드를 한 번에, 생략 없이 보여줘</div>
+
+  <div class="box danger">
+    <span class="t">🔴 "CDN 사용 금지"를 반드시 넣으세요</span>
+    AI는 습관적으로 React나 Tailwind 같은 <strong>외부 라이브러리 주소를 코드에 넣습니다.</strong>
+    그러면 인터넷이 없거나 느릴 때 <strong>화면이 하얗게 비어서 뜨고</strong>, 원인을 찾기 매우 어렵습니다.
+    <strong>오늘 가장 많이 터질 사고입니다.</strong>
+  </div>
+
+  <h4>받은 코드 실행하기</h4>
+  <ol>
+    <li>VS Code에서 <kbd>Ctrl</kbd>+<kbd>N</kbd> → 새 파일</li>
+    <li>코드 블록 오른쪽 위 <strong>복사</strong> 버튼 → 붙여넣기</li>
+    <li><kbd>Ctrl</kbd>+<kbd>S</kbd> → 바탕화면에 <code class="inline">game.html</code>로 저장</li>
+    <li>바탕화면에서 <strong>더블클릭</strong> → 브라우저에서 실행</li>
+  </ol>
+
+  <div class="prompt"><span class="label">프롬프트 2 · 고치기</span><button class="copy">복사</button>좋아. 이제 점수판을 추가해줘.
+이긴 횟수와 진 횟수를 화면에 표시하고, 초기화 버튼도 넣어줘.
+수정된 전체 코드를 다시 보여줘.</div>
+
+  <div class="prompt"><span class="label">프롬프트 3 · 꾸미기</span><button class="copy">복사</button>디자인을 개선해줘.
+버튼을 크고 둥글게, 배경에 부드러운 그라데이션,
+결과가 나올 때 살짝 나타나는 애니메이션을 넣어줘.
+전체 코드를 다시 보여줘.</div>
+
+  <div class="box tip">
+    <span class="t">"전체 코드를 다시 보여줘"를 매번 넣으세요</span>
+    안 넣으면 AI가 <em>"이 부분만 이렇게 바꾸세요"</em> 하고 조각만 줍니다.
+    작은 모델을 쓸 땐 <strong>파일 전체를 통째로 받아 덮어쓰는 게</strong> 훨씬 빠르고 안 헷갈립니다.
+  </div>
+
+  <h3 style="margin-top:40px">▶ 이제 내 것을 만들 차례</h3>
+  <p>아래 메뉴에서 하나 고르고, <strong>최소 3번 이상 고쳐보세요.</strong>
+     그리고 <strong>쓴 프롬프트를 전부 기록하세요</strong> — 발표 자료가 됩니다.</p>
+</section>
+
+<!-- ===================== 메뉴판 ===================== -->
+<section id="menu">
+  <h2><span class="num">5</span>확장 과제 메뉴판</h2>
+  <p class="sub">하나만 고르세요. 고민하는 시간이 아깝습니다.</p>
+
+  <div class="grid">
+    <div class="card"><b>🧮 계산기</b><span>사칙연산. 여유되면 키보드 입력까지</span></div>
+    <div class="card"><b>🍅 뽀모도로 타이머</b><span>25분 집중 / 5분 휴식, 알림음</span></div>
+    <div class="card"><b>⌨️ 타자 연습</b><span>단어가 뜨고 정확도·속도 측정</span></div>
+    <div class="card"><b>🎨 색상 팔레트</b><span>랜덤 조합 생성, 클릭하면 색상코드 복사</span></div>
+    <div class="card"><b>🎲 랜덤 조 편성</b><span>이름 입력하면 조를 나눠줌</span></div>
+    <div class="card"><b>🐍 스네이크 게임</b><span>방향키 조작. 난이도 상급</span></div>
+    <div class="card"><b>💭 밸런스 게임</b><span>질문에 답하면 결과 유형 판정</span></div>
+    <div class="card"><b>✅ 할 일 목록</b><span>추가·삭제·완료. 새로고침해도 유지</span></div>
+  </div>
+
+  <div class="box tip">
+    <span class="t">프롬프트 만드는 공식</span>
+    <div class="code" style="margin-top:8px"><button class="copy">복사</button>[만들 것]을 만들어줘.
+
+조건:
+- HTML, CSS, JavaScript를 파일 하나에 모두 넣어줘
+- 외부 라이브러리나 CDN은 절대 사용하지 마
+- [기능 1]
+- [기능 2]
+- 전체 코드를 한 번에, 생략 없이 보여줘</div>
+  </div>
+
+  <h3>발표 때 말할 것 (팀당 2~3분)</h3>
+  <ol>
+    <li><strong>시연</strong> — 브라우저에서 동작을 보여주기</li>
+    <li><strong>프롬프트 공개</strong> — 뭐라고 시켰는지</li>
+    <li><strong>몇 번 만에 됐나</strong></li>
+    <li><strong>끝까지 안 된 것 한 가지</strong> ← 가장 중요합니다</li>
+  </ol>
+  <div class="box ok">
+    <span class="t">실패는 감점이 아닙니다</span>
+    작은 모델은 <strong>반드시 어딘가에서 헛소리를 합니다.</strong>
+    그 지점을 정확히 찾아낸 사람이 오늘 가장 많이 배운 사람입니다.
+    "어디까지 되고 어디부터 안 되는가" — 이게 오늘의 진짜 결론입니다.
+  </div>
+</section>
+
+<!-- ===================== 트러블슈팅 ===================== -->
+<section id="trouble">
+  <h2><span class="num">6</span>이럴 땐 이렇게</h2>
+  <p class="sub">오늘 실제로 터질 문제들.</p>
+
+  <table>
+    <tr><th style="width:38%">증상</th><th>해결</th></tr>
+    <tr>
+      <td><strong>브라우저 화면이 하얗게 빈다</strong></td>
+      <td>CDN 링크가 들어간 경우입니다. <strong>"외부 라이브러리 없이 다시 만들어줘"</strong>라고 요청하세요. 가장 흔합니다</td>
+    </tr>
+    <tr>
+      <td><strong>코드가 중간에 끊긴다</strong></td>
+      <td><code class="inline">이어서 계속 보여줘</code>라고 요청. 또는 기능을 줄여서 다시 요청</td>
+    </tr>
+    <tr>
+      <td><strong>ollama list에 아무것도 없다</strong></td>
+      <td><code class="inline">manifests</code> 폴더를 복사했는지 확인 (설치 STEP 3)</td>
+    </tr>
+    <tr>
+      <td><strong>VS Code에 모델이 안 보인다</strong></td>
+      <td>작업표시줄에 Ollama가 켜져 있는지 확인 → VS Code 재시작</td>
+    </tr>
+    <tr>
+      <td><strong>너무 느리다</strong></td>
+      <td>첫 응답은 모델 로딩이라 느립니다. 계속 느리면 아래 <code class="inline">ollama ps</code> 확인</td>
+    </tr>
+    <tr>
+      <td><strong>답변이 엉뚱하다</strong></td>
+      <td>영어로 다시 시도 / 요청을 더 잘게 쪼개기 / 조건을 구체적으로</td>
+    </tr>
+    <tr>
+      <td><strong>같은 실수를 반복한다</strong></td>
+      <td>대화가 길어져서 앞을 잊은 겁니다. <strong>새 대화를 시작</strong>하고 처음부터 다시 요청하세요</td>
+    </tr>
+  </table>
+
+  <h3>속도가 안 나올 때 확인</h3>
+  <div class="code"><button class="copy">복사</button>ollama ps</div>
+  <p>
+    <strong>100% GPU</strong>로 나와야 정상입니다.
+    <strong>CPU 비율이 잡히면</strong> 모델이 그래픽카드에 다 안 들어간 겁니다 → 조교에게 알려주세요 (더 작은 모델로 교체).
+  </p>
+</section>
+
+<!-- ===================== 마무리 ===================== -->
+<section id="next">
+  <h2><span class="num">끝</span>정리, 그리고 집에서</h2>
+
+  <h3>오늘 확인한 것</h3>
+  <ul>
+    <li>LLM은 <strong>다음 단어를 예측</strong>하는 기계이고, 그래서 <strong>그럴듯하게 틀립니다</strong></li>
+    <li>모델 크기(B)와 그래픽카드 메모리(VRAM)가 <strong>내가 뭘 돌릴 수 있는지</strong>를 결정합니다</li>
+    <li>로컬 LLM은 <strong>공짜·오프라인·비밀 유지</strong>가 되지만 <strong>성능은 제한적</strong>입니다</li>
+    <li>바이브코딩은 <strong>한 번에 완성이 아니라 빠른 반복</strong>입니다</li>
+  </ul>
+
+  <div class="box tip">
+    <span class="t">오늘 답해볼 질문</span>
+    <strong>"어떤 일에 로컬 AI를 쓰고, 어떤 일에 클라우드 AI를 쓸 것인가?"</strong><br>
+    오늘 직접 겪은 것을 근거로 각자의 답을 만들어 보세요. 정답은 없습니다.
+  </div>
+
+  <h3>집에서 이어가려면</h3>
+  <p>
+    <strong>오늘 설치한 건 전부 내 것입니다.</strong> 수업이 끝나도 그대로 남아 있고,
+    집 PC에도 똑같이 설치할 수 있습니다. 이게 서버로 실습하지 않은 이유입니다.
+  </p>
+  <ul>
+    <li>모델 받기 — 인터넷이 되는 곳에서 <code class="inline">ollama pull 모델명</code></li>
+    <li>모델 찾기 — <strong>ollama.com/search</strong> 에서 크기·용도별로 탐색</li>
+    <li>내 PC가 더 좋은 그래픽카드라면 <strong>더 큰 모델</strong>에 도전 (VRAM의 60~70% 이내)</li>
+    <li>공식 문서 — <strong>docs.ollama.com</strong></li>
+  </ul>
+
+  <h3>더 나아가고 싶다면</h3>
+  <ul>
+    <li><strong>Modelfile</strong> — 나만의 성격을 가진 AI 만들기</li>
+    <li><strong>REST API</strong> — <code class="inline">localhost:11434</code>에 직접 요청을 보내 내 프로그램에 AI 붙이기</li>
+    <li><strong>RAG</strong> — 내 문서를 읽고 답하는 AI 만들기</li>
+  </ul>
+</section>
+
+<footer>
+  로컬 LLM 바이브코딩 실습 · 이 페이지도 HTML 파일 하나입니다 — 여러분이 오늘 만든 것과 같은 형식으로요.
+</footer>
+
+</div>
+
+<script>
+document.querySelectorAll('.copy').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var box = btn.parentNode.cloneNode(true);
+    var b = box.querySelector('.copy'); if (b) b.remove();
+    var lb = box.querySelector('.label'); if (lb) lb.remove();
+    var text = box.textContent.trim();
+
+    var done = function(){
+      var old = btn.textContent;
+      btn.textContent = '복사됨'; btn.classList.add('done');
+      setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1400);
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else { fallback(); }
+
+    function fallback(){
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch(e) { alert('복사에 실패했습니다. 직접 선택해서 복사해 주세요.'); }
+      document.body.removeChild(ta);
+    }
+  });
+});
+</script>
+<script type="text/plain" id="ps1-src">
+# Ollama 수업 사전 점검 스크립트
+# 실습실 PC에서 실행하여 GPU / 드라이버 / 디스크 / VS Code / Ollama 상태를 확인합니다.
+
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$ErrorActionPreference = 'SilentlyContinue'
+
+$log = Join-Path $PSScriptRoot ("check-{0}-{1}.txt" -f $env:COMPUTERNAME, (Get-Date -Format 'MMdd-HHmm'))
+$out = New-Object System.Collections.ArrayList
+
+function Say($msg, $color = 'Gray') {
+    Write-Host $msg -ForegroundColor $color
+    [void]$out.Add($msg)
+}
+function Head($msg) {
+    Say ""
+    Say ("=" * 60) 'DarkGray'
+    Say "  $msg" 'Cyan'
+    Say ("=" * 60) 'DarkGray'
+}
+
+Head "Ollama 수업 환경 점검  |  $env:COMPUTERNAME  |  $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
+
+# ---------- 1. Windows ----------
+Head "1. Windows"
+$os = Get-CimInstance Win32_OperatingSystem
+$dv = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion').DisplayVersion
+Say "  버전   : $($os.Caption) ($dv, build $($os.BuildNumber))"
+Say ("  메모리 : {0:N1} GB" -f ($os.TotalVisibleMemorySize / 1MB))
+if ([int]$os.BuildNumber -ge 19045) { Say "  [OK] Windows 10 22H2 이상 - Ollama 지원" 'Green' }
+else { Say "  [경고] Ollama는 Windows 10 22H2 이상 필요" 'Red' }
+
+# ---------- 2. GPU ----------
+Head "2. GPU / VRAM"
+$gpuFound = $false
+$vramGB = 0
+$smi = Get-Command nvidia-smi -ErrorAction SilentlyContinue
+
+if ($smi) {
+    $gpuFound = $true
+    $q = & nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader 2>$null
+    foreach ($line in $q) {
+        $p = $line -split ',\s*'
+        Say "  카드       : $($p[0])"
+        Say "  VRAM       : $($p[1])"
+        Say "  드라이버   : $($p[2])"
+        if ($p[1] -match '(\d+)') { $vramGB = [math]::Round([int]$Matches[1] / 1024, 1) }
+
+        # 드라이버 551.61 이상 필요
+        if ($p[2] -match '^(\d+)\.(\d+)') {
+            $maj = [int]$Matches[1]; $min = [int]$Matches[2]
+            if ($maj -gt 551 -or ($maj -eq 551 -and $min -ge 61)) {
+                Say "  [OK] 드라이버 551.61 이상 - GPU 가속 사용 가능" 'Green'
+            } else {
+                Say "  [경고] 드라이버가 551.61 미만입니다. GPU 가속이 안 되고" 'Red'
+                Say "         CPU로 동작하여 매우 느려집니다. 수업 전 업데이트 필요!" 'Red'
+            }
+        }
+    }
+} else {
+    Say "  [경고] nvidia-smi 없음 - NVIDIA GPU가 없거나 드라이버 미설치" 'Red'
+    Say "  아래는 Windows가 인식한 디스플레이 어댑터입니다:" 'DarkGray'
+    Get-CimInstance Win32_VideoController | ForEach-Object {
+        Say "    - $($_.Name)  (드라이버 $($_.DriverVersion))"
+    }
+    # 레지스트리에서 VRAM 재확인 (AdapterRAM은 4GB 초과 시 부정확)
+    $key = 'HKLM:\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000'
+    $qw = (Get-ItemProperty $key).'HardwareInformation.qwMemorySize'
+    if ($qw) {
+        $vramGB = [math]::Round($qw / 1GB, 1)
+        Say "    VRAM(레지스트리 기준): $vramGB GB"
+    }
+}
+
+# ---------- 3. 모델 권장 ----------
+Head "3. 권장 모델 등급"
+if ($vramGB -ge 7.5)     { Say "  VRAM ${vramGB}GB -> 7~8B급(Q4, ~5GB)까지 여유. 4B급 권장" 'Green' }
+elseif ($vramGB -ge 5.5) { Say "  VRAM ${vramGB}GB -> [주력] 4B급 Q4 (~3.3GB) 권장" 'Green' }
+elseif ($vramGB -ge 3.5) { Say "  VRAM ${vramGB}GB -> [예비] 1~3B급 Q4 (~1-2GB) 사용" 'Yellow' }
+elseif ($vramGB -gt 0)   { Say "  VRAM ${vramGB}GB -> GPU 가속 어려움. 1B급 또는 CPU 실행" 'Red' }
+else                     { Say "  VRAM 확인 실패 - 수동 확인 필요" 'Red' }
+
+# ---------- 4. 디스크 ----------
+Head "4. 디스크 여유 공간 (C:)"
+$c = Get-PSDrive C
+$freeGB = [math]::Round($c.Free / 1GB, 1)
+Say "  여유 공간: $freeGB GB"
+if ($freeGB -ge 10) { Say "  [OK] Ollama(4GB) + 모델 설치 가능" 'Green' }
+else { Say "  [경고] 10GB 이상 확보 권장 (Ollama 바이너리만 4GB)" 'Red' }
+
+# ---------- 5. VS Code ----------
+Head "5. VS Code"
+$code = Get-Command code -ErrorAction SilentlyContinue
+if ($code) {
+    $ver = (& code --version 2>$null)[0]
+    Say "  설치됨: $ver"
+    $parts = $ver -split '\.'
+    if ([int]$parts[0] -gt 1 -or ([int]$parts[0] -eq 1 -and [int]$parts[1] -ge 127)) {
+        Say "  [OK] 1.127 이상 - 공식 Ollama 확장 사용 가능" 'Green'
+    } else {
+        Say "  [경고] 공식 Ollama 확장은 VS Code 1.127 이상 필요" 'Red'
+    }
+} else {
+    Say "  [경고] code 명령을 찾을 수 없음 (미설치이거나 PATH 미등록)" 'Yellow'
+}
+
+# ---------- 6. Ollama ----------
+Head "6. Ollama"
+$ollama = Get-Command ollama -ErrorAction SilentlyContinue
+if ($ollama) {
+    Say "  설치됨: $(& ollama --version 2>$null)"
+    $conn = Test-NetConnection -ComputerName 127.0.0.1 -Port 11434 -WarningAction SilentlyContinue
+    if ($conn.TcpTestSucceeded) {
+        Say "  [OK] 서버 응답 중 (127.0.0.1:11434)" 'Green'
+        Say "  보유 모델:"
+        (& ollama list 2>$null) | ForEach-Object { Say "    $_" }
+    } else {
+        Say "  [경고] 설치는 됐으나 서버가 응답하지 않음. Ollama 실행 필요" 'Yellow'
+    }
+    Say ""
+    Say "  모델 경로: $(if ($env:OLLAMA_MODELS) { $env:OLLAMA_MODELS } else { "$env:USERPROFILE\.ollama\models (기본값)" })"
+} else {
+    Say "  미설치 - OllamaSetup.exe 실행 필요 (관리자 권한 불필요)" 'Yellow'
+}
+
+Head "점검 완료"
+Say "  결과 저장: $log"
+$out | Out-File -FilePath $log -Encoding UTF8
+Write-Host ""
+Read-Host "엔터를 누르면 종료합니다"
+</script>
+<script type="text/plain" id="bat-src">
+@echo off
+REM Ollama class - environment check launcher
+REM Keep this file ASCII-only. Korean output comes from check-env.ps1.
+chcp 65001 >nul
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0check-env.ps1"
+</script>
+<script>
+// 소스 보기 채우기
+(function(){
+  var v = document.getElementById('ps1-view');
+  if (v) v.textContent = document.getElementById('ps1-src').textContent.replace(/^\n/, '');
+})();
+
+// 다운로드
+document.querySelectorAll('.dl').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var t = document.getElementById(btn.dataset.src).textContent.replace(/^\n/, '');
+    if (btn.dataset.crlf) t = t.replace(/\r?\n/g, '\r\n');
+    if (btn.dataset.bom)  t = '\uFEFF' + t;
+    var url = URL.createObjectURL(new Blob([t], {type:'text/plain;charset=utf-8'}));
+    var a = document.createElement('a');
+    a.href = url; a.download = btn.dataset.name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 1000);
+    var old = btn.textContent;
+    btn.textContent = '내려받는 중...';
+    setTimeout(function(){ btn.textContent = old; }, 1400);
+  });
+});
+</script>
+</body>
+</html>
