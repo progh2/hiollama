@@ -138,9 +138,9 @@
   .card span{font-size:14px; color:var(--ink-soft); line-height:1.55}
   details{border:1px solid var(--line); border-radius:var(--r); padding:12px 16px; margin:19px 0; background:var(--surface-2)}
   details summary{cursor:pointer; font-weight:800; color:var(--accent); font-size:15.5px}
-  button.dl{background:var(--accent); color:#fff; border:none; border-radius:9px; padding:12px 22px;
-    font-size:16px; font-weight:800; cursor:pointer; font-family:inherit}
-  button.dl:hover{background:#1B5AD0}
+  a.dlfile{display:inline-block; background:var(--accent); color:#fff; text-decoration:none;
+    border-radius:9px; padding:13px 24px; font-size:16.5px; font-weight:800}
+  a.dlfile:hover{background:#1B5AD0}
   kbd{background:var(--surface-2); border:1px solid #C3CDDC; border-bottom-width:2px; border-radius:5px;
     padding:1px 7px; font-size:13.5px; font-weight:700}
   .muted{color:var(--ink-soft)}
@@ -634,45 +634,58 @@ OLLAMA_KV_CACHE_TYPE   = q8_0  ← 이게 동작합니다</div>
   </div>
   <p class="sub">설치 전에 이 PC가 준비됐는지 한 번에 확인합니다.</p>
 
-  <p>아래 두 파일을 <strong>같은 폴더에</strong> 내려받고 <code class="inline">run-check.bat</code>을 더블클릭하세요.</p>
+  <p>아래 파일을 내려받아 <strong>더블클릭</strong>하세요. 그게 전부입니다.</p>
 
-  <div style="display:flex; gap:10px; flex-wrap:wrap; margin:20px 0">
-    <button class="dl" data-src="bat-src" data-name="run-check.bat" data-crlf="1">⬇ run-check.bat</button>
-    <button class="dl" data-src="ps1-src" data-name="check-env.ps1" data-bom="1">⬇ check-env.ps1</button>
+  <div style="margin:20px 0">
+    <a class="dlfile" href="check-env.bat" download>⬇ check-env.bat 내려받기</a>
+  </div>
+
+  <div class="box ok">
+    <span class="t">설치도, 권한도 필요 없습니다</span>
+    윈도우 기본 명령어만 쓰는 <strong>배치 파일(.bat)</strong>이라
+    관리자 권한도, 스크립트 실행 정책 변경도 필요 없습니다.
+    백신이나 보안 정책에 걸릴 일도 없어요.
   </div>
 
   <h3>무엇을 확인하나</h3>
   <table>
     <tr><th style="width:34%">항목</th><th>통과 기준</th></tr>
-    <tr><td><strong>Windows 버전</strong></td><td>10 22H2 이상</td></tr>
+    <tr><td><strong>Windows 버전</strong></td><td>10 22H2 이상 (build 19045+)</td></tr>
     <tr><td><strong>그래픽카드 · VRAM</strong></td><td>RTX 2060 / 6GB 확인</td></tr>
     <tr><td><strong>NVIDIA 드라이버</strong></td><td><strong>551.61 이상</strong> — 미만이면 그래픽카드를 못 씁니다</td></tr>
+    <tr><td><strong>권장 모델</strong></td><td>VRAM에 맞는 모델을 알려줍니다</td></tr>
     <tr><td><strong>디스크 여유</strong></td><td>10GB 이상</td></tr>
     <tr><td><strong>VS Code</strong></td><td>1.127 이상</td></tr>
-    <tr><td><strong>Ollama</strong></td><td>설치 여부 · 서버 응답 · 보유 모델</td></tr>
+    <tr><td><strong>Ollama</strong></td><td>설치 · 서버 응답 · 보유 모델 · KV 캐시 설정</td></tr>
   </table>
 
-  <p>마지막에 <strong>권장 모델 등급</strong>까지 알려주고, 결과를 같은 폴더에
-     <code class="inline">check-PC이름-날짜.txt</code>로 저장합니다.</p>
-
-  <div class="box ok">
-    <span class="t">초록색 [OK]만 있으면 통과</span>
-    빨간 <strong>[경고]</strong>가 뜨면 그 줄을 조교에게 보여주세요.
-    특히 <strong>드라이버 551.61 미만</strong>은 수업 전에 반드시 해결해야 합니다
-    (<a href="https://www.nvidia.com/ko-kr/drivers/" target="_blank" rel="noopener">드라이버 받기</a>).
-  </div>
+  <h3>결과 읽는 법</h3>
+  <div class="code">  [OK] 드라이버 551.61 이상 - GPU 가속 사용 가능
+  [경고] 10GB 이상 확보 권장</div>
+  <p>
+    <strong><code class="inline">[OK]</code>만 있으면 통과</strong>입니다.
+    <strong><code class="inline">[경고]</code></strong>가 뜨면 그 줄을 조교에게 보여주세요.
+  </p>
+  <p>결과는 같은 폴더에 <code class="inline">check-PC이름.txt</code>로도 저장됩니다.</p>
 
   <div class="box warn">
-    <span class="t">실행이 막힐 때</span>
-    <code class="inline">run-check.bat</code>은 스크립트 실행 정책을 우회하도록 만들어져 있습니다.
-    그래도 막히면 창이 순식간에 닫히는 경우인데, 이때는
-    <strong>PowerShell을 직접 열고</strong> 아래를 붙여넣으세요.
-    <div class="code" style="margin-top:10px"><button class="copy">복사</button>powershell -NoProfile -ExecutionPolicy Bypass -File .\check-env.ps1</div>
+    <span class="t">⚠️ 드라이버 551.61 미만이면</span>
+    수업 전에 반드시 해결해야 합니다. GPU를 못 쓰면 CPU로 동작해서 <strong>몇 배로 느려집니다.</strong><br>
+    <a href="https://www.nvidia.com/ko-kr/drivers/" target="_blank" rel="noopener">nvidia.com/ko-kr/drivers</a>
+    에서 받거나
+    <a href="https://www.nvidia.com/ko-kr/software/nvidia-app/" target="_blank" rel="noopener">NVIDIA 앱</a>으로 자동 업데이트.
+    <strong>시간이 오래 걸리니 조교에게 먼저 알려주세요.</strong>
+  </div>
+
+  <div class="box tip">
+    <span class="t">창이 바로 닫히면</span>
+    <kbd>Win</kbd>+<kbd>R</kbd> → <code class="inline">cmd</code> → 엔터로 검은 창을 먼저 연 뒤,
+    <strong>배치 파일을 그 창에 끌어다 놓고</strong> 엔터를 치세요. 오류 메시지를 볼 수 있습니다.
   </div>
 
   <details>
-    <summary>전체 소스 보기 (check-env.ps1)</summary>
-    <div class="code" style="max-height:420px; overflow:auto"><button class="copy">복사</button><span id="ps1-view"></span></div>
+    <summary>전체 소스 보기 (check-env.bat)</summary>
+    <div class="code" style="max-height:420px; overflow:auto"><button class="copy">복사</button><span id="bat-view"></span></div>
   </details>
 
   <div class="pager"><button class="pg prev" data-go="05">← Ollama란</button><button class="pg next" data-go="07">설치하기 →</button></div>
@@ -1142,143 +1155,185 @@ ollama pull gemma3:4b             # 3.3GB - 범용 대화용</div>
 </article>
 </main>
 
-<script type="text/plain" id="ps1-src">
-# Ollama 수업 사전 점검 스크립트
-# 실습실 PC에서 실행하여 GPU / 드라이버 / 디스크 / VS Code / Ollama 상태를 확인합니다.
-
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-$ErrorActionPreference = 'SilentlyContinue'
-
-$log = Join-Path $PSScriptRoot ("check-{0}-{1}.txt" -f $env:COMPUTERNAME, (Get-Date -Format 'MMdd-HHmm'))
-$out = New-Object System.Collections.ArrayList
-
-function Say($msg, $color = 'Gray') {
-    Write-Host $msg -ForegroundColor $color
-    [void]$out.Add($msg)
-}
-function Head($msg) {
-    Say ""
-    Say ("=" * 60) 'DarkGray'
-    Say "  $msg" 'Cyan'
-    Say ("=" * 60) 'DarkGray'
-}
-
-Head "Ollama 수업 환경 점검  |  $env:COMPUTERNAME  |  $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
-
-# ---------- 1. Windows ----------
-Head "1. Windows"
-$os = Get-CimInstance Win32_OperatingSystem
-$dv = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion').DisplayVersion
-Say "  버전   : $($os.Caption) ($dv, build $($os.BuildNumber))"
-Say ("  메모리 : {0:N1} GB" -f ($os.TotalVisibleMemorySize / 1MB))
-if ([int]$os.BuildNumber -ge 19045) { Say "  [OK] Windows 10 22H2 이상 - Ollama 지원" 'Green' }
-else { Say "  [경고] Ollama는 Windows 10 22H2 이상 필요" 'Red' }
-
-# ---------- 2. GPU ----------
-Head "2. GPU / VRAM"
-$gpuFound = $false
-$vramGB = 0
-$smi = Get-Command nvidia-smi -ErrorAction SilentlyContinue
-
-if ($smi) {
-    $gpuFound = $true
-    $q = & nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader 2>$null
-    foreach ($line in $q) {
-        $p = $line -split ',\s*'
-        Say "  카드       : $($p[0])"
-        Say "  VRAM       : $($p[1])"
-        Say "  드라이버   : $($p[2])"
-        if ($p[1] -match '(\d+)') { $vramGB = [math]::Round([int]$Matches[1] / 1024, 1) }
-
-        # 드라이버 551.61 이상 필요
-        if ($p[2] -match '^(\d+)\.(\d+)') {
-            $maj = [int]$Matches[1]; $min = [int]$Matches[2]
-            if ($maj -gt 551 -or ($maj -eq 551 -and $min -ge 61)) {
-                Say "  [OK] 드라이버 551.61 이상 - GPU 가속 사용 가능" 'Green'
-            } else {
-                Say "  [경고] 드라이버가 551.61 미만입니다. GPU 가속이 안 되고" 'Red'
-                Say "         CPU로 동작하여 매우 느려집니다. 수업 전 업데이트 필요!" 'Red'
-            }
-        }
-    }
-} else {
-    Say "  [경고] nvidia-smi 없음 - NVIDIA GPU가 없거나 드라이버 미설치" 'Red'
-    Say "  아래는 Windows가 인식한 디스플레이 어댑터입니다:" 'DarkGray'
-    Get-CimInstance Win32_VideoController | ForEach-Object {
-        Say "    - $($_.Name)  (드라이버 $($_.DriverVersion))"
-    }
-    # 레지스트리에서 VRAM 재확인 (AdapterRAM은 4GB 초과 시 부정확)
-    $key = 'HKLM:\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000'
-    $qw = (Get-ItemProperty $key).'HardwareInformation.qwMemorySize'
-    if ($qw) {
-        $vramGB = [math]::Round($qw / 1GB, 1)
-        Say "    VRAM(레지스트리 기준): $vramGB GB"
-    }
-}
-
-# ---------- 3. 모델 권장 ----------
-Head "3. 권장 모델 등급"
-if ($vramGB -ge 7.5)     { Say "  VRAM ${vramGB}GB -> 7~8B급(Q4, ~5GB)까지 여유. 4B급 권장" 'Green' }
-elseif ($vramGB -ge 5.5) { Say "  VRAM ${vramGB}GB -> [주력] 4B급 Q4 (~3.3GB) 권장" 'Green' }
-elseif ($vramGB -ge 3.5) { Say "  VRAM ${vramGB}GB -> [예비] 1~3B급 Q4 (~1-2GB) 사용" 'Yellow' }
-elseif ($vramGB -gt 0)   { Say "  VRAM ${vramGB}GB -> GPU 가속 어려움. 1B급 또는 CPU 실행" 'Red' }
-else                     { Say "  VRAM 확인 실패 - 수동 확인 필요" 'Red' }
-
-# ---------- 4. 디스크 ----------
-Head "4. 디스크 여유 공간 (C:)"
-$c = Get-PSDrive C
-$freeGB = [math]::Round($c.Free / 1GB, 1)
-Say "  여유 공간: $freeGB GB"
-if ($freeGB -ge 10) { Say "  [OK] Ollama(4GB) + 모델 설치 가능" 'Green' }
-else { Say "  [경고] 10GB 이상 확보 권장 (Ollama 바이너리만 4GB)" 'Red' }
-
-# ---------- 5. VS Code ----------
-Head "5. VS Code"
-$code = Get-Command code -ErrorAction SilentlyContinue
-if ($code) {
-    $ver = (& code --version 2>$null)[0]
-    Say "  설치됨: $ver"
-    $parts = $ver -split '\.'
-    if ([int]$parts[0] -gt 1 -or ([int]$parts[0] -eq 1 -and [int]$parts[1] -ge 127)) {
-        Say "  [OK] 1.127 이상 - 공식 Ollama 확장 사용 가능" 'Green'
-    } else {
-        Say "  [경고] 공식 Ollama 확장은 VS Code 1.127 이상 필요" 'Red'
-    }
-} else {
-    Say "  [경고] code 명령을 찾을 수 없음 (미설치이거나 PATH 미등록)" 'Yellow'
-}
-
-# ---------- 6. Ollama ----------
-Head "6. Ollama"
-$ollama = Get-Command ollama -ErrorAction SilentlyContinue
-if ($ollama) {
-    Say "  설치됨: $(& ollama --version 2>$null)"
-    $conn = Test-NetConnection -ComputerName 127.0.0.1 -Port 11434 -WarningAction SilentlyContinue
-    if ($conn.TcpTestSucceeded) {
-        Say "  [OK] 서버 응답 중 (127.0.0.1:11434)" 'Green'
-        Say "  보유 모델:"
-        (& ollama list 2>$null) | ForEach-Object { Say "    $_" }
-    } else {
-        Say "  [경고] 설치는 됐으나 서버가 응답하지 않음. Ollama 실행 필요" 'Yellow'
-    }
-    Say ""
-    Say "  모델 경로: $(if ($env:OLLAMA_MODELS) { $env:OLLAMA_MODELS } else { "$env:USERPROFILE\.ollama\models (기본값)" })"
-} else {
-    Say "  미설치 - OllamaSetup.exe 실행 필요 (관리자 권한 불필요)" 'Yellow'
-}
-
-Head "점검 완료"
-Say "  결과 저장: $log"
-$out | Out-File -FilePath $log -Encoding UTF8
-Write-Host ""
-Read-Host "엔터를 누르면 종료합니다"
-</script>
 <script type="text/plain" id="bat-src">
 @echo off
-REM Ollama class - environment check launcher
-REM Keep this file ASCII-only. Korean output comes from check-env.ps1.
-chcp 65001 >nul
-powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0check-env.ps1"
+setlocal enabledelayedexpansion
+title Ollama 수업 환경 점검
+color 07
+set "LOG=%~dp0check-%COMPUTERNAME%.txt"
+if exist "%LOG%" del "%LOG%" >nul 2>&1
+set "TMPG=%TEMP%\_ollchk_gpu.txt"
+set "TMPL=%TEMP%\_ollchk_list.txt"
+
+call :hd "Ollama 수업 환경 점검"
+call :say "  PC 이름 : %COMPUTERNAME%"
+call :say "  점검 시각 : %DATE% %TIME:~0,5%"
+
+rem ============================================================
+call :hd "1. Windows"
+set "WNAME=" & set "WVER=" & set "WBUILD="
+for /f "tokens=2*" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v ProductName 2^>nul ^| find "REG_SZ"') do set "WNAME=%%b"
+for /f "tokens=2*" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v DisplayVersion 2^>nul ^| find "REG_SZ"') do set "WVER=%%b"
+for /f "tokens=2*" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v CurrentBuild 2^>nul ^| find "REG_SZ"') do set "WBUILD=%%b"
+call :say "  버전 : !WNAME! !WVER!  (build !WBUILD!)"
+set /a BN=!WBUILD! 2>nul
+if !BN! GEQ 19045 (call :ok "Windows 10 22H2 이상 - Ollama 지원") else (call :warn "Ollama 는 Windows 10 22H2 이상 필요")
+
+rem ============================================================
+call :hd "2. 그래픽카드 / VRAM / 드라이버"
+set "VRAMGB=0"
+set "HASGPU=0"
+where nvidia-smi >nul 2>&1
+if errorlevel 1 goto :nosmi
+
+nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader > "%TMPG%" 2>nul
+if not exist "%TMPG%" goto :nosmi
+for %%S in ("%TMPG%") do if %%~zS EQU 0 goto :nosmi
+
+for /f "usebackq tokens=1,2,3 delims=," %%a in ("%TMPG%") do (
+  set "GPU=%%a" & set "VRAM=%%b" & set "DRV=%%c"
+)
+del "%TMPG%" >nul 2>&1
+set "GPU=!GPU: =!" & set "VRAM=!VRAM: =!" & set "DRV=!DRV: =!"
+set "HASGPU=1"
+
+call :say "  카드     : !GPU!"
+call :say "  VRAM     : !VRAM!"
+call :say "  드라이버 : !DRV!"
+
+set "VMB=!VRAM:MiB=!"
+set "VMB=!VMB:MB=!"
+set /a VRAMGB=!VMB! / 1024 2>nul
+
+for /f "tokens=1,2 delims=." %%x in ("!DRV!") do (set /a DMAJ=%%x & set /a DMIN=%%y)
+if !DMAJ! GTR 551 goto :drvok
+if !DMAJ! LSS 551 goto :drvbad
+if !DMIN! GEQ 61 goto :drvok
+goto :drvbad
+:drvok
+call :ok "드라이버 551.61 이상 - GPU 가속 사용 가능"
+goto :gpudone
+:drvbad
+call :warn "드라이버가 551.61 미만입니다"
+call :say "         GPU 를 못 쓰고 CPU 로 동작해 매우 느려집니다."
+call :say "         https://www.nvidia.com/ko-kr/drivers/ 에서 업데이트하세요."
+goto :gpudone
+
+:nosmi
+call :warn "nvidia-smi 없음 - NVIDIA GPU 가 없거나 드라이버 미설치"
+call :say "  Windows 가 인식한 디스플레이 어댑터:"
+for /f "skip=1 tokens=*" %%d in ('wmic path win32_VideoController get name 2^>nul') do (
+  set "L=%%d"
+  if not "!L: =!"=="" call :say "    - !L!"
+)
+:gpudone
+
+rem ============================================================
+call :hd "3. 권장 모델"
+if "!HASGPU!"=="0" (
+  call :say "  GPU 확인 실패 - 조교에게 문의하세요."
+) else if !VRAMGB! GEQ 11 (
+  call :ok "VRAM !VRAMGB!GB : 7B 급까지 여유. qwen2.5-coder:7b 권장"
+) else if !VRAMGB! GEQ 5 (
+  call :ok "VRAM !VRAMGB!GB : qwen2.5-coder:3b 권장 (1.9GB)"
+) else if !VRAMGB! GEQ 3 (
+  call :warn "VRAM !VRAMGB!GB : qwen2.5-coder:1.5b 사용 (1.0GB)"
+) else (
+  call :warn "VRAM !VRAMGB!GB : GPU 가속이 어렵습니다. 조교에게 문의하세요."
+)
+
+rem ============================================================
+call :hd "4. 디스크 여유 공간 (%SystemDrive%)"
+set "FREEB="
+for /f "tokens=3" %%a in ('dir /-c "%SystemDrive%\" 2^>nul') do set "FREEB=%%a"
+set "FREEGB=!FREEB:~0,-9!"
+if "!FREEGB!"=="" set "FREEGB=0"
+call :say "  여유 공간 : 약 !FREEGB! GB"
+set /a FG=!FREEGB! 2>nul
+if !FG! GEQ 10 (call :ok "설치 공간 충분") else (call :warn "10GB 이상 확보 권장")
+
+rem ============================================================
+call :hd "5. VS Code"
+set "CODEVER="
+where code >nul 2>&1
+if errorlevel 1 (
+  call :warn "code 명령을 찾을 수 없음 - 미설치이거나 PATH 미등록"
+  call :say "         https://code.visualstudio.com/download"
+) else (
+  for /f "delims=" %%v in ('code --version 2^>nul') do if not defined CODEVER set "CODEVER=%%v"
+  call :say "  버전 : !CODEVER!"
+  for /f "tokens=1,2 delims=." %%x in ("!CODEVER!") do (set /a CMAJ=%%x & set /a CMIN=%%y)
+  if !CMAJ! GTR 1 (call :ok "공식 Ollama 확장 사용 가능"
+  ) else if !CMIN! GEQ 127 (call :ok "1.127 이상 - 공식 Ollama 확장 사용 가능"
+  ) else (call :warn "공식 Ollama 확장은 VS Code 1.127 이상 필요")
+)
+
+rem ============================================================
+call :hd "6. Ollama"
+where ollama >nul 2>&1
+if errorlevel 1 (
+  call :warn "미설치 - OllamaSetup.exe 실행 필요 (관리자 권한 불필요)"
+  call :say "         https://ollama.com/download/windows"
+  goto :ollend
+)
+for /f "delims=" %%v in ('ollama --version 2^>nul') do call :say "  %%v"
+
+netstat -ano 2>nul | find ":11434" | find "LISTENING" >nul
+if errorlevel 1 (
+  call :warn "설치는 됐으나 서버가 응답하지 않음 - 시작 메뉴에서 Ollama 실행"
+) else (
+  call :ok "서버 동작 중 (127.0.0.1:11434)"
+  call :say "  보유 모델:"
+  ollama list > "%TMPL%" 2>nul
+  for /f "usebackq skip=1 tokens=*" %%m in ("%TMPL%") do call :say "    %%m"
+  del "%TMPL%" >nul 2>&1
+)
+if defined OLLAMA_MODELS (
+  call :say "  모델 경로 : %OLLAMA_MODELS%"
+) else (
+  call :say "  모델 경로 : %USERPROFILE%\.ollama\models"
+)
+if defined OLLAMA_KV_CACHE_TYPE (
+  call :ok "KV 캐시 설정됨 (%OLLAMA_KV_CACHE_TYPE%)"
+) else (
+  call :say "  [안내] OLLAMA_KV_CACHE_TYPE 미설정 - 설치 STEP 3 참고"
+)
+:ollend
+
+rem ============================================================
+call :hd "점검 완료"
+call :say "  결과 파일 : %LOG%"
+echo.
+echo   [OK] 만 있으면 통과입니다.
+echo   [경고] 가 있으면 그 줄을 조교에게 보여주세요.
+echo.
+pause
+endlocal
+exit /b 0
+
+rem ================= 출력 도우미 =================
+:say
+echo %~1
+>>"%LOG%" echo %~1
+exit /b 0
+:ok
+echo   [OK] %~1
+>>"%LOG%" echo   [OK] %~1
+exit /b 0
+:warn
+echo   [경고] %~1
+>>"%LOG%" echo   [경고] %~1
+exit /b 0
+:hd
+echo.
+echo ============================================================
+echo   %~1
+echo ============================================================
+>>"%LOG%" echo.
+>>"%LOG%" echo ============================================================
+>>"%LOG%" echo   %~1
+>>"%LOG%" echo ============================================================
+exit /b 0
 </script>
 
 <script>
@@ -1345,23 +1400,9 @@ document.querySelectorAll('.copy').forEach(function(btn){
 
 // 점검 스크립트 소스 표시 + 다운로드
 (function(){
-  var v = document.getElementById('ps1-view');
-  if (v) v.textContent = document.getElementById('ps1-src').textContent.replace(/^\n/, '');
+  var v = document.getElementById('bat-view');
+  if (v) v.textContent = document.getElementById('bat-src').textContent.replace(/^\n/, '');
 })();
-document.querySelectorAll('.dl').forEach(function(btn){
-  btn.addEventListener('click', function(){
-    var t = document.getElementById(btn.dataset.src).textContent.replace(/^\n/, '');
-    if (btn.dataset.crlf) t = t.replace(/\r?\n/g, '\r\n');
-    if (btn.dataset.bom)  t = '\uFEFF' + t;
-    var url = URL.createObjectURL(new Blob([t], {type:'text/plain;charset=utf-8'}));
-    var a = document.createElement('a');
-    a.href = url; a.download = btn.dataset.name;
-    document.body.appendChild(a); a.click();
-    setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 1000);
-    var old = btn.textContent; btn.textContent = '내려받는 중...';
-    setTimeout(function(){ btn.textContent = old; }, 1400);
-  });
-});
 </script>
 </body>
 </html>
