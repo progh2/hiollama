@@ -77,7 +77,7 @@ if "!HASGPU!"=="0" (
 ) else if !VRAMGB! GEQ 11 (
   call :ok "VRAM !VRAMGB!GB : 7B 급까지 여유. qwen2.5-coder:7b 권장"
 ) else if !VRAMGB! GEQ 5 (
-  call :ok "VRAM !VRAMGB!GB : qwen2.5-coder:3b 권장 (1.9GB)"
+  call :ok "VRAM !VRAMGB!GB : qwen2.5-coder:3b + 1.5b-base 권장 (합 2.9GB)"
 ) else if !VRAMGB! GEQ 3 (
   call :warn "VRAM !VRAMGB!GB : qwen2.5-coder:1.5b 사용 (1.0GB)"
 ) else (
@@ -104,10 +104,7 @@ if errorlevel 1 (
 ) else (
   for /f "delims=" %%v in ('code --version 2^>nul') do if not defined CODEVER set "CODEVER=%%v"
   call :say "  버전 : !CODEVER!"
-  for /f "tokens=1,2 delims=." %%x in ("!CODEVER!") do (set /a CMAJ=%%x & set /a CMIN=%%y)
-  if !CMAJ! GTR 1 (call :ok "공식 Ollama 확장 사용 가능"
-  ) else if !CMIN! GEQ 127 (call :ok "1.127 이상 - 공식 Ollama 확장 사용 가능"
-  ) else (call :warn "공식 Ollama 확장은 VS Code 1.127 이상 필요")
+  call :ok "설치됨 - Twinny 확장을 설치해 사용합니다"
 )
 
 rem ============================================================
