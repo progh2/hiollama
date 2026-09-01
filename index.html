@@ -6,196 +6,277 @@
 <title>로컬 LLM으로 바이브코딩 — 100분 실습</title>
 <style>
   :root{
-    --bg:#ffffff; --fg:#1a1d21; --muted:#5b6572; --line:#e2e6ea;
-    --accent:#1f6feb; --accent-bg:#eef4ff;
-    --warn:#b45309; --warn-bg:#fff8ec;
-    --danger:#b91c1c; --danger-bg:#fef2f2;
-    --ok:#15803d; --ok-bg:#f0fdf4;
-    --code-bg:#1e2430; --code-fg:#e6edf3;
-    --radius:10px;
+    --bg:#EAEFF6; --surface:#fff; --surface-2:#F4F7FB;
+    --ink:#15233E; --ink-soft:#5C6B85; --line:#D6DEEA;
+    --accent:#2F6FEB; --accent-bg:#E9F0FE;
+    --warn:#B4700A; --warn-bg:#FFF6E8;
+    --danger:#C0392B; --danger-bg:#FDF0EE;
+    --ok:#1F9D57; --ok-bg:#EDFAF2;
+    --code-bg:#182231; --code-fg:#E6EDF6;
+    --grid:rgba(21,35,62,.05);
+    --shadow:0 1px 2px rgba(21,35,62,.06),0 12px 30px -18px rgba(21,35,62,.28);
+    --sans:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,-apple-system,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Consolas,"D2Coding",monospace;
+    --r:12px; --sbw:266px;
   }
   *{box-sizing:border-box}
-  html{scroll-behavior:smooth; scroll-padding-top:70px}
   body{
-    margin:0; background:var(--bg); color:var(--fg);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic","맑은 고딕",
-                "Apple SD Gothic Neo","Noto Sans KR",sans-serif;
-    font-size:18px; line-height:1.75; word-break:keep-all;
+    margin:0; font-family:var(--sans); color:var(--ink); font-size:17.5px; line-height:1.72;
+    background-color:var(--bg);
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:28px 28px; word-break:keep-all; -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:980px; margin:0 auto; padding:0 24px 120px}
 
-  /* ---- nav ---- */
-  nav{
-    position:sticky; top:0; z-index:50; background:rgba(255,255,255,.96);
-    backdrop-filter:blur(8px); border-bottom:1px solid var(--line);
+  /* ---------- 사이드바 ---------- */
+  aside.sb{
+    position:fixed; inset:0 auto 0 0; width:var(--sbw); z-index:60;
+    background:var(--surface); border-right:1px solid var(--line);
+    display:flex; flex-direction:column; overflow:hidden;
   }
-  nav .inner{max-width:980px; margin:0 auto; padding:10px 24px; display:flex; gap:6px; flex-wrap:wrap}
-  nav a{
-    font-size:14px; text-decoration:none; color:var(--muted);
-    padding:5px 11px; border-radius:99px; white-space:nowrap;
+  .sb-top{padding:20px 20px 14px; border-bottom:1px solid var(--line)}
+  .sb-top .kicker{font-size:11.5px; font-weight:800; letter-spacing:.1em; color:var(--accent)}
+  .sb-top h1{font-size:19px; margin:6px 0 0; line-height:1.35; letter-spacing:-.02em}
+  .prog{margin-top:12px}
+  .prog-bar{height:6px; background:var(--surface-2); border-radius:99px; overflow:hidden; border:1px solid var(--line)}
+  .prog-fill{height:100%; width:0; background:var(--accent); transition:width .3s}
+  .prog-txt{font-size:12px; color:var(--ink-soft); margin-top:5px; font-variant-numeric:tabular-nums}
+  .sb-nav{flex:1; overflow-y:auto; padding:12px 12px 24px}
+  .nav-grp{font-size:11px; font-weight:800; letter-spacing:.1em; color:var(--ink-soft);
+    padding:14px 10px 6px; text-transform:uppercase}
+  .nav-item{
+    display:flex; align-items:center; gap:10px; padding:8px 11px; border-radius:9px;
+    font-size:15px; color:var(--ink); cursor:pointer; text-decoration:none; line-height:1.35;
   }
-  nav a:hover{background:var(--accent-bg); color:var(--accent)}
+  .nav-item:hover{background:var(--surface-2)}
+  .nav-item.on{background:var(--accent); color:#fff; font-weight:700}
+  .nv-no{font-family:var(--mono); font-size:11.5px; font-weight:700; color:var(--ink-soft);
+    background:var(--surface-2); border:1px solid var(--line); border-radius:6px;
+    min-width:26px; text-align:center; padding:1px 0; flex:0 0 26px}
+  .nav-item.on .nv-no{background:rgba(255,255,255,.22); color:#fff; border-color:transparent}
+  .nav-item.done .nv-no{background:var(--ok-bg); color:var(--ok); border-color:#BFE7CF}
+  .sb-foot{padding:10px 16px; border-top:1px solid var(--line); font-size:12.5px}
+  .sb-foot a{color:var(--ink-soft); text-decoration:none} .sb-foot a:hover{color:var(--accent)}
 
-  /* ---- hero ---- */
-  header.hero{padding:64px 0 40px; border-bottom:3px solid var(--fg); margin-bottom:8px}
-  header.hero .eyebrow{color:var(--accent); font-weight:700; font-size:15px; letter-spacing:.08em}
-  header.hero h1{font-size:44px; line-height:1.25; margin:12px 0 16px; letter-spacing:-.02em}
-  header.hero p.lead{font-size:20px; color:var(--muted); margin:0}
+  /* ---------- 본문 ---------- */
+  main{margin-left:var(--sbw); padding:34px 34px 100px; max-width:1000px}
+  .chapter{display:none; background:var(--surface); border:1px solid var(--line);
+    border-radius:16px; padding:30px 34px 26px; box-shadow:var(--shadow)}
+  .chapter.on{display:block; animation:fade .22s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+  .ch-head{display:flex; align-items:center; gap:13px; margin:0 0 4px}
+  .ch-no{font-family:var(--mono); font-size:13px; font-weight:800; color:#fff; background:var(--ink);
+    min-width:36px; height:36px; border-radius:10px; display:grid; place-items:center; flex:0 0 36px}
+  .ch-head h2{font-size:26px; margin:0; letter-spacing:-.02em}
 
-  section{padding:52px 0; border-bottom:1px solid var(--line)}
-  section > h2{
-    font-size:30px; margin:0 0 8px; letter-spacing:-.02em;
-    display:flex; align-items:baseline; gap:12px;
-  }
-  section > h2 .num{
-    font-size:15px; color:#fff; background:var(--fg); border-radius:99px;
-    padding:3px 11px; font-weight:700; letter-spacing:0;
-  }
-  section > p.sub{color:var(--muted); margin:0 0 28px; font-size:17px}
-  h3{font-size:21px; margin:34px 0 10px; letter-spacing:-.01em}
-  h4{font-size:17px; margin:22px 0 6px; color:var(--muted)}
-  p{margin:0 0 14px}
-  ul,ol{margin:0 0 16px; padding-left:22px}
-  li{margin:6px 0}
-  strong{font-weight:700}
+  /* ---------- 캐릭터 ---------- */
+  .guide{display:flex; align-items:flex-end; gap:12px; margin:16px 0 26px;
+    background:var(--surface-2); border:1px solid var(--line); border-radius:14px; padding:12px 14px}
+  .guide-img{width:76px; height:92px; flex:0 0 76px; display:block}
+  .guide-bubble{position:relative; flex:1 1 auto; background:#fff; border:1px solid var(--line);
+    border-radius:14px 14px 14px 5px; padding:10px 15px 12px}
+  .guide-bubble::before{content:""; position:absolute; left:-7px; bottom:18px; width:12px; height:12px;
+    background:#fff; border-left:1px solid var(--line); border-bottom:1px solid var(--line); transform:rotate(45deg)}
+  .guide-name{display:block; font-size:11px; font-weight:800; letter-spacing:.07em; color:var(--accent); margin-bottom:2px}
+  .guide-bubble p{margin:0; font-size:16px; line-height:1.55; font-weight:600}
+
+  /* ---------- 페이저 ---------- */
+  .pager{display:flex; justify-content:space-between; align-items:center; gap:12px;
+    margin-top:34px; padding-top:20px; border-top:1px solid var(--line)}
+  .pg{background:var(--surface-2); border:1px solid var(--line); color:var(--ink);
+    border-radius:10px; padding:11px 18px; font-size:15.5px; font-weight:700; cursor:pointer; font-family:inherit}
+  .pg:hover{background:var(--accent-bg); border-color:var(--accent); color:var(--accent)}
+  .pg.next{background:var(--accent); border-color:var(--accent); color:#fff}
+  .pg.next:hover{background:#1B5AD0; color:#fff}
+  .pg-done{font-weight:700; color:var(--ok)}
+  .jump{color:var(--accent); cursor:pointer; text-decoration:underline; font-weight:600}
+
+  /* ---------- 본문 요소 ---------- */
+  h3{font-size:20px; margin:32px 0 10px; letter-spacing:-.01em}
+  h4{font-size:16.5px; margin:20px 0 6px; color:var(--ink-soft)}
+  p{margin:0 0 13px} ul,ol{margin:0 0 15px; padding-left:22px} li{margin:6px 0}
   a{color:var(--accent)}
-
-  /* ---- boxes ---- */
-  .box{border-radius:var(--radius); padding:16px 20px; margin:20px 0; border:1px solid var(--line)}
-  .box p:last-child, .box ul:last-child, .box ol:last-child{margin-bottom:0}
-  .box .t{font-weight:700; margin-bottom:6px; display:block}
-  .tip{background:var(--accent-bg); border-color:#c7dbff}
-  .tip .t{color:var(--accent)}
-  .warn{background:var(--warn-bg); border-color:#f5d9a8}
-  .warn .t{color:var(--warn)}
-  .danger{background:var(--danger-bg); border-color:#f6c9c9}
-  .danger .t{color:var(--danger)}
-  .ok{background:var(--ok-bg); border-color:#bbe8c8}
-  .ok .t{color:var(--ok)}
-
-  /* ---- code ---- */
-  .code{
-    position:relative; background:var(--code-bg); color:var(--code-fg);
-    border-radius:var(--radius); padding:16px 56px 16px 18px; margin:14px 0;
-    font-family:ui-monospace,SFMono-Regular,Consolas,"D2Coding",monospace;
-    font-size:15.5px; line-height:1.65; white-space:pre-wrap; overflow-wrap:anywhere;
-  }
-  code.inline{
-    background:#eef1f5; padding:2px 7px; border-radius:5px; font-size:.92em;
-    font-family:ui-monospace,SFMono-Regular,Consolas,"D2Coding",monospace;
-  }
-  .copy{
-    position:absolute; top:10px; right:10px; border:1px solid #3a4557; background:#2b3444;
-    color:#cbd5e1; border-radius:6px; padding:4px 10px; font-size:12.5px; cursor:pointer;
-    font-family:inherit;
-  }
-  .copy:hover{background:#3a4557; color:#fff}
+  p.sub{color:var(--ink-soft); margin:0 0 22px; font-size:16.5px}
+  .box{border-radius:var(--r); padding:15px 19px; margin:19px 0; border:1px solid var(--line); background:var(--surface-2)}
+  .box p:last-child,.box ul:last-child,.box ol:last-child{margin-bottom:0}
+  .box .t{font-weight:800; margin-bottom:5px; display:block}
+  .tip{background:var(--accent-bg); border-color:#C4D8FB} .tip .t{color:var(--accent)}
+  .warn{background:var(--warn-bg); border-color:#F2DBB0} .warn .t{color:var(--warn)}
+  .danger{background:var(--danger-bg); border-color:#F3C8C2} .danger .t{color:var(--danger)}
+  .ok{background:var(--ok-bg); border-color:#BFE7CF} .ok .t{color:var(--ok)}
+  .pc{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:19px 0}
+  .pc .box{margin:0} .pc ul{padding-left:20px; margin:0} .pc li{margin:5px 0; font-size:15.5px}
+  .code{position:relative; background:var(--code-bg); color:var(--code-fg); border-radius:var(--r);
+    padding:15px 56px 15px 17px; margin:13px 0; font-family:var(--mono); font-size:15px;
+    line-height:1.65; white-space:pre-wrap; overflow-wrap:anywhere}
+  code.inline{background:#E6ECF5; padding:2px 7px; border-radius:5px; font-size:.9em; font-family:var(--mono)}
+  .copy{position:absolute; top:9px; right:9px; border:1px solid #3A4759; background:#2A3547; color:#C6D2E2;
+    border-radius:6px; padding:4px 10px; font-size:12.5px; cursor:pointer; font-family:inherit}
+  .copy:hover{background:#3A4759; color:#fff}
   .copy.done{background:var(--ok); border-color:var(--ok); color:#fff}
-
-  /* ---- prompt card ---- */
-  .prompt{
-    background:#fbfcfe; border:2px solid var(--accent); border-radius:var(--radius);
-    padding:18px 56px 18px 20px; margin:16px 0; position:relative;
-    font-size:16.5px; line-height:1.7; white-space:pre-wrap;
-  }
-  .prompt .copy{background:var(--accent); border-color:var(--accent); color:#fff; top:12px}
-  .prompt .copy:hover{background:#1a5ed0}
-  .prompt .label{
-    position:absolute; top:-11px; left:16px; background:var(--accent); color:#fff;
-    font-size:12px; font-weight:700; padding:2px 10px; border-radius:99px; letter-spacing:.04em;
-  }
-
-  /* ---- table ---- */
-  table{width:100%; border-collapse:collapse; margin:18px 0; font-size:16.5px}
-  th,td{border:1px solid var(--line); padding:10px 13px; text-align:left; vertical-align:top}
-  th{background:#f6f8fa; font-weight:700; font-size:15.5px}
+  .prompt{background:#FBFCFE; border:2px solid var(--accent); border-radius:var(--r);
+    padding:17px 56px 17px 19px; margin:15px 0; position:relative; font-size:16px; line-height:1.7; white-space:pre-wrap}
+  .prompt .copy{background:var(--accent); border-color:var(--accent); color:#fff}
+  .prompt .copy:hover{background:#1B5AD0}
+  .prompt .label{position:absolute; top:-11px; left:15px; background:var(--accent); color:#fff;
+    font-size:11.5px; font-weight:800; padding:2px 10px; border-radius:99px}
+  table{width:100%; border-collapse:collapse; margin:17px 0; font-size:16px}
+  th,td{border:1px solid var(--line); padding:9px 12px; text-align:left; vertical-align:top}
+  th{background:var(--surface-2); font-weight:800; font-size:15px}
   td.c,th.c{text-align:center}
   tr.hi td{background:var(--ok-bg); font-weight:600}
-
-  /* ---- timeline ---- */
-  .tl{display:grid; grid-template-columns:auto 1fr; gap:0 18px; margin:20px 0}
-  .tl .t{font-weight:700; color:var(--accent); padding:9px 0; white-space:nowrap; font-variant-numeric:tabular-nums}
+  .tl{display:grid; grid-template-columns:auto 1fr; gap:0 18px; margin:19px 0}
+  .tl .t{font-weight:800; color:var(--accent); padding:9px 0; white-space:nowrap;
+    font-variant-numeric:tabular-nums; border-bottom:1px solid var(--line)}
   .tl .d{padding:9px 0; border-bottom:1px solid var(--line)}
-  .tl .t{border-bottom:1px solid var(--line)}
-
-  /* ---- steps ---- */
-  .step{border-left:3px solid var(--accent); padding:2px 0 2px 22px; margin:26px 0}
-  .step .n{
-    display:inline-block; background:var(--accent); color:#fff; font-size:13px; font-weight:700;
-    border-radius:99px; padding:2px 11px; margin-bottom:6px;
-  }
+  .step{border-left:3px solid var(--accent); padding:2px 0 2px 21px; margin:25px 0}
+  .step .n{display:inline-block; background:var(--accent); color:#fff; font-size:12.5px; font-weight:800;
+    border-radius:99px; padding:2px 11px; margin-bottom:5px}
   .step h3{margin:6px 0 8px}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:12px; margin:19px 0}
+  .card{border:1px solid var(--line); border-radius:var(--r); padding:13px 15px; background:var(--surface-2)}
+  .card b{display:block; font-size:16.5px; margin-bottom:3px}
+  .card span{font-size:14px; color:var(--ink-soft); line-height:1.55}
+  details{border:1px solid var(--line); border-radius:var(--r); padding:12px 16px; margin:19px 0; background:var(--surface-2)}
+  details summary{cursor:pointer; font-weight:800; color:var(--accent); font-size:15.5px}
+  button.dl{background:var(--accent); color:#fff; border:none; border-radius:9px; padding:12px 22px;
+    font-size:16px; font-weight:800; cursor:pointer; font-family:inherit}
+  button.dl:hover{background:#1B5AD0}
+  kbd{background:var(--surface-2); border:1px solid #C3CDDC; border-bottom-width:2px; border-radius:5px;
+    padding:1px 7px; font-size:13.5px; font-weight:700}
+  .muted{color:var(--ink-soft)}
 
-  /* ---- menu grid ---- */
-  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(215px,1fr)); gap:12px; margin:20px 0}
-  .card{border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; background:#fbfcfe}
-  .card b{display:block; font-size:17px; margin-bottom:4px}
-  .card span{font-size:14.5px; color:var(--muted); line-height:1.6}
-
-  kbd{
-    background:#f6f8fa; border:1px solid #ccd3da; border-bottom-width:2px; border-radius:5px;
-    padding:1px 7px; font-size:14px; font-family:inherit; font-weight:600;
-  }
-
-  details{border:1px solid var(--line); border-radius:var(--radius); padding:12px 16px; margin:20px 0; background:#fbfcfe}
-  details summary{cursor:pointer; font-weight:700; color:var(--accent); font-size:16px}
-  details[open] summary{margin-bottom:8px}
-  button.dl{
-    background:var(--accent); color:#fff; border:none; border-radius:8px;
-    padding:12px 22px; font-size:16.5px; font-weight:700; cursor:pointer; font-family:inherit;
-  }
-  button.dl:hover{background:#1a5ed0}
-  .pc{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:20px 0}
-  .pc .box{margin:0}
-  .pc ul{padding-left:20px; margin:0}
-  .pc li{margin:5px 0; font-size:16px}
-  @media (max-width:720px){ .pc{grid-template-columns:1fr} }
-  .muted{color:var(--muted)}
-  footer{padding:40px 0; color:var(--muted); font-size:15px; text-align:center}
-
-  @media (max-width:640px){
+  /* ---------- 모바일 ---------- */
+  .sb-toggle{display:none; position:fixed; top:12px; left:12px; z-index:70; background:var(--ink);
+    color:#fff; border:none; border-radius:10px; padding:9px 14px; font-size:15px; font-weight:700; cursor:pointer}
+  .scrim{display:none; position:fixed; inset:0; background:rgba(21,35,62,.4); z-index:55}
+  @media (max-width:980px){
+    aside.sb{transform:translateX(-100%); transition:transform .25s}
+    body.nav-open aside.sb{transform:none}
+    body.nav-open .scrim{display:block}
+    .sb-toggle{display:block}
+    main{margin-left:0; padding:64px 14px 80px}
+    .chapter{padding:22px 18px 20px; border-radius:12px}
+    .ch-head h2{font-size:21px}
+    .pc{grid-template-columns:1fr}
+    .guide{flex-direction:column; align-items:flex-start}
+    .guide-bubble{width:100%; border-radius:5px 14px 14px 14px}
+    .guide-bubble::before{left:20px; top:-7px; bottom:auto; border:none;
+      border-left:1px solid var(--line); border-top:1px solid var(--line)}
     body{font-size:16.5px}
-    header.hero h1{font-size:31px}
-    section>h2{font-size:24px}
-    .wrap{padding:0 16px 80px}
-    nav .inner{padding:8px 16px}
   }
   @media print{
-    nav{display:none} .copy{display:none}
-    section{break-inside:avoid; padding:24px 0}
-    body{font-size:12pt}
+    aside.sb,.sb-toggle,.pager,.copy,.scrim{display:none}
+    main{margin:0; padding:0; max-width:none}
+    .chapter{display:block !important; box-shadow:none; border:none; break-after:page; padding:0 0 20px}
+    body{font-size:11.5pt; background:none}
   }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<g id="lm-base">
+  <rect x="33" y="100" width="7" height="15" rx="3.5" fill="#E0CFB4"/>
+  <rect x="60" y="100" width="7" height="15" rx="3.5" fill="#E0CFB4"/>
+  <rect x="44" y="102" width="7" height="13" rx="3.5" fill="#EADCC6"/>
+  <ellipse cx="50" cy="86" rx="26" ry="19" fill="#F5EBDC"/>
+  <path d="M26 82 q24 -9 48 0 l0 9 q-24 9 -48 0 z" fill="#2F6FEB"/>
+  <path d="M26 82 q24 -9 48 0" stroke="#1B4FB8" stroke-width="2" fill="none"/>
+  <rect x="43" y="44" width="14" height="32" rx="7" fill="#F5EBDC"/>
+  <ellipse cx="39" cy="15" rx="4.5" ry="10" fill="#EADCC6"/>
+  <ellipse cx="59" cy="15" rx="4.5" ry="10" fill="#EADCC6"/>
+  <rect x="32" y="19" width="34" height="31" rx="14" fill="#F5EBDC"/>
+  <rect x="40" y="37" width="18" height="12" rx="6" fill="#E7D8C0"/>
+  <circle cx="45.5" cy="41" r="1.1" fill="#15233E"/><circle cx="52.5" cy="41" r="1.1" fill="#15233E"/>
+</g>
+</defs>
 
-<nav><div class="inner">
-  <a href="#goal">오늘의 목표</a>
-  <a href="#llm">LLM이란</a>
-  <a href="#why">왜 로컬인가</a>
-  <a href="#kinds">모델의 종류</a>
-  <a href="#ollama">Ollama</a>
-  <a href="#check">⓪ 점검</a>
-  <a href="#install">① 설치</a>
-  <a href="#cli">② 첫 대화</a>
-  <a href="#vscode">③ VS Code</a>
-  <a href="#vibe">④ 바이브코딩</a>
-  <a href="#menu">확장 과제</a>
-  <a href="#trouble">문제 해결</a>
-  <a href="#next">집에서</a>
-</div></nav>
+<symbol id="lm-hello" viewBox="0 0 100 120">
+  <rect x="70" y="62" width="7" height="19" rx="3.5" fill="#EADCC6" transform="rotate(35 73 71)"/>
+  <use href="#lm-base"/>
+  <circle cx="42" cy="30" r="2.7" fill="#15233E"/><circle cx="56" cy="30" r="2.7" fill="#15233E"/>
+  <path d="M45 46 q4 3.5 8 0" stroke="#15233E" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <circle cx="35" cy="35" r="3" fill="#F2A7A0" opacity=".55"/><circle cx="63" cy="35" r="3" fill="#F2A7A0" opacity=".55"/>
+</symbol>
 
-<div class="wrap">
+<symbol id="lm-teach" viewBox="0 0 100 120">
+  <use href="#lm-base"/>
+  <rect x="70" y="64" width="7" height="20" rx="3.5" fill="#EADCC6" transform="rotate(-18 73 74)"/>
+  <circle cx="77" cy="60" r="3.2" fill="#EADCC6"/>
+  <circle cx="42" cy="30" r="2.7" fill="#15233E"/><circle cx="56" cy="30" r="2.7" fill="#15233E"/>
+  <path d="M45 46 q4 2.5 8 0" stroke="#15233E" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+</symbol>
 
-<header class="hero">
-  <div class="eyebrow">100분 실습 · 내 컴퓨터에서 돌리는 AI</div>
-  <h1>로컬 LLM으로<br>바이브코딩 시작하기</h1>
-  <p class="lead">인터넷도, 결제도, 구독도 없이 — 내 PC의 그래픽카드로 AI를 돌려서 코드를 만들어 봅니다.</p>
-</header>
+<symbol id="lm-think" viewBox="0 0 100 120">
+  <use href="#lm-base"/>
+  <circle cx="78" cy="22" r="3" fill="#C7D3E6"/><circle cx="85" cy="13" r="4.5" fill="#C7D3E6"/>
+  <text x="85" y="17" font-size="8" font-weight="800" text-anchor="middle" fill="#15233E" font-family="sans-serif">?</text>
+  <circle cx="42" cy="30" r="2.7" fill="#15233E"/><circle cx="56" cy="30" r="2.7" fill="#15233E"/>
+  <path d="M45 47 q4 -2 8 0" stroke="#15233E" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+</symbol>
 
-<!-- ===================== 목표 ===================== -->
-<section id="goal">
-  <h2><span class="num">시작</span>오늘의 목표</h2>
+<symbol id="lm-wow" viewBox="0 0 100 120">
+  <use href="#lm-base"/>
+  <circle cx="42" cy="30" r="3.6" fill="#15233E"/><circle cx="56" cy="30" r="3.6" fill="#15233E"/>
+  <circle cx="43.2" cy="28.8" r="1.2" fill="#fff"/><circle cx="57.2" cy="28.8" r="1.2" fill="#fff"/>
+  <ellipse cx="49" cy="46.5" rx="3" ry="3.6" fill="#15233E"/>
+  <text x="80" y="24" font-size="20" font-weight="900" fill="#E5533D" font-family="sans-serif">!</text>
+</symbol>
+
+<symbol id="lm-ok" viewBox="0 0 100 120">
+  <use href="#lm-base"/>
+  <rect x="70" y="66" width="7" height="17" rx="3.5" fill="#EADCC6" transform="rotate(20 73 74)"/>
+  <path d="M40 29 q2.5 -3 5 0" stroke="#15233E" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M54 29 q2.5 -3 5 0" stroke="#15233E" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M44 45 q5 5 10 0" stroke="#15233E" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M76 20 l4 5 8 -10" stroke="#1F9D57" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</symbol>
+</svg>
+
+<button class="sb-toggle" id="sbToggle">☰ 목차</button>
+<div class="scrim" id="scrim"></div>
+
+<aside class="sb">
+  <div class="sb-top">
+    <div class="kicker">100분 실습</div>
+    <h1>로컬 LLM으로<br>바이브코딩</h1>
+    <div class="prog">
+      <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+      <div class="prog-txt" id="progTxt">0 / 14</div>
+    </div>
+  </div>
+  <nav class="sb-nav" id="sbNav">
+    <a class="nav-item" data-go="00"><span class="nv-no">00</span>시작하기</a>
+    <div class="nav-grp">개념</div>
+    <a class="nav-item" data-go="01"><span class="nv-no">01</span>LLM이 뭔가요</a>
+    <a class="nav-item" data-go="02"><span class="nv-no">02</span>왜 내 PC에서?</a>
+    <a class="nav-item" data-go="03"><span class="nv-no">03</span>모델 고르는 법</a>
+    <a class="nav-item" data-go="04"><span class="nv-no">04</span>내 PC에 맞추기</a>
+    <a class="nav-item" data-go="05"><span class="nv-no">05</span>Ollama란</a>
+    <div class="nav-grp">실습</div>
+    <a class="nav-item" data-go="06"><span class="nv-no">06</span>PC 점검</a>
+    <a class="nav-item" data-go="07"><span class="nv-no">07</span>설치하기</a>
+    <a class="nav-item" data-go="08"><span class="nv-no">08</span>채팅 연습</a>
+    <a class="nav-item" data-go="09"><span class="nv-no">09</span>VS Code 연결</a>
+    <a class="nav-item" data-go="10"><span class="nv-no">10</span>바이브코딩</a>
+    <a class="nav-item" data-go="11"><span class="nv-no">11</span>내 것 만들기</a>
+    <div class="nav-grp">마무리</div>
+    <a class="nav-item" data-go="12"><span class="nv-no">12</span>문제 해결</a>
+    <a class="nav-item" data-go="13"><span class="nv-no">13</span>정리</a>
+  </nav>
+  <div class="sb-foot">
+    <a href="https://ollama.com" target="_blank" rel="noopener">ollama.com</a> ·
+    <a href="https://docs.ollama.com" target="_blank" rel="noopener">공식 문서</a> ·
+    <a href="https://ollama.com/search" target="_blank" rel="noopener">모델 찾기</a>
+  </div>
+</aside>
+
+<main id="main">
+<article class="chapter" id="ch00" data-no="00">
+  <div class="ch-head"><div class="ch-no">00</div><h2>시작하기</h2></div>
+  <div class="guide">
+    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-hello"/></svg>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>안녕! 나는 라마야. 오늘 100분, 같이 가보자.</p></div>
+  </div>
   <p class="sub">끝나고 나면 이 세 가지를 할 수 있게 됩니다.</p>
 
   <ol>
@@ -219,11 +300,16 @@
     위쪽 메뉴로 언제든 이동할 수 있습니다. 회색 상자의 <strong>복사</strong> 버튼을 누르면
     명령어나 프롬프트가 클립보드에 들어갑니다. 진도를 놓쳐도 혼자 따라올 수 있어요.
   </div>
-</section>
 
-<!-- ===================== LLM이란 ===================== -->
-<section id="llm">
-  <h2><span class="num">1</span>LLM이 뭔가요?</h2>
+  <div class="pager"><span></span><button class="pg next" data-go="01">LLM이 뭔가요 →</button></div>
+</article>
+
+<article class="chapter" id="ch01" data-no="01">
+  <div class="ch-head"><div class="ch-no">01</div><h2>LLM이 뭔가요</h2></div>
+  <div class="guide">
+    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-teach"/></svg>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>나 같은 애들은 사실 '다음 단어 맞히기' 선수야.</p></div>
+  </div>
   <p class="sub">Large Language Model — 커다란 언어 모델.</p>
 
   <h3>하는 일은 딱 하나입니다: 다음 단어 맞히기</h3>
@@ -256,11 +342,16 @@
     오늘 쓸 모델은 <strong>가장 작은 축</strong>입니다. ChatGPT를 기대하면 실망합니다.
     대신 <strong>내 컴퓨터에서, 공짜로, 인터넷 없이</strong> 돕니다. 그 대가를 오늘 직접 확인해 봅시다.
   </div>
-</section>
 
-<!-- ===================== 왜 로컬인가 ===================== -->
-<section id="why">
-  <h2><span class="num">2</span>왜 굳이 내 PC에서?</h2>
+  <div class="pager"><button class="pg prev" data-go="00">← 시작하기</button><button class="pg next" data-go="02">왜 내 PC에서? →</button></div>
+</article>
+
+<article class="chapter" id="ch02" data-no="02">
+  <div class="ch-head"><div class="ch-no">02</div><h2>왜 내 PC에서?</h2></div>
+  <div class="guide">
+    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-think"/></svg>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>인터넷이 없어도, 내가 네 컴퓨터 안에 있으면 되잖아?</p></div>
+  </div>
   <p class="sub">ChatGPT 놔두고 왜 이 고생을 하는가.</p>
 
   <table>
@@ -286,11 +377,16 @@
     "로컬이 좋다"가 아니라 <strong>"어떤 일에 로컬을 쓰고 어떤 일에 클라우드를 쓸지 판단할 줄 아는 것"</strong>입니다.
     양쪽을 다 써본 사람만 판단할 수 있습니다.
   </div>
-</section>
 
-<!-- ===================== 종류 ===================== -->
-<section id="kinds">
-  <h2><span class="num">3</span>모델에도 종류가 있습니다</h2>
+  <div class="pager"><button class="pg prev" data-go="01">← LLM이 뭔가요</button><button class="pg next" data-go="03">모델 고르는 법 →</button></div>
+</article>
+
+<article class="chapter" id="ch03" data-no="03">
+  <div class="ch-head"><div class="ch-no">03</div><h2>모델 고르는 법</h2></div>
+  <div class="guide">
+    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-teach"/></svg>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>덩치보다 뭘 배웠느냐가 중요해. 나는 코딩만 팠거든.</p></div>
+  </div>
   <p class="sub">모델을 고를 때 봐야 하는 세 가지 축.</p>
 
   <h3>① 용도 — 범용이냐 코딩 특화냐</h3>
@@ -386,6 +482,16 @@
     "기능이 많은 쪽이 좋다"가 아니라 <strong>"내 목적에 맞는 쪽이 좋다"</strong>는 게 모델 선택의 핵심입니다.
   </div>
 
+
+  <div class="pager"><button class="pg prev" data-go="02">← 왜 내 PC에서?</button><button class="pg next" data-go="04">내 PC에 맞추기 →</button></div>
+</article>
+
+<article class="chapter" id="ch04" data-no="04">
+  <div class="ch-head"><div class="ch-no">04</div><h2>내 PC에 맞추기</h2></div>
+  <div class="guide">
+    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-think"/></svg>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>메모장이 꽉 차면 나도 앞 얘기를 까먹어.</p></div>
+  </div>
   <h3>④ KV 캐시 — 대화를 기억하는 공간</h3>
   <p>
     설치할 때 <code class="inline">OLLAMA_KV_CACHE_TYPE = q8_0</code>을 넣었죠. 그게 뭔지 알아봅시다.
@@ -491,11 +597,16 @@ OLLAMA_KV_CACHE_TYPE   = q8_0  ← 이게 동작합니다</div>
     <code class="inline">qwen2.5-coder:3b</code>는 3B밖에 안 되지만 <strong>코딩만 훈련받아서</strong>
     비슷한 크기의 범용 모델보다 코드를 훨씬 잘 씁니다. 크기가 전부가 아닙니다.
   </div>
-</section>
 
-<!-- ===================== Ollama ===================== -->
-<section id="ollama">
-  <h2><span class="num">4</span>Ollama가 하는 일</h2>
+  <div class="pager"><button class="pg prev" data-go="03">← 모델 고르는 법</button><button class="pg next" data-go="05">Ollama란 →</button></div>
+</article>
+
+<article class="chapter" id="ch05" data-no="05">
+  <div class="ch-head"><div class="ch-no">05</div><h2>Ollama란</h2></div>
+  <div class="guide">
+    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-hello"/></svg>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>11434 — 이게 내 방 번호야. 기억해 둬.</p></div>
+  </div>
   <p class="sub">모델을 내 PC에서 굴리기 쉽게 만들어주는 프로그램.</p>
 
   <p>원래 로컬 LLM은 설정이 지옥이었습니다. Ollama는 이걸 <strong>명령어 한 줄</strong>로 만들었습니다.</p>
@@ -511,11 +622,16 @@ OLLAMA_KV_CACHE_TYPE   = q8_0  ← 이게 동작합니다</div>
 
   <div class="code">[ VS Code ]  ──▶  localhost:11434  ──▶  [ Ollama ]  ──▶  [ RTX 2060 ]
    내가 쓰는 곳          내 PC 안                프로그램          실제 연산</div>
-</section>
 
-<!-- ===================== 실습 0: 점검 ===================== -->
-<section id="check">
-  <h2><span class="num">실습 ⓪</span>내 PC 점검 <span class="muted" style="font-size:17px;font-weight:400">· 3분</span></h2>
+  <div class="pager"><button class="pg prev" data-go="04">← 내 PC에 맞추기</button><button class="pg next" data-go="06">PC 점검 →</button></div>
+</article>
+
+<article class="chapter" id="ch06" data-no="06">
+  <div class="ch-head"><div class="ch-no">06</div><h2>PC 점검</h2></div>
+  <div class="guide">
+    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-ok"/></svg>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>시작 전에 네 컴퓨터부터 건강검진!</p></div>
+  </div>
   <p class="sub">설치 전에 이 PC가 준비됐는지 한 번에 확인합니다.</p>
 
   <p>아래 두 파일을 <strong>같은 폴더에</strong> 내려받고 <code class="inline">run-check.bat</code>을 더블클릭하세요.</p>
@@ -542,7 +658,8 @@ OLLAMA_KV_CACHE_TYPE   = q8_0  ← 이게 동작합니다</div>
   <div class="box ok">
     <span class="t">초록색 [OK]만 있으면 통과</span>
     빨간 <strong>[경고]</strong>가 뜨면 그 줄을 조교에게 보여주세요.
-    특히 <strong>드라이버 551.61 미만</strong>은 수업 전에 반드시 해결해야 합니다.
+    특히 <strong>드라이버 551.61 미만</strong>은 수업 전에 반드시 해결해야 합니다
+    (<a href="https://www.nvidia.com/ko-kr/drivers/" target="_blank" rel="noopener">드라이버 받기</a>).
   </div>
 
   <div class="box warn">
@@ -557,17 +674,25 @@ OLLAMA_KV_CACHE_TYPE   = q8_0  ← 이게 동작합니다</div>
     <summary>전체 소스 보기 (check-env.ps1)</summary>
     <div class="code" style="max-height:420px; overflow:auto"><button class="copy">복사</button><span id="ps1-view"></span></div>
   </details>
-</section>
 
-<!-- ===================== 실습 1: 설치 ===================== -->
-<section id="install">
-  <h2><span class="num">실습 ①</span>설치하기 <span class="muted" style="font-size:17px;font-weight:400">· 15분</span></h2>
+  <div class="pager"><button class="pg prev" data-go="05">← Ollama란</button><button class="pg next" data-go="07">설치하기 →</button></div>
+</article>
+
+<article class="chapter" id="ch07" data-no="07">
+  <div class="ch-head"><div class="ch-no">07</div><h2>설치하기</h2></div>
+  <div class="guide">
+    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-wow"/></svg>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>manifests 폴더 빼먹으면 나 안 보여. 진짜야!</p></div>
+  </div>
   <p class="sub">Ollama를 깔고, 모델을 가져오고, 잘 되는지 확인합니다.</p>
 
   <div class="step">
     <span class="n">STEP 1</span>
     <h3>Ollama 설치</h3>
     <p>배포된 <code class="inline">OllamaSetup.exe</code>를 실행하고 기본값으로 진행하세요.</p>
+    <p class="muted">파일이 없거나 집에서 설치한다면 →
+      <a href="https://ollama.com/download/windows" target="_blank" rel="noopener">ollama.com/download/windows</a>
+      (바로 받기: <a href="https://ollama.com/download/OllamaSetup.exe" target="_blank" rel="noopener">OllamaSetup.exe</a>)</p>
     <div class="box ok"><span class="t">관리자 권한 필요 없습니다</span>
       내 계정 안에 설치되므로 실습실 PC의 권한 제한과 무관합니다.</div>
     <p>설치가 끝나면 작업표시줄 오른쪽에 <strong>Ollama 아이콘</strong>이 생깁니다.</p>
@@ -618,7 +743,7 @@ OLLAMA_KV_CACHE_TYPE   = q8_0  ← 이게 동작합니다</div>
     <span class="n">STEP 3</span>
     <h3>환경변수 2개 설정</h3>
     <p><strong>대화 기억 공간(KV 캐시)을 절반으로 압축</strong>해서, 같은 그래픽카드로 더 긴 대화를 가능하게 하는 설정입니다.
-       (자세한 설명은 <a href="#kinds">모델의 종류 ④</a>)</p>
+       (자세한 설명은 <a class="jump" data-go="04">04 내 PC에 맞추기</a>)</p>
     <p><kbd>Win</kbd> 키 → <strong>"환경 변수"</strong> 검색 → <strong>계정의 환경 변수 편집</strong> → 새로 만들기로 두 개 추가:</p>
     <div class="code"><button class="copy">복사</button>OLLAMA_FLASH_ATTENTION = 1
 OLLAMA_KV_CACHE_TYPE   = q8_0</div>
@@ -634,7 +759,23 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
        아무것도 안 뜨면 STEP 2의 <code class="inline">manifests</code>를 확인하세요.</p>
     <p>그래픽카드를 제대로 쓰는지도 확인해 둡시다:</p>
     <div class="code"><button class="copy">복사</button>nvidia-smi</div>
-    <p class="muted">카드 이름과 메모리(6GB 내외), 드라이버 버전이 나옵니다. 드라이버가 <strong>551.61 미만</strong>이면 그래픽카드를 못 쓰고 매우 느려집니다 — 조교에게 알려주세요.</p>
+    <p class="muted">카드 이름과 메모리(6GB 내외), 드라이버 버전이 나옵니다.</p>
+
+    <div class="box warn">
+      <span class="t">⚠️ 드라이버 551.61 이상이어야 합니다</span>
+      미만이면 그래픽카드를 못 쓰고 <strong>CPU로 동작해 매우 느려집니다.</strong>
+      <h4 style="margin:12px 0 4px">확인하는 방법 (셋 중 아무거나)</h4>
+      <ul style="margin-bottom:10px">
+        <li><code class="inline">nvidia-smi</code> — 오른쪽 위 <code class="inline">Driver Version</code></li>
+        <li>바탕화면 우클릭 → <strong>NVIDIA 제어판</strong> → 좌측 하단 <strong>시스템 정보</strong></li>
+        <li><kbd>Win</kbd>+<kbd>R</kbd> → <code class="inline">dxdiag</code> → <strong>디스플레이</strong> 탭</li>
+      </ul>
+      <h4 style="margin:12px 0 4px">낮으면 업데이트</h4>
+      <a href="https://www.nvidia.com/ko-kr/drivers/" target="_blank" rel="noopener">nvidia.com/ko-kr/drivers</a>
+      에서 카드 모델을 선택해 받거나,
+      <a href="https://www.nvidia.com/ko-kr/software/nvidia-app/" target="_blank" rel="noopener">NVIDIA 앱</a>으로 자동 업데이트.
+      <strong>수업 중에 하기엔 오래 걸리니 조교에게 먼저 알려주세요.</strong>
+    </div>
   </div>
 
   <h3>모델 관리 명령어 정리</h3>
@@ -647,39 +788,92 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
     <tr><td><code class="inline">ollama rm &lt;모델&gt;</code></td><td>모델 삭제 (디스크 확보)</td></tr>
     <tr><td><code class="inline">ollama show &lt;모델&gt;</code></td><td>모델 정보 (크기·컨텍스트 등)</td></tr>
   </table>
-</section>
 
-<!-- ===================== 실습 2: CLI ===================== -->
-<section id="cli">
-  <h2><span class="num">실습 ②</span>첫 대화 <span class="muted" style="font-size:17px;font-weight:400">· 10분</span></h2>
-  <p class="sub">VS Code로 가기 전에, 검은 창에서 직접 말을 걸어봅니다.</p>
+  <div class="pager"><button class="pg prev" data-go="06">← PC 점검</button><button class="pg next" data-go="08">채팅 연습 →</button></div>
+</article>
+
+<article class="chapter" id="ch08" data-no="08">
+  <div class="ch-head"><div class="ch-no">08</div><h2>채팅 연습</h2></div>
+  <div class="guide">
+    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-wow"/></svg>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>없는 함수도 그럴듯하게 지어낼 거야. 속지 마!</p></div>
+  </div>
+  <p class="sub">VS Code로 가기 전에, 검은 창에서 직접 말을 걸어봅니다. 여기서 감을 잡아두면 뒤가 쉽습니다.</p>
 
   <div class="code"><button class="copy">복사</button>ollama run qwen2.5-coder:3b</div>
   <p class="muted">다른 모델을 받았다면 <code class="inline">ollama list</code>에 뜬 이름으로 바꿔 넣으세요.</p>
+  <p>잠깐 로딩된 뒤 <code class="inline">&gt;&gt;&gt;</code> 표시가 나오면 준비 완료입니다.</p>
 
-  <p>잠깐 로딩된 뒤 프롬프트가 뜹니다. 아무거나 물어보세요.</p>
-  <div class="prompt"><span class="label">해볼 것</span><button class="copy">복사</button>자바스크립트에서 배열의 중복을 제거하는 가장 짧은 방법은?</div>
+  <h3>연습 1 · 그냥 물어보기</h3>
+  <div class="prompt"><button class="copy">복사</button>자바스크립트에서 배열의 중복을 제거하는 가장 짧은 방법은?</div>
+  <p>글자가 <strong>실시간으로 찍혀 나옵니다.</strong> 이게 지금 내 2060이 계산하고 있는 속도예요.</p>
 
-  <h3>관찰해 볼 것 세 가지</h3>
-  <ol>
-    <li><strong>속도</strong> — 글자가 실시간으로 찍혀 나옵니다. 이게 내 2060이 계산하고 있는 속도입니다</li>
-    <li><strong>인터넷을 꺼도 됩니다</strong> — 랜선을 뽑고 다시 물어보세요. 똑같이 답합니다</li>
-    <li><strong>한국어 vs 영어</strong> — 같은 질문을 영어로도 던져보세요. <strong>영어 답변 품질이 대체로 더 좋습니다.</strong> 작은 모델일수록 차이가 큽니다</li>
-  </ol>
+  <h3>연습 2 · 코드 시켜보기</h3>
+  <div class="prompt"><button class="copy">복사</button>1부터 100까지 소수(prime number)를 모두 출력하는 파이썬 코드를 짜줘. 설명은 짧게.</div>
 
-  <p>나가려면:</p>
-  <div class="code"><button class="copy">복사</button>/bye</div>
+  <h3>연습 3 · 코드 설명시키기</h3>
+  <p>여러 줄을 입력할 땐 <strong>큰따옴표 3개</strong>로 감쌉니다.</p>
+  <div class="code"><button class="copy">복사</button>&gt;&gt;&gt; """이 코드가 뭐 하는 건지 한 줄로 설명해줘.
+... const r = [...new Set(arr)].sort((a,b) =&gt; a-b);
+... """</div>
+  <p class="muted"><code class="inline">"""</code>를 치고 엔터 → 내용 입력 → 마지막 줄에 <code class="inline">"""</code> 치고 엔터.</p>
 
+  <h3>연습 4 · 한국어 vs 영어</h3>
+  <p>같은 질문을 두 언어로 던져서 답변을 비교해 보세요.</p>
+  <div class="prompt"><button class="copy">복사</button>Explain what a closure is in JavaScript, in two sentences.</div>
+  <div class="box tip">
+    <span class="t">대체로 영어 쪽이 낫습니다</span>
+    작은 모델일수록 차이가 큽니다. 학습 데이터에 영어가 압도적으로 많기 때문이에요.
+    <strong>답이 이상하면 영어로 바꿔보는 게 좋은 습관</strong>입니다.
+  </div>
+
+  <h3>연습 5 · 일부러 헛소리를 시켜보기 ★</h3>
+  <p>이걸 꼭 해보세요. <strong>오늘 가장 중요한 연습</strong>입니다.</p>
+  <div class="prompt"><button class="copy">복사</button>자바스크립트 Array.prototype.shuffle() 메서드 사용법을 예제와 함께 알려줘.</div>
+  <div class="box danger">
+    <span class="t">🔴 그런 메서드는 존재하지 않습니다</span>
+    그런데 모델은 아마 <strong>아주 그럴듯하게 사용법을 설명</strong>할 겁니다. 예제 코드까지 만들어서요.<br><br>
+    이게 <strong>환각(hallucination)</strong>입니다. LLM은 "아는 것"이 아니라 <strong>"그럴듯한 것"</strong>을 내놓는다고 했죠.
+    없는 함수도 있을 법하게 지어냅니다.<br><br>
+    <strong>바이브코딩에서 이게 그대로 나타납니다.</strong> AI가 준 코드가 실행이 안 되는 흔한 이유가
+    바로 <strong>존재하지 않는 함수를 갖다 쓰는 것</strong>이에요.
+    그래서 <strong>받은 코드는 반드시 돌려봐야 합니다.</strong>
+  </div>
+
+  <h3>채팅 중에 쓰는 명령어</h3>
+  <table>
+    <tr><th style="width:26%">입력</th><th>하는 일</th></tr>
+    <tr><td><code class="inline">/?</code></td><td>쓸 수 있는 명령 전체 보기</td></tr>
+    <tr><td><code class="inline">/bye</code></td><td>채팅 종료</td></tr>
+    <tr><td><code class="inline">"""</code></td><td>여러 줄 입력 시작 / 끝</td></tr>
+  </table>
+  <p class="muted">
+    <code class="inline">/?</code>를 쳐보면 <strong>대화 내용을 비우는 명령</strong>도 있습니다.
+    그게 바로 <a class="jump" data-go="04">④ KV 캐시</a>에서 말한 <strong>"메모장 비우기"</strong>예요.
+  </p>
+
+  <h3>인터넷을 꺼봅시다</h3>
+  <p>
+    랜선을 뽑거나 Wi-Fi를 끄고 다시 물어보세요. <strong>똑같이 답합니다.</strong>
+  </p>
   <div class="box tip">
     <span class="t">지금 무슨 일이 일어났나</span>
     방금 <strong>내 PC의 그래픽카드가 AI를 돌렸습니다.</strong>
     서버도, 계정도, 결제도, 인터넷도 없이요. 이게 오늘 수업의 전부이자 핵심입니다.
   </div>
-</section>
 
-<!-- ===================== 실습 3: VS Code ===================== -->
-<section id="vscode">
-  <h2><span class="num">실습 ③</span>VS Code에 연결 <span class="muted" style="font-size:17px;font-weight:400">· 15분</span></h2>
+  <p>다음 단계로 넘어가려면 채팅을 끝냅니다:</p>
+  <div class="code"><button class="copy">복사</button>/bye</div>
+
+  <div class="pager"><button class="pg prev" data-go="07">← 설치하기</button><button class="pg next" data-go="09">VS Code 연결 →</button></div>
+</article>
+
+<article class="chapter" id="ch09" data-no="09">
+  <div class="ch-head"><div class="ch-no">09</div><h2>VS Code 연결</h2></div>
+  <div class="guide">
+    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-hello"/></svg>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>이제 편집기 안에서 만나자.</p></div>
+  </div>
   <p class="sub">이제 개발 도구 안에서 AI를 씁니다.</p>
 
   <div class="step">
@@ -711,11 +905,16 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
     <p>채팅에 아무거나 쳐보세요. 답이 오면 연결 성공입니다.</p>
     <p class="muted">모델이 안 보이면 → 작업표시줄에 Ollama가 켜져 있는지, <code class="inline">ollama list</code>에 모델이 뜨는지 확인.</p>
   </div>
-</section>
 
-<!-- ===================== 실습 4: 바이브코딩 ===================== -->
-<section id="vibe">
-  <h2><span class="num">실습 ④</span>바이브코딩 맛보기 <span class="muted" style="font-size:17px;font-weight:400">· 30분</span></h2>
+  <div class="pager"><button class="pg prev" data-go="08">← 채팅 연습</button><button class="pg next" data-go="10">바이브코딩 →</button></div>
+</article>
+
+<article class="chapter" id="ch10" data-no="10">
+  <div class="ch-head"><div class="ch-no">10</div><h2>바이브코딩</h2></div>
+  <div class="guide">
+    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-teach"/></svg>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>한 번에 완벽하게? 그런 건 없어. 세 번 고쳐.</p></div>
+  </div>
   <p class="sub">코드를 직접 쓰지 않고, <strong>말로 시켜서</strong> 프로그램을 만듭니다.</p>
 
   <h3>바이브코딩의 루프</h3>
@@ -777,11 +976,16 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
   <h3 style="margin-top:40px">▶ 이제 내 것을 만들 차례</h3>
   <p>아래 메뉴에서 하나 고르고, <strong>최소 3번 이상 고쳐보세요.</strong>
      그리고 <strong>쓴 프롬프트를 기록해두세요</strong> — 활동지에 옮겨 적을 거예요.</p>
-</section>
 
-<!-- ===================== 메뉴판 ===================== -->
-<section id="menu">
-  <h2><span class="num">5</span>확장 과제 메뉴판</h2>
+  <div class="pager"><button class="pg prev" data-go="09">← VS Code 연결</button><button class="pg next" data-go="11">내 것 만들기 →</button></div>
+</article>
+
+<article class="chapter" id="ch11" data-no="11">
+  <div class="ch-head"><div class="ch-no">11</div><h2>내 것 만들기</h2></div>
+  <div class="guide">
+    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-ok"/></svg>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>고민하지 말고 하나 골라. 시간이 아까워!</p></div>
+  </div>
   <p class="sub">하나만 고르세요. 고민하는 시간이 아깝습니다.</p>
 
   <div class="grid">
@@ -821,11 +1025,16 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
     그 지점을 정확히 찾아낸 사람이 오늘 가장 많이 배운 사람입니다.
     "어디까지 되고 어디부터 안 되는가" — 이게 오늘의 진짜 결론입니다.
   </div>
-</section>
 
-<!-- ===================== 트러블슈팅 ===================== -->
-<section id="trouble">
-  <h2><span class="num">6</span>이럴 땐 이렇게</h2>
+  <div class="pager"><button class="pg prev" data-go="10">← 바이브코딩</button><button class="pg next" data-go="12">문제 해결 →</button></div>
+</article>
+
+<article class="chapter" id="ch12" data-no="12">
+  <div class="ch-head"><div class="ch-no">12</div><h2>문제 해결</h2></div>
+  <div class="guide">
+    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-think"/></svg>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>느려지면 새 대화 시작. 내 메모장 비우는 거야.</p></div>
+  </div>
   <p class="sub">오늘 실제로 터질 문제들.</p>
 
   <table>
@@ -866,11 +1075,16 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
     <strong>100% GPU</strong>로 나와야 정상입니다.
     <strong>CPU 비율이 잡히면</strong> 모델이 그래픽카드에 다 안 들어간 겁니다 → 조교에게 알려주세요 (더 작은 모델로 교체).
   </p>
-</section>
 
-<!-- ===================== 마무리 ===================== -->
-<section id="next">
-  <h2><span class="num">끝</span>정리, 그리고 집에서</h2>
+  <div class="pager"><button class="pg prev" data-go="11">← 내 것 만들기</button><button class="pg next" data-go="13">정리 →</button></div>
+</article>
+
+<article class="chapter" id="ch13" data-no="13">
+  <div class="ch-head"><div class="ch-no">13</div><h2>정리</h2></div>
+  <div class="guide">
+    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-ok"/></svg>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>오늘 만든 건 전부 네 컴퓨터에 남아. 집에서도 해봐!</p></div>
+  </div>
 
   <h3>오늘 확인한 것</h3>
   <ul>
@@ -893,9 +1107,9 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
   </p>
   <ul>
     <li>모델 받기 — <code class="inline">ollama pull &lt;모델명&gt;</code></li>
-    <li>모델 찾기 — <strong>ollama.com/search</strong> 에서 크기·용도별로 탐색</li>
+    <li>모델 찾기 — <a href="https://ollama.com/search" target="_blank" rel="noopener"><strong>ollama.com/search</strong></a> 에서 크기·용도별로 탐색</li>
     <li>내 PC가 더 좋은 그래픽카드라면 <strong>더 큰 모델</strong>에 도전 (VRAM의 60~70% 이내)</li>
-    <li>공식 문서 — <strong>docs.ollama.com</strong></li>
+    <li>공식 문서 — <a href="https://docs.ollama.com" target="_blank" rel="noopener"><strong>docs.ollama.com</strong></a></li>
   </ul>
 
   <h4>집 PC 사양별로 받아볼 모델</h4>
@@ -911,43 +1125,23 @@ ollama pull gemma3:4b             # 3.3GB - 범용 대화용</div>
     <li><strong>REST API</strong> — <code class="inline">localhost:11434</code>에 직접 요청을 보내 내 프로그램에 AI 붙이기</li>
     <li><strong>RAG</strong> — 내 문서를 읽고 답하는 AI 만들기</li>
   </ul>
-</section>
 
-<footer>
-  로컬 LLM 바이브코딩 실습 · 이 페이지도 HTML 파일 하나입니다 — 여러분이 오늘 만든 것과 같은 형식으로요.
-</footer>
+  <h3>참고 링크 모음</h3>
+  <table>
+    <tr><th style="width:38%">무엇</th><th>주소</th></tr>
+    <tr><td>Ollama 홈</td><td><a href="https://ollama.com" target="_blank" rel="noopener">ollama.com</a></td></tr>
+    <tr><td>설치 파일 (Windows)</td><td><a href="https://ollama.com/download/windows" target="_blank" rel="noopener">ollama.com/download/windows</a></td></tr>
+    <tr><td>모델 찾기</td><td><a href="https://ollama.com/search" target="_blank" rel="noopener">ollama.com/search</a></td></tr>
+    <tr><td>오늘 쓴 모델</td><td><a href="https://ollama.com/library/qwen2.5-coder" target="_blank" rel="noopener">ollama.com/library/qwen2.5-coder</a></td></tr>
+    <tr><td>공식 문서</td><td><a href="https://docs.ollama.com" target="_blank" rel="noopener">docs.ollama.com</a></td></tr>
+    <tr><td>NVIDIA 드라이버</td><td><a href="https://www.nvidia.com/ko-kr/drivers/" target="_blank" rel="noopener">nvidia.com/ko-kr/drivers</a></td></tr>
+    <tr><td>VS Code</td><td><a href="https://code.visualstudio.com/download" target="_blank" rel="noopener">code.visualstudio.com/download</a></td></tr>
+  </table>
 
-</div>
+  <div class="pager"><button class="pg prev" data-go="12">← 문제 해결</button><span class="pg-done">수고했습니다 🎉</span></div>
+</article>
+</main>
 
-<script>
-document.querySelectorAll('.copy').forEach(function(btn){
-  btn.addEventListener('click', function(){
-    var box = btn.parentNode.cloneNode(true);
-    var b = box.querySelector('.copy'); if (b) b.remove();
-    var lb = box.querySelector('.label'); if (lb) lb.remove();
-    var text = box.textContent.trim();
-
-    var done = function(){
-      var old = btn.textContent;
-      btn.textContent = '복사됨'; btn.classList.add('done');
-      setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1400);
-    };
-
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(text).then(done, fallback);
-    } else { fallback(); }
-
-    function fallback(){
-      var ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); done(); } catch(e) { alert('복사에 실패했습니다. 직접 선택해서 복사해 주세요.'); }
-      document.body.removeChild(ta);
-    }
-  });
-});
-</script>
 <script type="text/plain" id="ps1-src">
 # Ollama 수업 사전 점검 스크립트
 # 실습실 PC에서 실행하여 GPU / 드라이버 / 디스크 / VS Code / Ollama 상태를 확인합니다.
@@ -1086,14 +1280,74 @@ REM Keep this file ASCII-only. Korean output comes from check-env.ps1.
 chcp 65001 >nul
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0check-env.ps1"
 </script>
+
 <script>
-// 소스 보기 채우기
+(function(){
+  var chs   = [].slice.call(document.querySelectorAll('.chapter'));
+  var items = [].slice.call(document.querySelectorAll('.nav-item'));
+  var seen  = {};
+
+  function go(no){
+    chs.forEach(function(c){ c.classList.toggle('on', c.dataset.no === no); });
+    items.forEach(function(a){ a.classList.toggle('on', a.dataset.go === no); });
+    seen[no] = 1;
+    items.forEach(function(a){ if (seen[a.dataset.go]) a.classList.add('done'); });
+    var n = Object.keys(seen).length;
+    document.getElementById('progFill').style.width = (n/chs.length*100) + '%';
+    document.getElementById('progTxt').textContent = n + ' / ' + chs.length;
+    if (location.hash !== '#' + no) history.replaceState(null, '', '#' + no);
+    window.scrollTo(0,0);
+    document.body.classList.remove('nav-open');
+  }
+
+  document.addEventListener('click', function(e){
+    var t = e.target.closest('[data-go]');
+    if (t) { e.preventDefault(); go(t.dataset.go); }
+  });
+
+  document.getElementById('sbToggle').onclick = function(){ document.body.classList.toggle('nav-open'); };
+  document.getElementById('scrim').onclick    = function(){ document.body.classList.remove('nav-open'); };
+
+  document.addEventListener('keydown', function(e){
+    if (e.target.matches('input,textarea')) return;
+    var cur = chs.findIndex(function(c){ return c.classList.contains('on'); });
+    if (e.key === 'ArrowRight' && cur < chs.length-1) go(chs[cur+1].dataset.no);
+    if (e.key === 'ArrowLeft'  && cur > 0)            go(chs[cur-1].dataset.no);
+  });
+
+  var start = (location.hash || '').replace('#','');
+  go(chs.some(function(c){ return c.dataset.no === start; }) ? start : '00');
+})();
+
+// 복사
+document.querySelectorAll('.copy').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var box = btn.parentNode.cloneNode(true);
+    var b = box.querySelector('.copy'); if (b) b.remove();
+    var lb = box.querySelector('.label'); if (lb) lb.remove();
+    var text = box.textContent.trim();
+    function done(){
+      var old = btn.textContent;
+      btn.textContent = '복사됨'; btn.classList.add('done');
+      setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1400);
+    }
+    function fallback(){
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch(e) { alert('복사 실패 — 직접 선택해 주세요.'); }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, fallback);
+    else fallback();
+  });
+});
+
+// 점검 스크립트 소스 표시 + 다운로드
 (function(){
   var v = document.getElementById('ps1-view');
   if (v) v.textContent = document.getElementById('ps1-src').textContent.replace(/^\n/, '');
 })();
-
-// 다운로드
 document.querySelectorAll('.dl').forEach(function(btn){
   btn.addEventListener('click', function(){
     var t = document.getElementById(btn.dataset.src).textContent.replace(/^\n/, '');
@@ -1104,8 +1358,7 @@ document.querySelectorAll('.dl').forEach(function(btn){
     a.href = url; a.download = btn.dataset.name;
     document.body.appendChild(a); a.click();
     setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 1000);
-    var old = btn.textContent;
-    btn.textContent = '내려받는 중...';
+    var old = btn.textContent; btn.textContent = '내려받는 중...';
     setTimeout(function(){ btn.textContent = old; }, 1400);
   });
 });
