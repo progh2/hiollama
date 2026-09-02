@@ -266,15 +266,16 @@
   </div>
   <nav class="sb-nav" id="sbNav">
     <a class="nav-item" data-go="00"><span class="nv-no">00</span>시작하기</a>
+    <div class="nav-grp">준비</div>
+    <a class="nav-item" data-go="01"><span class="nv-no">01</span>PC 점검</a>
+    <a class="nav-item" data-go="02"><span class="nv-no">02</span>설치와 모델 받기</a>
     <div class="nav-grp">개념</div>
-    <a class="nav-item" data-go="01"><span class="nv-no">01</span>LLM이 뭔가요</a>
-    <a class="nav-item" data-go="02"><span class="nv-no">02</span>왜 내 PC에서?</a>
-    <a class="nav-item" data-go="03"><span class="nv-no">03</span>모델 고르는 법</a>
-    <a class="nav-item" data-go="04"><span class="nv-no">04</span>내 PC에 맞추기</a>
-    <a class="nav-item" data-go="05"><span class="nv-no">05</span>Ollama란</a>
+    <a class="nav-item" data-go="03"><span class="nv-no">03</span>LLM이 뭔가요</a>
+    <a class="nav-item" data-go="04"><span class="nv-no">04</span>왜 내 PC에서?</a>
+    <a class="nav-item" data-go="05"><span class="nv-no">05</span>모델 고르는 법</a>
+    <a class="nav-item" data-go="06"><span class="nv-no">06</span>내 PC에 맞추기</a>
+    <a class="nav-item" data-go="07"><span class="nv-no">07</span>Ollama란</a>
     <div class="nav-grp">실습</div>
-    <a class="nav-item" data-go="06"><span class="nv-no">06</span>PC 점검</a>
-    <a class="nav-item" data-go="07"><span class="nv-no">07</span>설치하기</a>
     <a class="nav-item" data-go="08"><span class="nv-no">08</span>채팅 연습</a>
     <a class="nav-item" data-go="09"><span class="nv-no">09</span>VS Code 연결</a>
     <a class="nav-item" data-go="10"><span class="nv-no">10</span>바이브코딩</a>
@@ -295,7 +296,7 @@
   <div class="ch-head"><div class="ch-no">00</div><h2>시작하기</h2></div>
   <div class="guide">
     <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-hello"/></svg>
-    <div class="guide-bubble"><span class="guide-name">라마</span><p>안녕! 나는 라마야. 오늘 100분, 같이 가보자.</p></div>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>안녕! 나는 라마야. 먼저 설치부터 걸어두고 시작하자.</p></div>
   </div>
   <p class="sub">끝나고 나면 이 세 가지를 할 수 있게 됩니다.</p>
 
@@ -307,26 +308,222 @@
 
   <h3>오늘의 타임라인</h3>
   <div class="tl">
-    <div class="t">0–15분</div><div class="d">Ollama 설치 + 모델 준비</div>
-    <div class="t">15–25분</div><div class="d">터미널에서 첫 대화</div>
-    <div class="t">25–40분</div><div class="d">VS Code 연결</div>
-    <div class="t">40–60분</div><div class="d"><strong>바이브코딩 따라하기</strong> — 강사와 함께</div>
-    <div class="t">60–90분</div><div class="d"><strong>내 것 만들기</strong> — 메뉴에서 하나 골라 자유 실습</div>
+    <div class="t">0–15분</div><div class="d">PC 점검 → Ollama 설치 → <strong>모델 다운로드 시작</strong></div>
+    <div class="t">15–40분</div><div class="d">이론 — <strong>모델을 받는 동안</strong> 진행합니다</div>
+    <div class="t">40–50분</div><div class="d">터미널에서 채팅 연습</div>
+    <div class="t">50–62분</div><div class="d">VS Code 연결 (Twinny)</div>
+    <div class="t">62–90분</div><div class="d"><strong>바이브코딩</strong> — 따라하기 → 내 것 만들기</div>
     <div class="t">90–100분</div><div class="d">활동지 작성 + 정리</div>
   </div>
 
+  <div class="box tip">
+    <span class="t">왜 설치부터 하나</span>
+    Ollama 설치와 모델 다운로드는 <strong>시간이 오래 걸립니다.</strong>
+    그래서 <strong>먼저 시작만 걸어두고</strong>, 받아지는 동안 이론을 배웁니다.
+    이론이 끝날 즈음 다운로드도 끝나 있을 거예요.
+  </div>
   <div class="box tip">
     <span class="t">이 페이지 사용법</span>
     <strong>왼쪽 목차</strong>로 언제든 이동할 수 있고, <kbd>←</kbd> <kbd>→</kbd> 방향키로도 넘길 수 있습니다.
     검은 상자의 <strong>복사</strong> 버튼을 누르면 명령어나 프롬프트가 클립보드에 들어갑니다.
     진도를 놓쳐도 혼자 따라올 수 있어요.
   </div>
-
-  <div class="pager"><span></span><button class="pg next" data-go="01">LLM이 뭔가요 →</button></div>
+  <div class="pager"><span></span><button class="pg next" data-go="01">PC 점검 →</button></div>
 </article>
 
 <article class="chapter" id="ch01" data-no="01">
-  <div class="ch-head"><div class="ch-no">01</div><h2>LLM이 뭔가요</h2></div>
+  <div class="ch-head"><div class="ch-no">01</div><h2>PC 점검</h2></div>
+  <div class="guide">
+    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-ok"/></svg>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>시작 전에 네 컴퓨터부터 건강검진!</p></div>
+  </div>
+  <p class="sub">설치 전에 이 PC가 준비됐는지 한 번에 확인합니다.</p>
+
+  <p>아래 파일을 내려받아 <strong>더블클릭</strong>하세요. 그게 전부입니다.</p>
+
+  <div style="margin:20px 0">
+    <a class="dlfile" href="check-env.bat" download>⬇ check-env.bat 내려받기</a>
+  </div>
+
+  <div class="box ok">
+    <span class="t">설치도, 권한도 필요 없습니다</span>
+    윈도우 기본 명령어만 쓰는 <strong>배치 파일(.bat)</strong>이라
+    관리자 권한도, 스크립트 실행 정책 변경도 필요 없습니다.
+    백신이나 보안 정책에 걸릴 일도 없어요.
+  </div>
+
+  <h3>무엇을 확인하나</h3>
+  <table>
+    <tr><th style="width:34%">항목</th><th>통과 기준</th></tr>
+    <tr><td><strong>Windows 버전</strong></td><td>10 22H2 이상 (build 19045+)</td></tr>
+    <tr><td><strong>그래픽카드 · VRAM</strong></td><td>RTX 2060 / 6GB 확인</td></tr>
+    <tr><td><strong>NVIDIA 드라이버</strong></td><td><strong>551.61 이상</strong> — 미만이면 그래픽카드를 못 씁니다</td></tr>
+    <tr><td><strong>권장 모델</strong></td><td>VRAM에 맞는 모델을 알려줍니다</td></tr>
+    <tr><td><strong>디스크 여유</strong></td><td>10GB 이상</td></tr>
+    <tr><td><strong>VS Code</strong></td><td>1.127 이상</td></tr>
+    <tr><td><strong>Ollama</strong></td><td>설치 · 서버 응답 · 보유 모델 · KV 캐시 설정</td></tr>
+  </table>
+
+  <h3>결과 읽는 법</h3>
+  <div class="code">  [OK] 드라이버 551.61 이상 - GPU 가속 사용 가능
+  [경고] 10GB 이상 확보 권장</div>
+  <p>
+    <strong><code class="inline">[OK]</code>만 있으면 통과</strong>입니다.
+    <strong><code class="inline">[경고]</code></strong>가 뜨면 그 줄을 조교에게 보여주세요.
+  </p>
+  <p>결과는 같은 폴더에 <code class="inline">check-PC이름.txt</code>로도 저장됩니다.</p>
+
+  <div class="box warn">
+    <span class="t">⚠️ 드라이버 551.61 미만이면</span>
+    수업 전에 반드시 해결해야 합니다. GPU를 못 쓰면 CPU로 동작해서 <strong>몇 배로 느려집니다.</strong><br>
+    <a href="https://www.nvidia.com/ko-kr/drivers/" target="_blank" rel="noopener">nvidia.com/ko-kr/drivers</a>
+    에서 받거나
+    <a href="https://www.nvidia.com/ko-kr/software/nvidia-app/" target="_blank" rel="noopener">NVIDIA 앱</a>으로 자동 업데이트.
+    <strong>시간이 오래 걸리니 조교에게 먼저 알려주세요.</strong>
+  </div>
+
+  <div class="box tip">
+    <span class="t">창이 바로 닫히면</span>
+    <kbd>Win</kbd>+<kbd>R</kbd> → <code class="inline">cmd</code> → 엔터로 검은 창을 먼저 연 뒤,
+    <strong>배치 파일을 그 창에 끌어다 놓고</strong> 엔터를 치세요. 오류 메시지를 볼 수 있습니다.
+  </div>
+
+  <details>
+    <summary>전체 소스 보기 (check-env.bat)</summary>
+    <div class="code" style="max-height:420px; overflow:auto"><button class="copy">복사</button><span id="bat-view"></span></div>
+  </details>
+  <div class="pager"><button class="pg prev" data-go="00">← 시작하기</button><button class="pg next" data-go="02">설치와 모델 받기 →</button></div>
+</article>
+
+<article class="chapter" id="ch02" data-no="02">
+  <div class="ch-head"><div class="ch-no">02</div><h2>설치와 모델 받기</h2></div>
+  <div class="guide">
+    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-wow"/></svg>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>다운로드는 시작만 걸어둬. 기다리지 말고 다음으로!</p></div>
+  </div>
+  <p class="sub">Ollama를 깔고, 모델 다운로드를 <strong>걸어둡니다.</strong> 받는 동안 이론을 배울 거예요.</p>
+
+  <div class="box tip">
+    <span class="t">오늘의 전략</span>
+    다운로드는 <strong>시작만 해두고 기다리지 않습니다.</strong>
+    STEP 2에서 명령어를 실행해 진행률이 돌기 시작하면, <strong>창을 닫지 말고 그대로 둔 채</strong>
+    다음 이론 챕터로 넘어가세요. 이론이 끝날 때쯤 완료돼 있습니다.
+  </div>
+
+  <div class="step">
+    <span class="n">STEP 1</span>
+    <h3>Ollama 설치</h3>
+    <p>배포된 <code class="inline">OllamaSetup.exe</code>를 실행하고 기본값으로 진행하세요.</p>
+    <p class="muted">파일이 없거나 집에서 설치한다면 →
+      <a href="https://ollama.com/download/windows" target="_blank" rel="noopener">ollama.com/download/windows</a>
+      (바로 받기: <a href="https://ollama.com/download/OllamaSetup.exe" target="_blank" rel="noopener">OllamaSetup.exe</a>)</p>
+    <div class="box ok"><span class="t">관리자 권한 필요 없습니다</span>
+      내 계정 안에 설치되므로 실습실 PC의 권한 제한과 무관합니다.</div>
+    <p>설치가 끝나면 작업표시줄 오른쪽에 <strong>Ollama 아이콘</strong>이 생깁니다.</p>
+  </div>
+
+  <div class="step">
+    <span class="n">STEP 2</span>
+    <h3>모델 가져오기 — 가장 중요한 단계</h3>
+    <p>두 가지 방법이 있습니다. <strong>조교 안내에 따라 하나만</strong> 하세요.</p>
+
+    <h4>■ 방법 A · 배포 파일 복사 <span style="color:var(--ok)">(권장 — 훨씬 빠릅니다)</span></h4>
+    <ol>
+      <li>작업표시줄 Ollama 아이콘 <strong>우클릭 → Quit</strong> (복사하는 동안 꺼져 있어야 합니다)</li>
+      <li>배포된 <code class="inline">blobs</code>, <code class="inline">manifests</code> 두 폴더를 아래 경로에 통째로 붙여넣기
+        <div class="code"><button class="copy">복사</button>%USERPROFILE%\.ollama\models</div>
+        <span class="muted">탐색기 주소창에 붙여넣으면 해당 폴더로 이동합니다. 없으면 만드세요.</span>
+      </li>
+      <li>시작 메뉴에서 <strong>Ollama 다시 실행</strong></li>
+    </ol>
+    <div class="box danger">
+      <span class="t">🔴 가장 많이 하는 실수</span>
+      <strong><code class="inline">manifests</code> 폴더를 빠뜨리는 것.</strong>
+      <code class="inline">blobs</code>만 복사하면 파일은 다 있는데 모델 목록에 아무것도 안 뜹니다.
+      원인을 찾기 어려우니 <strong>두 폴더 다 복사했는지 지금 확인하세요.</strong>
+    </div>
+
+    <h4>■ 방법 B · 직접 다운로드</h4>
+    <p>인터넷에서 바로 받습니다. <strong>Ollama가 켜져 있어야</strong> 합니다.</p>
+    <p><kbd>Win</kbd>+<kbd>R</kbd> → <code class="inline">cmd</code> → 엔터. 검은 창에 입력:</p>
+    <div class="code"><button class="copy">복사</button>ollama pull qwen2.5-coder:3b
+ollama pull qwen2.5-coder:1.5b-base</div>
+    <p class="muted">두 번째는 VS Code 자동완성용입니다 (09 VS Code 연결에서 설명).</p>
+    <p>진행률이 표시되고, 합쳐서 <strong>2.9GB</strong>라 회선 상태에 따라 <strong>5~20분</strong> 걸립니다.
+       <code class="inline">success</code>가 뜨면 완료입니다.</p>
+    <div class="box ok">
+      <span class="t">여기서 멈추고 이론으로 넘어가세요</span>
+      진행률 숫자가 올라가기 시작했으면 성공입니다. <strong>창을 닫지 말고</strong> 그대로 두세요.
+      끝날 때까지 쳐다볼 필요 없습니다.
+    </div>
+
+    <div class="box warn">
+      <span class="t">18명이 동시에 받으면 느려집니다</span>
+      교육장 회선을 다 같이 나눠 쓰게 됩니다. <strong>조교가 방법 A를 안내했다면 그쪽을 쓰세요.</strong>
+      직접 받아야 한다면, 다 받을 때까지 기다리지 말고 먼저 끝난 사람부터 다음 단계로 넘어가면 됩니다.
+    </div>
+
+    <div class="box tip">
+      <span class="t">저사양 PC용 대체 모델</span>
+      점검 결과 VRAM이 부족하다고 나왔다면 더 작은 모델을 받으세요.
+      <div class="code" style="margin-top:8px"><button class="copy">복사</button>ollama pull qwen2.5-coder:1.5b</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="n">STEP 3</span>
+    <h3>환경변수 2개 설정</h3>
+    <p><strong>대화 기억 공간(KV 캐시)을 절반으로 압축</strong>해서, 같은 그래픽카드로 더 긴 대화를 가능하게 하는 설정입니다.
+       (자세한 설명은 <a class="jump" data-go="06">06 내 PC에 맞추기</a>)</p>
+    <p><kbd>Win</kbd> 키 → <strong>"환경 변수"</strong> 검색 → <strong>계정의 환경 변수 편집</strong> → 새로 만들기로 두 개 추가:</p>
+    <div class="code"><button class="copy">복사</button>OLLAMA_FLASH_ATTENTION = 1
+OLLAMA_KV_CACHE_TYPE   = q8_0</div>
+    <p><strong>추가한 뒤 Ollama를 다시 실행하세요.</strong> (시작 메뉴에서 Ollama 실행)</p>
+  </div>
+
+  <div class="step">
+    <span class="n">STEP 4</span>
+    <h3>확인</h3>
+    <p><kbd>Win</kbd>+<kbd>R</kbd> → <code class="inline">cmd</code> → 엔터. 검은 창에 입력:</p>
+    <div class="code"><button class="copy">복사</button>ollama list</div>
+    <p><code class="inline">qwen2.5-coder:3b</code>가 뜨면 <strong>성공입니다.</strong>
+       아무것도 안 뜨면 STEP 2의 <code class="inline">manifests</code>를 확인하세요.</p>
+    <p>그래픽카드를 제대로 쓰는지도 확인해 둡시다:</p>
+    <div class="code"><button class="copy">복사</button>nvidia-smi</div>
+    <p class="muted">카드 이름과 메모리(6GB 내외), 드라이버 버전이 나옵니다.</p>
+
+    <div class="box warn">
+      <span class="t">⚠️ 드라이버 551.61 이상이어야 합니다</span>
+      미만이면 그래픽카드를 못 쓰고 <strong>CPU로 동작해 매우 느려집니다.</strong>
+      <h4 style="margin:12px 0 4px">확인하는 방법 (셋 중 아무거나)</h4>
+      <ul style="margin-bottom:10px">
+        <li><code class="inline">nvidia-smi</code> — 오른쪽 위 <code class="inline">Driver Version</code></li>
+        <li>바탕화면 우클릭 → <strong>NVIDIA 제어판</strong> → 좌측 하단 <strong>시스템 정보</strong></li>
+        <li><kbd>Win</kbd>+<kbd>R</kbd> → <code class="inline">dxdiag</code> → <strong>디스플레이</strong> 탭</li>
+      </ul>
+      <h4 style="margin:12px 0 4px">낮으면 업데이트</h4>
+      <a href="https://www.nvidia.com/ko-kr/drivers/" target="_blank" rel="noopener">nvidia.com/ko-kr/drivers</a>
+      에서 카드 모델을 선택해 받거나,
+      <a href="https://www.nvidia.com/ko-kr/software/nvidia-app/" target="_blank" rel="noopener">NVIDIA 앱</a>으로 자동 업데이트.
+      <strong>수업 중에 하기엔 오래 걸리니 조교에게 먼저 알려주세요.</strong>
+    </div>
+  </div>
+
+  <h3>모델 관리 명령어 정리</h3>
+  <table>
+    <tr><th style="width:44%">명령어</th><th>하는 일</th></tr>
+    <tr><td><code class="inline">ollama pull &lt;모델&gt;</code></td><td>모델 내려받기</td></tr>
+    <tr><td><code class="inline">ollama list</code></td><td>가진 모델 목록</td></tr>
+    <tr><td><code class="inline">ollama run &lt;모델&gt;</code></td><td>대화 시작</td></tr>
+    <tr><td><code class="inline">ollama ps</code></td><td>지금 돌아가는 모델 · GPU 사용률</td></tr>
+    <tr><td><code class="inline">ollama rm &lt;모델&gt;</code></td><td>모델 삭제 (디스크 확보)</td></tr>
+    <tr><td><code class="inline">ollama show &lt;모델&gt;</code></td><td>모델 정보 (크기·컨텍스트 등)</td></tr>
+  </table>
+  <div class="pager"><button class="pg prev" data-go="01">← PC 점검</button><button class="pg next" data-go="03">LLM이 뭔가요 →</button></div>
+</article>
+
+<article class="chapter" id="ch03" data-no="03">
+  <div class="ch-head"><div class="ch-no">03</div><h2>LLM이 뭔가요</h2></div>
   <div class="guide">
     <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-teach"/></svg>
     <div class="guide-bubble"><span class="guide-name">라마</span><p>나 같은 애들은 사실 '다음 단어 맞히기' 선수야.</p></div>
@@ -363,12 +560,11 @@
     오늘 쓸 모델은 <strong>가장 작은 축</strong>입니다. ChatGPT를 기대하면 실망합니다.
     대신 <strong>내 컴퓨터에서, 공짜로, 인터넷 없이</strong> 돕니다. 그 대가를 오늘 직접 확인해 봅시다.
   </div>
-
-  <div class="pager"><button class="pg prev" data-go="00">← 시작하기</button><button class="pg next" data-go="02">왜 내 PC에서? →</button></div>
+  <div class="pager"><button class="pg prev" data-go="02">← 설치와 모델 받기</button><button class="pg next" data-go="04">왜 내 PC에서? →</button></div>
 </article>
 
-<article class="chapter" id="ch02" data-no="02">
-  <div class="ch-head"><div class="ch-no">02</div><h2>왜 내 PC에서?</h2></div>
+<article class="chapter" id="ch04" data-no="04">
+  <div class="ch-head"><div class="ch-no">04</div><h2>왜 내 PC에서?</h2></div>
   <div class="guide">
     <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-think"/></svg>
     <div class="guide-bubble"><span class="guide-name">라마</span><p>인터넷이 없어도, 내가 네 컴퓨터 안에 있으면 되잖아?</p></div>
@@ -398,12 +594,11 @@
     "로컬이 좋다"가 아니라 <strong>"어떤 일에 로컬을 쓰고 어떤 일에 클라우드를 쓸지 판단할 줄 아는 것"</strong>입니다.
     양쪽을 다 써본 사람만 판단할 수 있습니다.
   </div>
-
-  <div class="pager"><button class="pg prev" data-go="01">← LLM이 뭔가요</button><button class="pg next" data-go="03">모델 고르는 법 →</button></div>
+  <div class="pager"><button class="pg prev" data-go="03">← LLM이 뭔가요</button><button class="pg next" data-go="05">모델 고르는 법 →</button></div>
 </article>
 
-<article class="chapter" id="ch03" data-no="03">
-  <div class="ch-head"><div class="ch-no">03</div><h2>모델 고르는 법</h2></div>
+<article class="chapter" id="ch05" data-no="05">
+  <div class="ch-head"><div class="ch-no">05</div><h2>모델 고르는 법</h2></div>
   <div class="guide">
     <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-teach"/></svg>
     <div class="guide-bubble"><span class="guide-name">라마</span><p>덩치보다 뭘 배웠느냐가 중요해. 나는 코딩만 팠거든.</p></div>
@@ -502,13 +697,11 @@
     <strong>그림 보는 능력에 자리를 내주는 것보다, 코딩에 전부 쓰는 게</strong> 낫습니다.
     "기능이 많은 쪽이 좋다"가 아니라 <strong>"내 목적에 맞는 쪽이 좋다"</strong>는 게 모델 선택의 핵심입니다.
   </div>
-
-
-  <div class="pager"><button class="pg prev" data-go="02">← 왜 내 PC에서?</button><button class="pg next" data-go="04">내 PC에 맞추기 →</button></div>
+  <div class="pager"><button class="pg prev" data-go="04">← 왜 내 PC에서?</button><button class="pg next" data-go="06">내 PC에 맞추기 →</button></div>
 </article>
 
-<article class="chapter" id="ch04" data-no="04">
-  <div class="ch-head"><div class="ch-no">04</div><h2>내 PC에 맞추기</h2></div>
+<article class="chapter" id="ch06" data-no="06">
+  <div class="ch-head"><div class="ch-no">06</div><h2>내 PC에 맞추기</h2></div>
   <div class="guide">
     <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-think"/></svg>
     <div class="guide-bubble"><span class="guide-name">라마</span><p>메모장이 꽉 차면 나도 앞 얘기를 까먹어.</p></div>
@@ -618,12 +811,11 @@ OLLAMA_KV_CACHE_TYPE   = q8_0  ← 이게 동작합니다</div>
     <code class="inline">qwen2.5-coder:3b</code>는 3B밖에 안 되지만 <strong>코딩만 훈련받아서</strong>
     비슷한 크기의 범용 모델보다 코드를 훨씬 잘 씁니다. 크기가 전부가 아닙니다.
   </div>
-
-  <div class="pager"><button class="pg prev" data-go="03">← 모델 고르는 법</button><button class="pg next" data-go="05">Ollama란 →</button></div>
+  <div class="pager"><button class="pg prev" data-go="05">← 모델 고르는 법</button><button class="pg next" data-go="07">Ollama란 →</button></div>
 </article>
 
-<article class="chapter" id="ch05" data-no="05">
-  <div class="ch-head"><div class="ch-no">05</div><h2>Ollama란</h2></div>
+<article class="chapter" id="ch07" data-no="07">
+  <div class="ch-head"><div class="ch-no">07</div><h2>Ollama란</h2></div>
   <div class="guide">
     <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-hello"/></svg>
     <div class="guide-bubble"><span class="guide-name">라마</span><p>11434 — 이게 내 방 번호야. 기억해 둬.</p></div>
@@ -643,189 +835,7 @@ OLLAMA_KV_CACHE_TYPE   = q8_0  ← 이게 동작합니다</div>
 
   <div class="code">[ VS Code ]  ──▶  localhost:11434  ──▶  [ Ollama ]  ──▶  [ RTX 2060 ]
    내가 쓰는 곳          내 PC 안                프로그램          실제 연산</div>
-
-  <div class="pager"><button class="pg prev" data-go="04">← 내 PC에 맞추기</button><button class="pg next" data-go="06">PC 점검 →</button></div>
-</article>
-
-<article class="chapter" id="ch06" data-no="06">
-  <div class="ch-head"><div class="ch-no">06</div><h2>PC 점검</h2></div>
-  <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-ok"/></svg>
-    <div class="guide-bubble"><span class="guide-name">라마</span><p>시작 전에 네 컴퓨터부터 건강검진!</p></div>
-  </div>
-  <p class="sub">설치 전에 이 PC가 준비됐는지 한 번에 확인합니다.</p>
-
-  <p>아래 파일을 내려받아 <strong>더블클릭</strong>하세요. 그게 전부입니다.</p>
-
-  <div style="margin:20px 0">
-    <a class="dlfile" href="check-env.bat" download>⬇ check-env.bat 내려받기</a>
-  </div>
-
-  <div class="box ok">
-    <span class="t">설치도, 권한도 필요 없습니다</span>
-    윈도우 기본 명령어만 쓰는 <strong>배치 파일(.bat)</strong>이라
-    관리자 권한도, 스크립트 실행 정책 변경도 필요 없습니다.
-    백신이나 보안 정책에 걸릴 일도 없어요.
-  </div>
-
-  <h3>무엇을 확인하나</h3>
-  <table>
-    <tr><th style="width:34%">항목</th><th>통과 기준</th></tr>
-    <tr><td><strong>Windows 버전</strong></td><td>10 22H2 이상 (build 19045+)</td></tr>
-    <tr><td><strong>그래픽카드 · VRAM</strong></td><td>RTX 2060 / 6GB 확인</td></tr>
-    <tr><td><strong>NVIDIA 드라이버</strong></td><td><strong>551.61 이상</strong> — 미만이면 그래픽카드를 못 씁니다</td></tr>
-    <tr><td><strong>권장 모델</strong></td><td>VRAM에 맞는 모델을 알려줍니다</td></tr>
-    <tr><td><strong>디스크 여유</strong></td><td>10GB 이상</td></tr>
-    <tr><td><strong>VS Code</strong></td><td>1.127 이상</td></tr>
-    <tr><td><strong>Ollama</strong></td><td>설치 · 서버 응답 · 보유 모델 · KV 캐시 설정</td></tr>
-  </table>
-
-  <h3>결과 읽는 법</h3>
-  <div class="code">  [OK] 드라이버 551.61 이상 - GPU 가속 사용 가능
-  [경고] 10GB 이상 확보 권장</div>
-  <p>
-    <strong><code class="inline">[OK]</code>만 있으면 통과</strong>입니다.
-    <strong><code class="inline">[경고]</code></strong>가 뜨면 그 줄을 조교에게 보여주세요.
-  </p>
-  <p>결과는 같은 폴더에 <code class="inline">check-PC이름.txt</code>로도 저장됩니다.</p>
-
-  <div class="box warn">
-    <span class="t">⚠️ 드라이버 551.61 미만이면</span>
-    수업 전에 반드시 해결해야 합니다. GPU를 못 쓰면 CPU로 동작해서 <strong>몇 배로 느려집니다.</strong><br>
-    <a href="https://www.nvidia.com/ko-kr/drivers/" target="_blank" rel="noopener">nvidia.com/ko-kr/drivers</a>
-    에서 받거나
-    <a href="https://www.nvidia.com/ko-kr/software/nvidia-app/" target="_blank" rel="noopener">NVIDIA 앱</a>으로 자동 업데이트.
-    <strong>시간이 오래 걸리니 조교에게 먼저 알려주세요.</strong>
-  </div>
-
-  <div class="box tip">
-    <span class="t">창이 바로 닫히면</span>
-    <kbd>Win</kbd>+<kbd>R</kbd> → <code class="inline">cmd</code> → 엔터로 검은 창을 먼저 연 뒤,
-    <strong>배치 파일을 그 창에 끌어다 놓고</strong> 엔터를 치세요. 오류 메시지를 볼 수 있습니다.
-  </div>
-
-  <details>
-    <summary>전체 소스 보기 (check-env.bat)</summary>
-    <div class="code" style="max-height:420px; overflow:auto"><button class="copy">복사</button><span id="bat-view"></span></div>
-  </details>
-
-  <div class="pager"><button class="pg prev" data-go="05">← Ollama란</button><button class="pg next" data-go="07">설치하기 →</button></div>
-</article>
-
-<article class="chapter" id="ch07" data-no="07">
-  <div class="ch-head"><div class="ch-no">07</div><h2>설치하기</h2></div>
-  <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-wow"/></svg>
-    <div class="guide-bubble"><span class="guide-name">라마</span><p>manifests 폴더 빼먹으면 나 안 보여. 진짜야!</p></div>
-  </div>
-  <p class="sub">Ollama를 깔고, 모델을 가져오고, 잘 되는지 확인합니다.</p>
-
-  <div class="step">
-    <span class="n">STEP 1</span>
-    <h3>Ollama 설치</h3>
-    <p>배포된 <code class="inline">OllamaSetup.exe</code>를 실행하고 기본값으로 진행하세요.</p>
-    <p class="muted">파일이 없거나 집에서 설치한다면 →
-      <a href="https://ollama.com/download/windows" target="_blank" rel="noopener">ollama.com/download/windows</a>
-      (바로 받기: <a href="https://ollama.com/download/OllamaSetup.exe" target="_blank" rel="noopener">OllamaSetup.exe</a>)</p>
-    <div class="box ok"><span class="t">관리자 권한 필요 없습니다</span>
-      내 계정 안에 설치되므로 실습실 PC의 권한 제한과 무관합니다.</div>
-    <p>설치가 끝나면 작업표시줄 오른쪽에 <strong>Ollama 아이콘</strong>이 생깁니다.</p>
-  </div>
-
-  <div class="step">
-    <span class="n">STEP 2</span>
-    <h3>모델 가져오기 — 가장 중요한 단계</h3>
-    <p>두 가지 방법이 있습니다. <strong>조교 안내에 따라 하나만</strong> 하세요.</p>
-
-    <h4>■ 방법 A · 배포 파일 복사 <span style="color:var(--ok)">(권장 — 훨씬 빠릅니다)</span></h4>
-    <ol>
-      <li>작업표시줄 Ollama 아이콘 <strong>우클릭 → Quit</strong> (복사하는 동안 꺼져 있어야 합니다)</li>
-      <li>배포된 <code class="inline">blobs</code>, <code class="inline">manifests</code> 두 폴더를 아래 경로에 통째로 붙여넣기
-        <div class="code"><button class="copy">복사</button>%USERPROFILE%\.ollama\models</div>
-        <span class="muted">탐색기 주소창에 붙여넣으면 해당 폴더로 이동합니다. 없으면 만드세요.</span>
-      </li>
-      <li>시작 메뉴에서 <strong>Ollama 다시 실행</strong></li>
-    </ol>
-    <div class="box danger">
-      <span class="t">🔴 가장 많이 하는 실수</span>
-      <strong><code class="inline">manifests</code> 폴더를 빠뜨리는 것.</strong>
-      <code class="inline">blobs</code>만 복사하면 파일은 다 있는데 모델 목록에 아무것도 안 뜹니다.
-      원인을 찾기 어려우니 <strong>두 폴더 다 복사했는지 지금 확인하세요.</strong>
-    </div>
-
-    <h4>■ 방법 B · 직접 다운로드</h4>
-    <p>인터넷에서 바로 받습니다. <strong>Ollama가 켜져 있어야</strong> 합니다.</p>
-    <p><kbd>Win</kbd>+<kbd>R</kbd> → <code class="inline">cmd</code> → 엔터. 검은 창에 입력:</p>
-    <div class="code"><button class="copy">복사</button>ollama pull qwen2.5-coder:3b
-ollama pull qwen2.5-coder:1.5b-base</div>
-    <p class="muted">두 번째는 VS Code 자동완성용입니다 (09 챕터에서 설명).</p>
-    <p>진행률이 표시되고, 합쳐서 <strong>2.9GB</strong>라 회선 상태에 따라 몇 분 걸립니다.
-       <code class="inline">success</code>가 뜨면 완료입니다.</p>
-
-    <div class="box warn">
-      <span class="t">18명이 동시에 받으면 느려집니다</span>
-      교육장 회선을 다 같이 나눠 쓰게 됩니다. <strong>조교가 방법 A를 안내했다면 그쪽을 쓰세요.</strong>
-      직접 받아야 한다면, 다 받을 때까지 기다리지 말고 먼저 끝난 사람부터 다음 단계로 넘어가면 됩니다.
-    </div>
-
-    <div class="box tip">
-      <span class="t">저사양 PC용 대체 모델</span>
-      점검 결과 VRAM이 부족하다고 나왔다면 더 작은 모델을 받으세요.
-      <div class="code" style="margin-top:8px"><button class="copy">복사</button>ollama pull qwen2.5-coder:1.5b</div>
-    </div>
-  </div>
-
-  <div class="step">
-    <span class="n">STEP 3</span>
-    <h3>환경변수 2개 설정</h3>
-    <p><strong>대화 기억 공간(KV 캐시)을 절반으로 압축</strong>해서, 같은 그래픽카드로 더 긴 대화를 가능하게 하는 설정입니다.
-       (자세한 설명은 <a class="jump" data-go="04">04 내 PC에 맞추기</a>)</p>
-    <p><kbd>Win</kbd> 키 → <strong>"환경 변수"</strong> 검색 → <strong>계정의 환경 변수 편집</strong> → 새로 만들기로 두 개 추가:</p>
-    <div class="code"><button class="copy">복사</button>OLLAMA_FLASH_ATTENTION = 1
-OLLAMA_KV_CACHE_TYPE   = q8_0</div>
-    <p><strong>추가한 뒤 Ollama를 다시 실행하세요.</strong> (시작 메뉴에서 Ollama 실행)</p>
-  </div>
-
-  <div class="step">
-    <span class="n">STEP 4</span>
-    <h3>확인</h3>
-    <p><kbd>Win</kbd>+<kbd>R</kbd> → <code class="inline">cmd</code> → 엔터. 검은 창에 입력:</p>
-    <div class="code"><button class="copy">복사</button>ollama list</div>
-    <p><code class="inline">qwen2.5-coder:3b</code>가 뜨면 <strong>성공입니다.</strong>
-       아무것도 안 뜨면 STEP 2의 <code class="inline">manifests</code>를 확인하세요.</p>
-    <p>그래픽카드를 제대로 쓰는지도 확인해 둡시다:</p>
-    <div class="code"><button class="copy">복사</button>nvidia-smi</div>
-    <p class="muted">카드 이름과 메모리(6GB 내외), 드라이버 버전이 나옵니다.</p>
-
-    <div class="box warn">
-      <span class="t">⚠️ 드라이버 551.61 이상이어야 합니다</span>
-      미만이면 그래픽카드를 못 쓰고 <strong>CPU로 동작해 매우 느려집니다.</strong>
-      <h4 style="margin:12px 0 4px">확인하는 방법 (셋 중 아무거나)</h4>
-      <ul style="margin-bottom:10px">
-        <li><code class="inline">nvidia-smi</code> — 오른쪽 위 <code class="inline">Driver Version</code></li>
-        <li>바탕화면 우클릭 → <strong>NVIDIA 제어판</strong> → 좌측 하단 <strong>시스템 정보</strong></li>
-        <li><kbd>Win</kbd>+<kbd>R</kbd> → <code class="inline">dxdiag</code> → <strong>디스플레이</strong> 탭</li>
-      </ul>
-      <h4 style="margin:12px 0 4px">낮으면 업데이트</h4>
-      <a href="https://www.nvidia.com/ko-kr/drivers/" target="_blank" rel="noopener">nvidia.com/ko-kr/drivers</a>
-      에서 카드 모델을 선택해 받거나,
-      <a href="https://www.nvidia.com/ko-kr/software/nvidia-app/" target="_blank" rel="noopener">NVIDIA 앱</a>으로 자동 업데이트.
-      <strong>수업 중에 하기엔 오래 걸리니 조교에게 먼저 알려주세요.</strong>
-    </div>
-  </div>
-
-  <h3>모델 관리 명령어 정리</h3>
-  <table>
-    <tr><th style="width:44%">명령어</th><th>하는 일</th></tr>
-    <tr><td><code class="inline">ollama pull &lt;모델&gt;</code></td><td>모델 내려받기</td></tr>
-    <tr><td><code class="inline">ollama list</code></td><td>가진 모델 목록</td></tr>
-    <tr><td><code class="inline">ollama run &lt;모델&gt;</code></td><td>대화 시작</td></tr>
-    <tr><td><code class="inline">ollama ps</code></td><td>지금 돌아가는 모델 · GPU 사용률</td></tr>
-    <tr><td><code class="inline">ollama rm &lt;모델&gt;</code></td><td>모델 삭제 (디스크 확보)</td></tr>
-    <tr><td><code class="inline">ollama show &lt;모델&gt;</code></td><td>모델 정보 (크기·컨텍스트 등)</td></tr>
-  </table>
-
-  <div class="pager"><button class="pg prev" data-go="06">← PC 점검</button><button class="pg next" data-go="08">채팅 연습 →</button></div>
+  <div class="pager"><button class="pg prev" data-go="06">← 내 PC에 맞추기</button><button class="pg next" data-go="08">채팅 연습 →</button></div>
 </article>
 
 <article class="chapter" id="ch08" data-no="08">
@@ -839,6 +849,14 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
   <div class="code"><button class="copy">복사</button>ollama run qwen2.5-coder:3b</div>
   <p class="muted">다른 모델을 받았다면 <code class="inline">ollama list</code>에 뜬 이름으로 바꿔 넣으세요.</p>
   <p>잠깐 로딩된 뒤 <code class="inline">&gt;&gt;&gt;</code> 표시가 나오면 준비 완료입니다.</p>
+
+  <div class="box warn">
+    <span class="t">"안녕?"이라고만 치지 마세요</span>
+    코딩 전용 모델이라 <strong>짧은 인사에는 약합니다.</strong>
+    정보가 너무 적어서 <strong>같은 말을 끝없이 반복하는 루프</strong>에 빠지는 일이 실제로 있었어요.
+    처음부터 <strong>구체적인 질문</strong>으로 시작하세요.
+    (자세한 이유는 <a class="jump" data-go="12">12 문제 해결 C</a>)
+  </div>
 
   <h3>연습 1 · 그냥 물어보기</h3>
   <div class="prompt"><button class="copy">복사</button>자바스크립트에서 배열의 중복을 제거하는 가장 짧은 방법은?</div>
@@ -885,7 +903,7 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
   </table>
   <p class="muted">
     <code class="inline">/?</code>를 쳐보면 <strong>대화 내용을 비우는 명령</strong>도 있습니다.
-    그게 바로 <a class="jump" data-go="04">④ KV 캐시</a>에서 말한 <strong>"메모장 비우기"</strong>예요.
+    그게 바로 <a class="jump" data-go="06">④ KV 캐시</a>에서 말한 <strong>"메모장 비우기"</strong>예요.
   </p>
 
   <h3>인터넷을 꺼봅시다</h3>
@@ -900,14 +918,13 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
 
   <p>다음 단계로 넘어가려면 채팅을 끝냅니다:</p>
   <div class="code"><button class="copy">복사</button>/bye</div>
-
-  <div class="pager"><button class="pg prev" data-go="07">← 설치하기</button><button class="pg next" data-go="09">VS Code 연결 →</button></div>
+  <div class="pager"><button class="pg prev" data-go="07">← Ollama란</button><button class="pg next" data-go="09">VS Code 연결 →</button></div>
 </article>
 
 <article class="chapter" id="ch09" data-no="09">
   <div class="ch-head"><div class="ch-no">09</div><h2>VS Code 연결</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-hello"/></svg>
+    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-teach"/></svg>
     <div class="guide-bubble"><span class="guide-name">라마</span><p>Path 두 개만 정확히! 채팅은 /v1, 자동완성은 /api/generate.</p></div>
   </div>
   <p class="sub">VS Code에서 로컬 모델을 쓰게 해주는 확장 <strong>Twinny</strong>를 붙입니다.</p>
@@ -1017,7 +1034,6 @@ ollama pull qwen2.5-coder:1.5b-base</div>
     <tr><td><strong>코드 선택 후 질문</strong></td><td>코드를 드래그해 선택하고 채팅에 질문 → 그 코드를 보고 답합니다</td></tr>
     <tr><td><strong>자동완성</strong></td><td>코드를 치다 멈추면 회색 글씨로 제안. <kbd>Tab</kbd>으로 수락</td></tr>
   </table>
-
   <div class="pager"><button class="pg prev" data-go="08">← 채팅 연습</button><button class="pg next" data-go="10">바이브코딩 →</button></div>
 </article>
 
@@ -1088,7 +1104,6 @@ ollama pull qwen2.5-coder:1.5b-base</div>
   <h3 style="margin-top:40px">▶ 이제 내 것을 만들 차례</h3>
   <p>아래 메뉴에서 하나 고르고, <strong>최소 3번 이상 고쳐보세요.</strong>
      그리고 <strong>쓴 프롬프트를 기록해두세요</strong> — 활동지에 옮겨 적을 거예요.</p>
-
   <div class="pager"><button class="pg prev" data-go="09">← VS Code 연결</button><button class="pg next" data-go="11">내 것 만들기 →</button></div>
 </article>
 
@@ -1137,7 +1152,6 @@ ollama pull qwen2.5-coder:1.5b-base</div>
     그 지점을 정확히 찾아낸 사람이 오늘 가장 많이 배운 사람입니다.
     "어디까지 되고 어디부터 안 되는가" — 이게 오늘의 진짜 결론입니다.
   </div>
-
   <div class="pager"><button class="pg prev" data-go="10">← 바이브코딩</button><button class="pg next" data-go="12">문제 해결 →</button></div>
 </article>
 
@@ -1145,48 +1159,197 @@ ollama pull qwen2.5-coder:1.5b-base</div>
   <div class="ch-head"><div class="ch-no">12</div><h2>문제 해결</h2></div>
   <div class="guide">
     <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-think"/></svg>
-    <div class="guide-bubble"><span class="guide-name">라마</span><p>느려지면 새 대화 시작. 내 메모장 비우는 거야.</p></div>
+    <div class="guide-bubble"><span class="guide-name">라마</span><p>막히면 5분 안에 조교 불러. 혼자 붙잡지 마.</p></div>
   </div>
-  <p class="sub">오늘 실제로 터질 문제들.</p>
+  <p class="sub">수업에서 실제로 터졌던 문제들과 대처법. <strong>막히면 여기부터 보세요.</strong></p>
+
+  <div class="box tip">
+    <span class="t">막혔을 때 순서</span>
+    ① 아래에서 내 증상 찾기 → ② 그래도 안 되면 <strong>조교 호출</strong> →
+    ③ 기다리는 동안 다음 단계로 넘어가기. <strong>혼자 5분 이상 붙잡고 있지 마세요.</strong>
+  </div>
+
+  <h3>A. Ollama가 안 켜진다 / 뻗었다</h3>
+
+  <div class="box danger">
+    <span class="t">🔴 실제로 터진 사례 — 윈도우 업데이트</span>
+    수업 중 <strong>Ollama가 아예 안 올라오는</strong> PC가 있었는데,
+    원인은 <strong>윈도우 업데이트가 백그라운드에서 돌고 있던 것</strong>이었습니다.
+    업데이트 중에는 시스템이 파일을 잠그거나 재시작을 대기시켜서 Ollama가 정상 실행되지 않습니다.
+  </div>
 
   <table>
-    <tr><th style="width:38%">증상</th><th>해결</th></tr>
+    <tr><th style="width:36%">증상</th><th>해결</th></tr>
     <tr>
-      <td><strong>브라우저 화면이 하얗게 빈다</strong></td>
-      <td>CDN 링크가 들어간 경우입니다. <strong>"외부 라이브러리 없이 다시 만들어줘"</strong>라고 요청하세요. 가장 흔합니다</td>
+      <td><strong>실행해도 트레이 아이콘이 안 생긴다</strong></td>
+      <td><strong>① 윈도우 업데이트 확인</strong> — 설정 → Windows 업데이트. 진행 중이거나 <strong>"다시 시작 필요"</strong>면 그것부터 처리<br>
+          ② <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Esc</kbd> 작업 관리자 → <code class="inline">ollama</code> 관련 프로세스 <strong>모두 끝내기</strong> → 다시 실행<br>
+          ③ 그래도 안 되면 <strong>재부팅</strong></td>
+    </tr>
+    <tr>
+      <td><strong>아이콘은 있는데 명령이 안 먹는다</strong></td>
+      <td>서버만 죽은 상태입니다. 트레이 아이콘 <strong>우클릭 → Quit</strong> 후 시작 메뉴에서 다시 실행</td>
+    </tr>
+    <tr>
+      <td><strong><code class="inline">ollama</code> 명령을 못 찾는다</strong></td>
+      <td>설치 후 <strong>열어둔 cmd 창은 인식하지 못합니다.</strong> 검은 창을 닫고 <strong>새로 여세요</strong></td>
+    </tr>
+    <tr>
+      <td><strong>포트가 이미 사용 중이라고 나온다</strong></td>
+      <td>Ollama가 두 번 떠 있는 겁니다. 작업 관리자에서 전부 종료 후 하나만 실행</td>
+    </tr>
+  </table>
+
+  <h4>서버가 살아있는지 확인하는 법</h4>
+  <div class="code"><button class="copy">복사</button>netstat -ano | findstr 11434</div>
+  <p>줄이 나오면 서버가 떠 있는 겁니다. 아무것도 안 나오면 Ollama가 죽은 상태예요.</p>
+
+  <h3>B. 모델 다운로드가 안 된다 / 끊긴다</h3>
+
+  <table>
+    <tr><th style="width:36%">증상</th><th>해결</th></tr>
+    <tr>
+      <td><strong>받다가 중간에 끊겼다</strong></td>
+      <td><strong>같은 명령을 그대로 다시 실행하세요.</strong> 받던 지점부터 <strong>이어받습니다.</strong> 처음부터 다시 받지 않아요
+          <div class="code" style="margin-top:8px"><button class="copy">복사</button>ollama pull qwen2.5-coder:3b</div></td>
+    </tr>
+    <tr>
+      <td><strong>진행률이 한참 멈춰 있다</strong></td>
+      <td>18명이 같은 회선을 쓰면 느려집니다. <strong>5분은 기다려 보세요.</strong>
+          그래도 0%면 <kbd>Ctrl</kbd>+<kbd>C</kbd>로 끊고 다시 실행</td>
+    </tr>
+    <tr>
+      <td><strong>속도가 너무 느리다</strong></td>
+      <td>조교에게 알리세요. <strong>USB나 넷클래스로 받는 편이 훨씬 빠릅니다</strong></td>
+    </tr>
+    <tr>
+      <td><strong>디스크 공간이 부족하다</strong></td>
+      <td>안 쓰는 모델 삭제: <code class="inline">ollama rm 모델명</code></td>
+    </tr>
+    <tr>
+      <td><strong>받았는데 <code class="inline">ollama list</code>에 없다</strong></td>
+      <td>파일 복사 방식이면 <strong><code class="inline">manifests</code> 폴더</strong>를 빠뜨린 겁니다.
+          직접 받았다면 <code class="inline">success</code>가 떴는지 확인</td>
+    </tr>
+  </table>
+
+  <h3>C. 답변이 이상하다</h3>
+
+  <div class="box danger">
+    <span class="t">🔴 실제로 터진 사례 — 같은 말 무한 반복</span>
+    <strong>"안녕?"</strong>이라고 인사했더니 이상한 문장을 <strong>끝없이 반복</strong>하는 일이 있었습니다.
+    고장이 아니라 <strong>작은 모델에서 흔히 나타나는 현상</strong>입니다.
+  </div>
+
+  <p>
+    <a class="jump" data-go="03">03 LLM이 뭔가요</a>에서 배웠듯, LLM은 <strong>다음 단어를 예측</strong>하는 기계입니다.
+    <strong>"안녕?" 같은 짧은 인사는 정보가 너무 적어서</strong> 다음에 뭘 말해야 할지 단서가 없습니다.
+    그러면 모델이 한 패턴에 갇혀서 <strong>같은 말을 계속 고르는 루프</strong>에 빠집니다.
+    <strong>코딩 전용 모델일수록 잡담에 약해서</strong> 더 잘 일어납니다.
+  </p>
+
+  <table>
+    <tr><th style="width:36%">증상</th><th>해결</th></tr>
+    <tr>
+      <td><strong>같은 말을 끝없이 반복한다</strong></td>
+      <td><kbd>Ctrl</kbd>+<kbd>C</kbd>로 중단 → <strong>구체적인 질문으로 다시 시작</strong>하세요.<br>
+          ❌ <code class="inline">안녕?</code>  →  ✅ <code class="inline">파이썬으로 구구단 출력하는 코드 짜줘</code></td>
+    </tr>
+    <tr>
+      <td><strong>인사했는데 코드가 튀어나온다</strong></td>
+      <td>정상입니다. <strong>코딩 전용 모델</strong>이라 뭘 물어도 코드로 답하려 합니다. 잡담 말고 <strong>코딩을 시키세요</strong></td>
+    </tr>
+    <tr>
+      <td><strong>없는 함수를 지어낸다</strong></td>
+      <td><strong>환각</strong>입니다 (<a class="jump" data-go="08">08 채팅 연습</a> 연습 5).
+          받은 코드는 <strong>반드시 실행해서 확인</strong>하세요</td>
+    </tr>
+    <tr>
+      <td><strong>답이 엉뚱하거나 어색하다</strong></td>
+      <td>① <strong>영어로 다시</strong> 물어보기 ② 요청을 잘게 쪼개기 ③ 조건을 구체적으로 쓰기</td>
+    </tr>
+    <tr>
+      <td><strong>같은 실수를 계속 반복한다</strong></td>
+      <td><strong>KV 캐시가 찬 겁니다</strong> (<a class="jump" data-go="06">06 내 PC에 맞추기</a>).
+          <strong>새 대화를 시작</strong>하고 지금까지 만든 코드를 붙여넣은 뒤 다시 요청</td>
     </tr>
     <tr>
       <td><strong>코드가 중간에 끊긴다</strong></td>
       <td><code class="inline">이어서 계속 보여줘</code>라고 요청. 또는 기능을 줄여서 다시 요청</td>
     </tr>
     <tr>
-      <td><strong>ollama list에 아무것도 없다</strong></td>
-      <td><code class="inline">manifests</code> 폴더를 복사했는지 확인 (설치 STEP 2). 직접 받았다면 <code class="inline">ollama pull</code>이 <code class="inline">success</code>로 끝났는지 확인</td>
-    </tr>
-    <tr>
-      <td><strong>Twinny에서 답이 안 온다</strong></td>
-      <td>① Ollama 실행 중인지 ② <code class="inline">ollama list</code>에 모델이 있는지 ③ Providers의 <strong>Path</strong>가 채팅 <code class="inline">/v1</code>, 자동완성 <code class="inline">/api/generate</code>인지 ④ 모델 이름 철자</td>
-    </tr>
-    <tr>
-      <td><strong>너무 느리다</strong></td>
-      <td>첫 응답은 모델 로딩이라 느립니다. <strong>대화가 길어져서 느려진 거라면 새 대화를 시작</strong>하세요. 계속 느리면 아래 <code class="inline">ollama ps</code> 확인</td>
-    </tr>
-    <tr>
-      <td><strong>답변이 엉뚱하다</strong></td>
-      <td>영어로 다시 시도 / 요청을 더 잘게 쪼개기 / 조건을 구체적으로</td>
-    </tr>
-    <tr>
-      <td><strong>같은 실수를 반복한다</strong></td>
-      <td><strong>KV 캐시(대화 메모장)가 찬 겁니다.</strong> <strong>새 대화를 시작</strong>하고, 지금까지 만든 코드를 붙여넣은 뒤 다시 요청하세요</td>
+      <td><strong>답이 아예 안 나온다</strong></td>
+      <td>첫 응답은 모델 로딩이라 <strong>10~30초</strong> 걸립니다. 1분 넘게 조용하면 <kbd>Ctrl</kbd>+<kbd>C</kbd> 후 재시도</td>
     </tr>
   </table>
 
-  <h3>속도가 안 나올 때 확인</h3>
+  <div class="box tip">
+    <span class="t">작은 모델을 다루는 요령</span>
+    <ul style="margin-bottom:0">
+      <li><strong>잡담하지 말고 일을 시키세요.</strong> 인사는 모델을 헤매게 합니다</li>
+      <li><strong>구체적으로.</strong> "게임 만들어줘"보다 "가위바위보 게임을 HTML 파일 하나로"</li>
+      <li><strong>길어지면 새 대화.</strong> 대화가 길수록 멍청해집니다</li>
+    </ul>
+  </div>
+
+  <h3>D. 너무 느리다</h3>
   <div class="code"><button class="copy">복사</button>ollama ps</div>
-  <p>
-    <strong>100% GPU</strong>로 나와야 정상입니다.
-    <strong>CPU 비율이 잡히면</strong> 모델이 그래픽카드에 다 안 들어간 겁니다 → 조교에게 알려주세요 (더 작은 모델로 교체).
-  </p>
+  <table>
+    <tr><th style="width:36%">결과</th><th>의미</th></tr>
+    <tr><td><strong>100% GPU</strong></td><td>정상입니다</td></tr>
+    <tr><td><strong>CPU 비율이 보인다</strong></td><td>모델이 그래픽카드에 다 안 들어간 겁니다 → <strong>조교 호출</strong> (더 작은 모델로 교체)</td></tr>
+    <tr><td><strong>아무것도 안 나온다</strong></td><td>모델이 안 떠 있는 상태. 질문을 한 번 던지고 다시 확인</td></tr>
+  </table>
+  <p>그 외 느려지는 원인: <strong>드라이버 551.61 미만</strong> · <strong>대화가 너무 길어짐</strong> · <strong>다른 프로그램이 GPU 사용 중</strong></p>
+
+  <h3>E. VS Code / Twinny</h3>
+  <table>
+    <tr><th style="width:36%">증상</th><th>해결</th></tr>
+    <tr>
+      <td><strong>Twinny에서 답이 안 온다</strong></td>
+      <td>① Ollama 실행 중인지 ② <code class="inline">ollama list</code>에 모델이 있는지
+          ③ <strong>Path</strong> — 채팅 <code class="inline">/v1</code>, 자동완성 <code class="inline">/api/generate</code>
+          ④ 모델 이름 철자 (<code class="inline">:3b</code>, <code class="inline">:1.5b-base</code>까지)</td>
+    </tr>
+    <tr>
+      <td><strong>모델 목록이 비어 있다</strong></td>
+      <td>Ollama를 켠 뒤 <strong>VS Code를 재시작</strong>하세요</td>
+    </tr>
+    <tr>
+      <td><strong>자동완성이 이상하게 나온다</strong></td>
+      <td><strong>FIM 템플릿</strong>이 모델과 안 맞는 겁니다. 다른 걸로 바꾸거나 <strong>자동완성을 끄고 채팅만</strong> 쓰세요</td>
+    </tr>
+  </table>
+
+  <h3>F. 만든 웹페이지가 안 열린다</h3>
+  <table>
+    <tr><th style="width:36%">증상</th><th>해결</th></tr>
+    <tr>
+      <td><strong>화면이 하얗게 비어 있다</strong></td>
+      <td><strong>CDN 링크가 들어간 경우입니다.</strong> "외부 라이브러리 없이 다시 만들어줘"라고 요청하세요.
+          <strong>가장 흔한 사고입니다</strong></td>
+    </tr>
+    <tr>
+      <td><strong>버튼을 눌러도 반응이 없다</strong></td>
+      <td><kbd>F12</kbd> → <strong>Console</strong> 탭에 빨간 오류가 있는지 확인.
+          그 오류 문구를 그대로 복사해서 AI에게 <strong>"이 오류 고쳐줘"</strong></td>
+    </tr>
+    <tr>
+      <td><strong>메모장으로 열린다</strong></td>
+      <td>파일 이름이 <code class="inline">.txt</code>로 저장된 겁니다. <strong>반드시 <code class="inline">.html</code></strong>로 저장</td>
+    </tr>
+    <tr>
+      <td><strong>한글이 깨진다</strong></td>
+      <td><code class="inline">&lt;meta charset="UTF-8"&gt;</code>이 있는지 확인. 없으면 넣어달라고 요청</td>
+    </tr>
+  </table>
+
+  <div class="box ok">
+    <span class="t">막혀도 괜찮습니다</span>
+    오늘 나오는 문제는 대부분 <strong>여러분 잘못이 아닙니다.</strong>
+    로컬 AI가 아직 그만큼 손이 많이 가는 물건이라는 뜻이고,
+    <strong>그걸 직접 겪어보는 게 오늘 수업의 목적 중 하나</strong>입니다.
+  </div>
 
   <div class="pager"><button class="pg prev" data-go="11">← 내 것 만들기</button><button class="pg next" data-go="13">정리 →</button></div>
 </article>
@@ -1250,7 +1413,6 @@ ollama pull gemma3:4b             # 3.3GB - 범용 대화용</div>
     <tr><td>VS Code</td><td><a href="https://code.visualstudio.com/download" target="_blank" rel="noopener">code.visualstudio.com/download</a></td></tr>
     <tr><td>Twinny 문서</td><td><a href="https://twinnydotdev.github.io/twinny-docs/" target="_blank" rel="noopener">twinnydotdev.github.io/twinny-docs</a></td></tr>
   </table>
-
   <div class="pager"><button class="pg prev" data-go="12">← 문제 해결</button><span class="pg-done">수고했습니다 🎉</span></div>
 </article>
 </main>
