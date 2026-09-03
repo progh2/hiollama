@@ -10,6 +10,9 @@
 |---|---|
 | `index.html` | 실습 페이지 (이론 → 설치 → 바이브코딩). 단일 파일, 외부 CDN 없음 |
 | `check-env.bat` | 학생 PC 사전 점검 — 더블클릭 실행 (GPU·VRAM·드라이버·디스크·VS Code·Ollama) |
+| `code/step1_hello.py` | requests 로 Ollama API 최소 호출 |
+| `code/step2_tutor.py` | system 메시지로 튜터 역할 부여 (콘솔) |
+| `code/tutor_app.py` | **에러 튜터 GUI 앱** — tkinter + threading 완성본 |
 
 실습 페이지 `06 PC 점검` 챕터에서 바로 내려받을 수 있습니다.
 
@@ -37,9 +40,21 @@
 실습   08 채팅 연습 · 09 VS Code 연결(Twinny)
        10 바이브코딩 · 11 내 것 만들기
 마무리 12 문제 해결 · 13 정리
+심화   14 파이썬으로 붙이기 · 15 에러 튜터 앱 · 16 내 앱 만들기   <- 다음 차시
 ```
 
 설치·다운로드가 5~20분 걸려서 **먼저 시작만 걸어두고 이론을 진행**하는 순서입니다.
+
+## 심화 차시 — 파이썬 GUI
+
+`qwen2.5-coder`가 **코드·에러 분석에 특화**된 점을 활용해, 에러 로그를 붙여넣으면
+원인·설명·해결책을 알려주는 **tkinter GUI 앱**을 만듭니다.
+
+교육 포인트:
+- `system` 메시지로 역할·답변 형식 고정 (작은 모델을 앱에 쓰는 핵심 장치)
+- **GUI 멈춤 문제** → `threading` + `root.after()` (교과서 GUI 단원 심화)
+- 예외별 친절한 안내 (ConnectionError / Timeout)
+- 확장: SYSTEM 문구만 바꿔 정규식 해설기·SQL 해설기·커밋 메시지 생성기 등으로
 
 ## 수업 설계 메모
 
