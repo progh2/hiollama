@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>로컬 LLM으로 바이브코딩 — 100분 실습</title>
+<link rel="icon" type="image/png" href="assets/guide-hello.png">
 <style>
   :root{
     --bg:#EAEFF6; --surface:#fff; --surface-2:#F4F7FB;
@@ -71,7 +72,7 @@
   /* ---------- 캐릭터 ---------- */
   .guide{display:flex; align-items:flex-end; gap:12px; margin:16px 0 26px;
     background:var(--surface-2); border:1px solid var(--line); border-radius:14px; padding:12px 14px}
-  .guide-img{width:76px; height:92px; flex:0 0 76px; display:block}
+  .guide-img{height:96px; width:auto; flex:0 0 auto; display:block; object-fit:contain}
   .guide-bubble{position:relative; flex:1 1 auto; background:#fff; border:1px solid var(--line);
     border-radius:14px 14px 14px 5px; padding:10px 15px 12px}
   .guide-bubble::before{content:""; position:absolute; left:-7px; bottom:18px; width:12px; height:12px;
@@ -173,84 +174,6 @@
 </style>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-<g id="lm-base">
-  <rect x="28" y="82" width="8" height="21" rx="4" fill="#DCC9A8"/>
-  <rect x="65" y="82" width="8" height="21" rx="4" fill="#DCC9A8"/>
-  <ellipse cx="50" cy="76" rx="26" ry="19" fill="#F5EBDC"/>
-  <rect x="37" y="86" width="10" height="28" rx="5" fill="#EFE2CE"/>
-  <rect x="53" y="86" width="10" height="28" rx="5" fill="#EFE2CE"/>
-  <rect x="44" y="34" width="14" height="46" rx="7" fill="#F5EBDC"/>
-  <path d="M60 55 l7 12 -6 3 -5 -12 z" fill="#1B4FB8"/>
-  <rect x="39" y="48" width="23" height="9" rx="4.5" fill="#2F6FEB"/>
-  <rect x="39" y="48" width="23" height="3" rx="1.5" fill="#5A93F5"/>
-  <g>
-    <ellipse cx="41" cy="9" rx="3.6" ry="9" fill="#EADCC6" transform="rotate(-14 41 9)"/>
-    <ellipse cx="41" cy="10" rx="1.6" ry="5" fill="#D8C3A4" transform="rotate(-14 41 10)"/>
-    <ellipse cx="59" cy="9" rx="3.6" ry="9" fill="#EADCC6" transform="rotate(14 59 9)"/>
-    <ellipse cx="59" cy="10" rx="1.6" ry="5" fill="#D8C3A4" transform="rotate(14 59 10)"/>
-  </g>
-  <rect x="36" y="14" width="28" height="26" rx="12" fill="#F5EBDC"/>
-  <path d="M40 17 q10 -6 20 0 q-10 -3 -20 0 z" fill="#EADCC6"/>
-  <rect x="41" y="30" width="18" height="15" rx="7.5" fill="#E8DAC3"/>
-  <circle cx="46" cy="35.5" r="1.2" fill="#15233E"/>
-  <circle cx="54" cy="35.5" r="1.2" fill="#15233E"/>
-</g>
-</defs>
-
-<symbol id="lm-hello" viewBox="0 0 100 120">
-  <use href="#lm-base"/>
-  <rect x="64" y="52" width="9" height="28" rx="4.5" fill="#EADCC6" transform="rotate(30 68 78)"/>
-  <circle cx="83" cy="50" r="4.8" fill="#EADCC6"/>
-  <circle cx="44" cy="24" r="2.8" fill="#15233E"/><circle cx="56" cy="24" r="2.8" fill="#15233E"/>
-  <circle cx="45" cy="23" r="1" fill="#fff"/><circle cx="57" cy="23" r="1" fill="#fff"/>
-  <path d="M45 40 q5 3.5 10 0" stroke="#15233E" stroke-width="1.7" fill="none" stroke-linecap="round"/>
-  <circle cx="39" cy="29" r="3.2" fill="#F2A7A0" opacity=".5"/>
-  <circle cx="61" cy="29" r="3.2" fill="#F2A7A0" opacity=".5"/>
-</symbol>
-
-<symbol id="lm-teach" viewBox="0 0 100 120">
-  <use href="#lm-base"/>
-  <rect x="64" y="52" width="9" height="28" rx="4.5" fill="#EADCC6" transform="rotate(44 68 76)"/>
-  <circle cx="90" cy="59" r="4.8" fill="#EADCC6"/>
-  <circle cx="44" cy="24" r="2.8" fill="#15233E"/><circle cx="56" cy="24" r="2.8" fill="#15233E"/>
-  <circle cx="45" cy="23" r="1" fill="#fff"/><circle cx="57" cy="23" r="1" fill="#fff"/>
-  <path d="M45 40 q5 2.5 10 0" stroke="#15233E" stroke-width="1.7" fill="none" stroke-linecap="round"/>
-</symbol>
-
-<symbol id="lm-think" viewBox="0 0 100 120">
-  <use href="#lm-base"/>
-  <circle cx="72" cy="24" r="2.6" fill="#D3DEEE"/>
-  <circle cx="79" cy="16" r="4" fill="#D3DEEE"/>
-  <circle cx="88" cy="8" r="6.5" fill="#D3DEEE"/>
-  <text x="88" y="12" font-size="9" font-weight="800" text-anchor="middle" fill="#15233E" font-family="sans-serif">?</text>
-  <circle cx="44" cy="24" r="2.8" fill="#15233E"/><circle cx="56" cy="24" r="2.8" fill="#15233E"/>
-  <circle cx="45.2" cy="22.8" r="1" fill="#fff"/><circle cx="57.2" cy="22.8" r="1" fill="#fff"/>
-  <path d="M45 41 q5 -2.5 10 0" stroke="#15233E" stroke-width="1.7" fill="none" stroke-linecap="round"/>
-</symbol>
-
-<symbol id="lm-wow" viewBox="0 0 100 120">
-  <use href="#lm-base"/>
-  <circle cx="44" cy="24" r="3.7" fill="#fff" stroke="#15233E" stroke-width="1.2"/>
-  <circle cx="56" cy="24" r="3.7" fill="#fff" stroke="#15233E" stroke-width="1.2"/>
-  <circle cx="44" cy="24.5" r="2.1" fill="#15233E"/><circle cx="56" cy="24.5" r="2.1" fill="#15233E"/>
-  <ellipse cx="50" cy="40" rx="3.2" ry="3.8" fill="#15233E"/>
-  <path d="M76 8 l0 13" stroke="#E5533D" stroke-width="4" stroke-linecap="round"/>
-  <circle cx="76" cy="27" r="2.4" fill="#E5533D"/>
-</symbol>
-
-<symbol id="lm-ok" viewBox="0 0 100 120">
-  <use href="#lm-base"/>
-  <rect x="64" y="52" width="9" height="28" rx="4.5" fill="#EADCC6" transform="rotate(26 68 78)"/>
-  <circle cx="82" cy="51" r="4.8" fill="#EADCC6"/>
-  <path d="M41 25 q3 -4 6 0" stroke="#15233E" stroke-width="2.1" fill="none" stroke-linecap="round"/>
-  <path d="M53 25 q3 -4 6 0" stroke="#15233E" stroke-width="2.1" fill="none" stroke-linecap="round"/>
-  <path d="M44 39 q6 5 12 0" stroke="#15233E" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-  <circle cx="38" cy="30" r="3.2" fill="#F2A7A0" opacity=".5"/>
-  <circle cx="62" cy="30" r="3.2" fill="#F2A7A0" opacity=".5"/>
-  <path d="M84 14 l4 5 8 -11" stroke="#1F9D57" stroke-width="3.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-</symbol>
-</svg>
 
 <button class="sb-toggle" id="sbToggle">☰ 목차</button>
 <div class="scrim" id="scrim"></div>
@@ -299,7 +222,7 @@
 <article class="chapter" id="ch00" data-no="00">
   <div class="ch-head"><div class="ch-no">00</div><h2>시작하기</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-hello"/></svg>
+    <img class="guide-img" src="assets/guide-hello.png" alt="라마 캐릭터" loading="lazy">
     <div class="guide-bubble"><span class="guide-name">라마</span><p>안녕! 나는 라마야. 먼저 설치부터 걸어두고 시작하자.</p></div>
   </div>
   <p class="sub">끝나고 나면 이 세 가지를 할 수 있게 됩니다.</p>
@@ -338,7 +261,7 @@
 <article class="chapter" id="ch01" data-no="01">
   <div class="ch-head"><div class="ch-no">01</div><h2>PC 점검</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-ok"/></svg>
+    <img class="guide-img" src="assets/guide-ok.png" alt="라마 캐릭터" loading="lazy">
     <div class="guide-bubble"><span class="guide-name">라마</span><p>시작 전에 네 컴퓨터부터 건강검진!</p></div>
   </div>
   <p class="sub">설치 전에 이 PC가 준비됐는지 한 번에 확인합니다.</p>
@@ -402,7 +325,7 @@
 <article class="chapter" id="ch02" data-no="02">
   <div class="ch-head"><div class="ch-no">02</div><h2>설치와 모델 받기</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-wow"/></svg>
+    <img class="guide-img" src="assets/guide-wow.png" alt="라마 캐릭터" loading="lazy">
     <div class="guide-bubble"><span class="guide-name">라마</span><p>다운로드는 시작만 걸어둬. 기다리지 말고 다음으로!</p></div>
   </div>
   <p class="sub">Ollama를 깔고, 모델 다운로드를 <strong>걸어둡니다.</strong> 받는 동안 이론을 배울 거예요.</p>
@@ -529,7 +452,7 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
 <article class="chapter" id="ch03" data-no="03">
   <div class="ch-head"><div class="ch-no">03</div><h2>LLM이 뭔가요</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-teach"/></svg>
+    <img class="guide-img" src="assets/guide-teach.png" alt="라마 캐릭터" loading="lazy">
     <div class="guide-bubble"><span class="guide-name">라마</span><p>나 같은 애들은 사실 '다음 단어 맞히기' 선수야.</p></div>
   </div>
   <p class="sub">Large Language Model — 커다란 언어 모델.</p>
@@ -570,7 +493,7 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
 <article class="chapter" id="ch04" data-no="04">
   <div class="ch-head"><div class="ch-no">04</div><h2>왜 내 PC에서?</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-think"/></svg>
+    <img class="guide-img" src="assets/guide-think.png" alt="라마 캐릭터" loading="lazy">
     <div class="guide-bubble"><span class="guide-name">라마</span><p>인터넷이 없어도, 내가 네 컴퓨터 안에 있으면 되잖아?</p></div>
   </div>
   <p class="sub">ChatGPT 놔두고 왜 이 고생을 하는가.</p>
@@ -604,7 +527,7 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
 <article class="chapter" id="ch05" data-no="05">
   <div class="ch-head"><div class="ch-no">05</div><h2>모델 고르는 법</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-teach"/></svg>
+    <img class="guide-img" src="assets/guide-teach.png" alt="라마 캐릭터" loading="lazy">
     <div class="guide-bubble"><span class="guide-name">라마</span><p>덩치보다 뭘 배웠느냐가 중요해. 나는 코딩만 팠거든.</p></div>
   </div>
   <p class="sub">모델을 고를 때 봐야 하는 세 가지 축.</p>
@@ -707,7 +630,7 @@ OLLAMA_KV_CACHE_TYPE   = q8_0</div>
 <article class="chapter" id="ch06" data-no="06">
   <div class="ch-head"><div class="ch-no">06</div><h2>내 PC에 맞추기</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-think"/></svg>
+    <img class="guide-img" src="assets/guide-think.png" alt="라마 캐릭터" loading="lazy">
     <div class="guide-bubble"><span class="guide-name">라마</span><p>메모장이 꽉 차면 나도 앞 얘기를 까먹어.</p></div>
   </div>
   <h3>④ KV 캐시 — 대화를 기억하는 공간</h3>
@@ -821,7 +744,7 @@ OLLAMA_KV_CACHE_TYPE   = q8_0  ← 이게 동작합니다</div>
 <article class="chapter" id="ch07" data-no="07">
   <div class="ch-head"><div class="ch-no">07</div><h2>Ollama란</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-hello"/></svg>
+    <img class="guide-img" src="assets/guide-hello.png" alt="라마 캐릭터" loading="lazy">
     <div class="guide-bubble"><span class="guide-name">라마</span><p>11434 — 이게 내 방 번호야. 기억해 둬.</p></div>
   </div>
   <p class="sub">모델을 내 PC에서 굴리기 쉽게 만들어주는 프로그램.</p>
@@ -845,7 +768,7 @@ OLLAMA_KV_CACHE_TYPE   = q8_0  ← 이게 동작합니다</div>
 <article class="chapter" id="ch08" data-no="08">
   <div class="ch-head"><div class="ch-no">08</div><h2>채팅 연습</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-wow"/></svg>
+    <img class="guide-img" src="assets/guide-wow.png" alt="라마 캐릭터" loading="lazy">
     <div class="guide-bubble"><span class="guide-name">라마</span><p>없는 함수도 그럴듯하게 지어낼 거야. 속지 마!</p></div>
   </div>
   <p class="sub">VS Code로 가기 전에, 검은 창에서 직접 말을 걸어봅니다. 여기서 감을 잡아두면 뒤가 쉽습니다.</p>
@@ -928,7 +851,7 @@ OLLAMA_KV_CACHE_TYPE   = q8_0  ← 이게 동작합니다</div>
 <article class="chapter" id="ch09" data-no="09">
   <div class="ch-head"><div class="ch-no">09</div><h2>VS Code 연결</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-teach"/></svg>
+    <img class="guide-img" src="assets/guide-teach.png" alt="라마 캐릭터" loading="lazy">
     <div class="guide-bubble"><span class="guide-name">라마</span><p>Path 두 개만 정확히! 채팅은 /v1, 자동완성은 /api/generate.</p></div>
   </div>
   <p class="sub">VS Code에서 로컬 모델을 쓰게 해주는 확장 <strong>Twinny</strong>를 붙입니다.</p>
@@ -1044,7 +967,7 @@ ollama pull qwen2.5-coder:1.5b-base</div>
 <article class="chapter" id="ch10" data-no="10">
   <div class="ch-head"><div class="ch-no">10</div><h2>바이브코딩</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-teach"/></svg>
+    <img class="guide-img" src="assets/guide-teach.png" alt="라마 캐릭터" loading="lazy">
     <div class="guide-bubble"><span class="guide-name">라마</span><p>한 번에 완벽하게? 그런 건 없어. 세 번 고쳐.</p></div>
   </div>
   <p class="sub">코드를 직접 쓰지 않고, <strong>말로 시켜서</strong> 프로그램을 만듭니다.</p>
@@ -1114,7 +1037,7 @@ ollama pull qwen2.5-coder:1.5b-base</div>
 <article class="chapter" id="ch11" data-no="11">
   <div class="ch-head"><div class="ch-no">11</div><h2>내 것 만들기</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-ok"/></svg>
+    <img class="guide-img" src="assets/guide-ok.png" alt="라마 캐릭터" loading="lazy">
     <div class="guide-bubble"><span class="guide-name">라마</span><p>고민하지 말고 하나 골라. 시간이 아까워!</p></div>
   </div>
   <p class="sub">하나만 고르세요. 고민하는 시간이 아깝습니다.</p>
@@ -1162,7 +1085,7 @@ ollama pull qwen2.5-coder:1.5b-base</div>
 <article class="chapter" id="ch12" data-no="12">
   <div class="ch-head"><div class="ch-no">12</div><h2>문제 해결</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-think"/></svg>
+    <img class="guide-img" src="assets/guide-think.png" alt="라마 캐릭터" loading="lazy">
     <div class="guide-bubble"><span class="guide-name">라마</span><p>막히면 5분 안에 조교 불러. 혼자 붙잡지 마.</p></div>
   </div>
   <p class="sub">수업에서 실제로 터졌던 문제들과 대처법. <strong>막히면 여기부터 보세요.</strong></p>
@@ -1361,7 +1284,7 @@ ollama pull qwen2.5-coder:1.5b-base</div>
 <article class="chapter" id="ch13" data-no="13">
   <div class="ch-head"><div class="ch-no">13</div><h2>정리</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-ok"/></svg>
+    <img class="guide-img" src="assets/guide-ok.png" alt="라마 캐릭터" loading="lazy">
     <div class="guide-bubble"><span class="guide-name">라마</span><p>오늘 만든 건 전부 네 컴퓨터에 남아. 집에서도 해봐!</p></div>
   </div>
 
@@ -1423,7 +1346,7 @@ ollama pull gemma3:4b             # 3.3GB - 범용 대화용</div>
 <article class="chapter" id="ch14" data-no="14">
   <div class="ch-head"><div class="ch-no">14</div><h2>파이썬으로 붙이기</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-teach"/></svg>
+    <img class="guide-img" src="assets/guide-teach.png" alt="라마 캐릭터" loading="lazy">
     <div class="guide-bubble"><span class="guide-name">라마</span><p>11434 포트로 말을 걸면 나는 누구한테든 대답해. 파이썬한테도.</p></div>
   </div>
   <p class="sub">여기부터는 <strong>다음 차시</strong>입니다. 이제 내 프로그램에 AI를 넣습니다.</p>
@@ -1490,7 +1413,7 @@ print(ask("파이썬에서 IndexError 가 나는 이유를 한 문장으로 설�
 <article class="chapter" id="ch15" data-no="15">
   <div class="ch-head"><div class="ch-no">15</div><h2>에러 튜터 앱 만들기</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-ok"/></svg>
+    <img class="guide-img" src="assets/guide-ok.png" alt="라마 캐릭터" loading="lazy">
     <div class="guide-bubble"><span class="guide-name">라마</span><p>잡담은 못하지만 에러 읽는 건 자신 있어. 이건 내 특기야!</p></div>
   </div>
   <p class="sub">에러 로그를 붙여넣으면 <strong>원인·설명·해결책</strong>을 알려주는 나만의 튜터.</p>
@@ -1658,7 +1581,7 @@ except requests.exceptions.Timeout:
 <article class="chapter" id="ch16" data-no="16">
   <div class="ch-head"><div class="ch-no">16</div><h2>내 앱 만들기</h2></div>
   <div class="guide">
-    <svg class="guide-img" viewBox="0 0 100 120" aria-hidden="true"><use href="#lm-hello"/></svg>
+    <img class="guide-img" src="assets/guide-hello.png" alt="라마 캐릭터" loading="lazy">
     <div class="guide-bubble"><span class="guide-name">라마</span><p>SYSTEM 문구만 바꾸면 나는 완전히 다른 사람이 돼. 뭘로 만들래?</p></div>
   </div>
   <p class="sub">튜터 앱을 <strong>내 주제로 바꿉니다.</strong> 고칠 곳은 생각보다 적습니다.</p>

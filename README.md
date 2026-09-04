@@ -13,6 +13,7 @@
 | `code/step1_hello.py` | requests 로 Ollama API 최소 호출 |
 | `code/step2_tutor.py` | system 메시지로 튜터 역할 부여 (콘솔) |
 | `code/tutor_app.py` | **에러 튜터 GUI 앱** — tkinter + threading 완성본 |
+| `assets/guide-*.png` | 마스코트 '라마' 5포즈 (hello/teach/think/wow/ok) |
 
 실습 페이지 `06 PC 점검` 챕터에서 바로 내려받을 수 있습니다.
 
@@ -20,6 +21,19 @@
 > 윈도우 기본 명령(`reg`/`dir`/`where`/`netstat`)만 사용합니다.
 > 한국어 Windows 콘솔에서 바로 읽히도록 **CP949 + CRLF**로 저장되어 있으니
 > 편집 시 인코딩을 유지하세요.
+
+## 리눅스에서 실습 코드 실행
+
+Debian/Ubuntu 기준. `requests` 는 배포판에 따라 이미 있을 수 있습니다.
+
+```bash
+sudo apt install python3-tk python3-requests
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull qwen2.5-coder:3b
+```
+
+> Debian 13 은 PEP 668 외부 관리 환경이라 `pip install` 이 막힙니다.
+> `apt` 를 쓰거나 `python3 -m venv` 로 가상환경을 만드세요.
 
 ## 환경 전제
 
