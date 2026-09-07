@@ -1,51 +1,31 @@
-"""파이썬 에러 튜터 - 로컬 LLM GUI 앱 (완성본)
+"""Qwen + VS Code 바이브코딩 실습의 PySide6 참고 완성본.
 
-에러 로그를 붙여넣으면 로컬 LLM 이 원인을 분석하고 해결책을 알려줍니다.
-인터넷 없이, 내 컴퓨터에서만 동작합니다.
-
-준비:  pip install requests
-       Ollama 실행 + qwen2.5-coder:3b 모델
-실행:  python tutor_app.py
+프로젝트 폴더에서 venv 활성화 후:
+    python -m pip install -r requirements.txt
+    python tutor_app.py
+Ollama 실행 + qwen2.5-coder:3b 모델이 필요합니다.
 """
-import threading
-import tkinter as tk
-from tkinter import scrolledtext, messagebox
+import sys
 
 import requests
+from PySide6.QtCore import QThread, Signal, Slot
+from PySide6.QtWidgets import (
+    QApplication, QHBoxLayout, QLabel, QMainWindow, QPlainTextEdit,
+    QPushButton, QVBoxLayout, QWidget,
+)
 
-# ---------------------------------------------------------------- 설정
 MODEL = "qwen2.5-coder:3b"
 URL = "http://localhost:11434/api/chat"
-
-SYSTEM = """당신은 친절한 파이썬 튜터입니다.
-학생이 붙여넣은 에러 메시지를 보고 아래 형식으로만 답하세요.
-각 항목의 제목은 그대로 쓰세요.
-
-[원인]
-무엇이 잘못됐는지 한두 문장
-
-[설명]
-왜 이런 일이 생기는지 초보자가 이해할 수 있게
-
-[해결 방법]
-1. 첫 번째 방법
-2. 두 번째 방법
-3. 세 번째 방법
-
-[고친 코드 예시]
-짧은 코드 한 토막
-
-규칙:
-- 한국어로 답하세요.
-- 확실하지 않으면 "확실하지 않습니다"라고 먼저 밝히세요.
-- 형식 밖의 인사말이나 사족은 쓰지 마세요.
+SYSTEM = """당신은 고등학생을 돕는 친절한 파이썬 튜터입니다.
+에러와 주변 코드를 읽고 [원인], [설명], [해결 방법], [고친 코드 예시] 순서로
+한국어로 짧게 답하세요. 모르는 정보는 추측으로 단정하지 말고 필요한 코드를 요청하세요.
+불확실하면 불확실하다고 밝히세요. 인사말은 생략하세요.
 """
 
 
-# ---------------------------------------------------------------- 모델 호출
 def ask_tutor(error_text):
-    """로컬 LLM 에 물어보고 답변 문자열을 돌려준다."""
-    res = requests.post(
+    """GUI와 분리된 HTTP 요청. timeout은 연결/읽기 대기 제한입니다."""
+    with requests.post(
         URL,
         json={
             "model": MODEL,
@@ -56,109 +36,150 @@ def ask_tutor(error_text):
             "stream": False,
             "options": {"temperature": 0.3},
         },
-        timeout=300,
-    )
-    res.raise_for_status()
-    return res.json()["message"]["content"]
+        timeout=(5, 300),
+    ) as response:
+        response.raise_for_status()
+        answer = response.json()["message"]["content"]
+    if not isinstance(answer, str) or not answer.strip():
+        raise ValueError("모델의 답변이 비어 있거나 문자열이 아닙니다.")
+    return answer
 
 
-# ---------------------------------------------------------------- 동작
-def on_analyze():
-    """[분석하기] 버튼을 눌렀을 때."""
-    error_text = input_box.get("1.0", "end").strip()
-    if not error_text:
-        messagebox.showinfo("알림", "에러 로그를 먼저 붙여넣어 주세요.")
-        return
+class AnalysisThread(QThread):
+    """run에서만 HTTP를 호출하고 위젯은 건드리지 않습니다."""
+    result = Signal(str, bool)
 
-    analyze_btn.config(state="disabled")
-    set_status("분석 중입니다... (10~40초)", "#B4700A")
-    write_output("")
+    def __init__(self, error_text, parent=None):
+        super().__init__(parent)
+        self.error_text = error_text
 
-    # GUI 가 멈추지 않도록 별도 스레드에서 요청한다
-    threading.Thread(target=worker, args=(error_text,), daemon=True).start()
-
-
-def worker(error_text):
-    """백그라운드 스레드 - 여기서 GUI 를 직접 건드리면 안 된다."""
-    try:
-        answer = ask_tutor(error_text)
-        ok = True
-    except requests.exceptions.ConnectionError:
-        answer = ("모델에 연결할 수 없습니다.\n\n"
-                  "· Ollama 가 실행 중인지 확인하세요 (작업표시줄 아이콘)\n"
-                  "· 검은 창에서  ollama list  로 모델이 있는지 확인하세요")
-        ok = False
-    except requests.exceptions.Timeout:
-        answer = "시간이 너무 오래 걸려서 중단했습니다. 에러 로그를 줄여서 다시 시도해 보세요."
-        ok = False
-    except Exception as err:                      # noqa: BLE001
-        answer = f"예상하지 못한 오류입니다.\n\n{type(err).__name__}: {err}"
-        ok = False
-
-    # GUI 갱신은 반드시 메인 스레드에서 - after() 로 넘긴다
-    root.after(0, done, answer, ok)
+    def run(self):
+        try:
+            answer = ask_tutor(self.error_text)
+        except requests.exceptions.Timeout:
+            self.result.emit("응답 대기 시간이 초과됐습니다. 입력을 줄인 뒤 다시 시도하세요.", False)
+        except requests.exceptions.ConnectionError:
+            self.result.emit("Ollama에 연결할 수 없습니다. Ollama를 실행하고 다시 시도하세요.", False)
+        except requests.exceptions.HTTPError as err:
+            code = err.response.status_code if err.response is not None else "알 수 없음"
+            hint = (f"ollama list에서 {MODEL} 모델을 확인하세요."
+                    if code == 404 else "Ollama 상태를 확인한 뒤 다시 시도하세요.")
+            self.result.emit(f"서버 오류 (HTTP {code}). {hint}", False)
+        except (ValueError, KeyError, TypeError):
+            self.result.emit("응답 형식을 읽을 수 없습니다. 모델과 Ollama 버전을 확인하세요.", False)
+        except requests.exceptions.RequestException as err:
+            self.result.emit(f"요청에 실패했습니다 ({type(err).__name__}). 연결 설정을 확인하세요.", False)
+        except Exception as err:
+            self.result.emit(f"예상하지 못한 오류 ({type(err).__name__}): {err}", False)
+        else:
+            self.result.emit(answer, True)
 
 
-def done(answer, ok):
-    write_output(answer)
-    set_status("완료" if ok else "실패", "#1F9D57" if ok else "#C0392B")
-    analyze_btn.config(state="normal")
+class TutorWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.worker = None  # finished까지 참조를 유지합니다.
+        self.setWindowTitle("라마의 파이썬 에러 튜터")
+        self.resize(820, 760)
+        self.setMinimumSize(560, 560)
+        central = QWidget()
+        self.setCentralWidget(central)
+        layout = QVBoxLayout(central)
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(12)
+        title = QLabel("함께 읽고, 원인을 찾아보자")
+        title.setObjectName("title")
+        layout.addWidget(title)
+        layout.addWidget(QLabel(f"로컬 모델: {MODEL} · 답변은 실행 결과로 확인하세요"))
+        input_label = QLabel("에러 로그와 주변 코드")
+        layout.addWidget(input_label)
+        self.input_box = QPlainTextEdit()
+        input_label.setBuddy(self.input_box)
+        self.input_box.setPlaceholderText("Traceback과 오류가 난 줄 주변 코드를 붙여넣으세요.")
+        layout.addWidget(self.input_box, 1)
+        buttons = QHBoxLayout()
+        self.analyze_btn = QPushButton("분석하기")
+        self.clear_btn = QPushButton("지우기")
+        self.analyze_btn.clicked.connect(self.on_analyze)
+        self.clear_btn.clicked.connect(self.on_clear)
+        buttons.addWidget(self.analyze_btn, 1)
+        buttons.addWidget(self.clear_btn)
+        layout.addLayout(buttons)
+        self.status = QLabel("준비됨")
+        self.status.setWordWrap(True)
+        layout.addWidget(self.status)
+        output_label = QLabel("튜터의 설명 · 복사해서 직접 검증하세요")
+        layout.addWidget(output_label)
+        self.output_box = QPlainTextEdit()
+        self.output_box.setReadOnly(True)
+        output_label.setBuddy(self.output_box)
+        layout.addWidget(self.output_box, 2)
+        self.setStyleSheet("""
+            QWidget { background: #f3f8f7; color: #193b38; font-size: 15px; }
+            QLabel#title { font-size: 23px; font-weight: bold; }
+            QPlainTextEdit { background: white; border: 1px solid #88aaa5;
+                border-radius: 10px; padding: 10px; }
+            QPushButton { background: #246b61; color: white; border: 2px solid #246b61;
+                border-radius: 10px; padding: 10px; }
+            QPushButton:focus { border-color: #da9800; }
+            QPushButton:disabled { background: #d6e1df; color: #536b67; border-color: #d6e1df; }
+        """)
+
+    @Slot()
+    def on_analyze(self):
+        if self.worker is not None:
+            return
+        error_text = self.input_box.toPlainText().strip()
+        if not error_text:
+            self.status.setText("에러 로그를 먼저 입력하세요.")
+            self.input_box.setFocus()
+            return
+        self.input_box.setReadOnly(True)
+        self.analyze_btn.setEnabled(False)
+        self.clear_btn.setEnabled(False)
+        self.output_box.clear()
+        self.status.setText("분석 중… 응답을 기다리고 있어요.")
+        self.worker = AnalysisThread(error_text, self)
+        self.worker.result.connect(self.on_result)
+        self.worker.finished.connect(self.on_finished)
+        self.worker.start()
+
+    @Slot(str, bool)
+    def on_result(self, answer, ok):
+        self.output_box.setPlainText(answer)
+        self.status.setText("완료 · 설명과 고친 코드를 직접 확인하세요." if ok else "실패 · 안내를 확인하고 다시 시도하세요.")
+
+    @Slot()
+    def on_finished(self):
+        worker = self.worker
+        self.worker = None
+        self.input_box.setReadOnly(False)
+        self.analyze_btn.setEnabled(True)
+        self.clear_btn.setEnabled(True)
+        if worker is not None:
+            worker.deleteLater()
+
+    @Slot()
+    def on_clear(self):
+        if self.worker is not None:
+            return
+        self.input_box.clear()
+        self.output_box.clear()
+        self.status.setText("준비됨")
+        self.input_box.setFocus()
+
+    def closeEvent(self, event):
+        # 동기 requests 호출은 quit()만으로 취소되지 않습니다.
+        # 실행 중 QThread를 파괴하지 않고 완료 후 닫도록 안내합니다.
+        if self.worker is not None:
+            self.status.setText("분석이 진행 중입니다. 응답 또는 오류 안내가 나온 뒤 다시 닫아주세요.")
+            event.ignore()
+        else:
+            event.accept()
 
 
-def write_output(text):
-    output_box.config(state="normal")
-    output_box.delete("1.0", "end")
-    output_box.insert("1.0", text)
-    output_box.config(state="disabled")
-
-
-def set_status(text, color="#5C6B85"):
-    status.config(text=text, fg=color)
-
-
-def on_clear():
-    input_box.delete("1.0", "end")
-    write_output("")
-    set_status("준비됨")
-
-
-# ---------------------------------------------------------------- 화면
-root = tk.Tk()
-root.title(f"파이썬 에러 튜터  ({MODEL})")
-root.geometry("780x720")
-root.minsize(560, 520)
-
-tk.Label(root, text="에러 로그를 붙여넣으세요",
-         font=("맑은 고딕", 11, "bold"), anchor="w").pack(fill="x", padx=14, pady=(14, 4))
-
-input_box = scrolledtext.ScrolledText(root, height=10, wrap="word",
-                                      font=("Consolas", 10))
-input_box.pack(fill="x", padx=14)
-
-btn_row = tk.Frame(root)
-btn_row.pack(fill="x", padx=14, pady=8)
-
-analyze_btn = tk.Button(btn_row, text="분석하기", command=on_analyze,
-                        height=2, font=("맑은 고딕", 11, "bold"))
-analyze_btn.pack(side="left", fill="x", expand=True)
-
-tk.Button(btn_row, text="지우기", command=on_clear,
-          height=2, width=10).pack(side="left", padx=(8, 0))
-
-status = tk.Label(root, text="준비됨", anchor="w", fg="#5C6B85")
-status.pack(fill="x", padx=14)
-
-tk.Label(root, text="튜터의 설명",
-         font=("맑은 고딕", 11, "bold"), anchor="w").pack(fill="x", padx=14, pady=(10, 4))
-
-output_box = scrolledtext.ScrolledText(root, height=18, wrap="word",
-                                       font=("맑은 고딕", 10), state="disabled")
-output_box.pack(fill="both", expand=True, padx=14, pady=(0, 14))
-
-input_box.insert("1.0",
-                 'Traceback (most recent call last):\n'
-                 '  File "test.py", line 3, in <module>\n'
-                 '    print(nums[5])\n'
-                 'IndexError: list index out of range')
-
-root.mainloop()
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = TutorWindow()
+    window.show()
+    sys.exit(app.exec())

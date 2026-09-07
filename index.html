@@ -221,7 +221,7 @@
     <a class="nav-item" href="#13" data-go="13"><span class="nv-no">13</span>정리</a>
     <div class="nav-grp">심화 · 다음 차시</div>
     <a class="nav-item" href="#14" data-go="14"><span class="nv-no">14</span>파이썬으로 붙이기</a>
-    <a class="nav-item" href="#15" data-go="15"><span class="nv-no">15</span>에러 튜터 앱 만들기</a>
+    <a class="nav-item" href="#15" data-go="15"><span class="nv-no">15</span>Qwen과 GUI 만들기</a>
     <a class="nav-item" href="#16" data-go="16"><span class="nv-no">16</span>내 앱 만들기</a>
   </nav>
   <div class="sb-foot">
@@ -1303,13 +1303,25 @@ ollama pull gemma3:4b             # 3.3GB - 범용 대화용</div>
   <div class="box tip">
     <span class="t">여기까지 오면 할 수 있는 것</span>
     지금까지는 <strong>남이 만든 도구(터미널·VS Code)</strong>로 AI를 썼습니다.
-    이제 <strong>내가 만든 프로그램</strong>에 AI를 넣습니다.
-    <code class="inline">localhost:11434</code>는 <strong>누가 요청하든 대답</strong>하기 때문에 가능한 일입니다.
+    이제 <strong>Qwen과 함께 만든 내 프로그램</strong>에 AI를 넣습니다.
+    <code class="inline">localhost:11434</code>는 같은 PC의 프로그램에서도 요청할 수 있기 때문에 가능한 일입니다.
   </div>
 
-  <h3>준비</h3>
-  <div class="code"><button class="copy">복사</button>pip install requests</div>
-  <p class="muted">Ollama가 실행 중이어야 합니다. 검은 창에서 <code class="inline">ollama list</code>로 확인하세요.</p>
+  <h3>준비 · 프로젝트 전용 venv</h3>
+  <p>다음 차시에는 <strong>Python + PySide6</strong>로 GUI를 만듭니다. 교사가 배포한 Python이 설치되어 있어야 합니다. VS Code에서 <strong>파일 → 폴더 열기</strong>로 새 <code class="inline">error-tutor</code> 폴더를 엽니다.</p>
+  <p><strong>터미널 → 새 터미널</strong> 옆 드롭다운에서 <strong>Command Prompt(cmd)</strong>를 선택합니다. 터미널 위치가 error-tutor 폴더인지 확인한 뒤 한 줄씩 실행하세요.</p>
+  <div class="code"><button class="copy">복사</button>py -m venv .venv
+.venv\Scripts\activate.bat
+python -m pip install "PySide6&gt;=6.8,&lt;7" "requests&gt;=2.32,&lt;3"
+python -c "import sys; print(sys.executable)"
+python -c "import PySide6, requests; print(PySide6.__version__)"</div>
+  <p>경로 끝이 <code class="inline">error-tutor\.venv\Scripts\python.exe</code>인지 확인합니다. 패키지는 프로젝트의 .venv에 설치합니다. <code class="inline">py</code>가 없으면 교사와 Python 설치를 확인하고 <code class="inline">python -m venv .venv</code>를 사용합니다.</p>
+  <div class="box tip"><span class="t">편집기와 실행 환경 맞추기</span>VS Code에 Python 확장이 설치되어 있다면 Ctrl+Shift+P → <strong>Python: Select Interpreter</strong> → .venv의 python.exe를 선택합니다. 목록에 없으면 경로를 직접 지정합니다. Python 확장이 없어도 활성화한 cmd에서 실행할 수 있습니다. 새 터미널을 열면 다시 활성화하고, 활성화 문제는 <code class="inline">.venv\Scripts\python.exe tutor_app.py</code>처럼 직접 실행해 확인합니다.</div>
+  <p class="muted">이 명령은 Windows cmd용입니다. PowerShell의 Activate.ps1 실행 정책을 바꾸는 대신 cmd 터미널을 선택하세요. 패키지 다운로드는 수업 전에 완료합니다. .venv는 PC별로 만들고 다른 PC에서 복사해 재사용하지 않습니다. <a href="code/requirements.txt" download>requirements.txt</a>를 받았다면 설치 명령 대신 <code class="inline">python -m pip install -r requirements.txt</code>를 사용해도 됩니다.</p>
+  <details><summary>Linux / macOS에서 준비</summary><div class="code"><button class="copy">복사</button>python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install "PySide6&gt;=6.8,&lt;7" "requests&gt;=2.32,&lt;3"</div><p>Debian/Ubuntu에서 venv 생성이 안 되면 교사가 python3-venv 패키지를 준비합니다. GUI 실행에는 데스크톱 세션과 Qt 플랫폼 라이브러리가 필요합니다.</p></details>
+  <p>Ollama를 켜고 <code class="inline">ollama list</code>에 qwen2.5-coder:3b가 있는지 확인합니다. 내려받는 Python 예제는 error-tutor 폴더에 저장하세요.</p>
 
   <h3>1단계 · 최소 코드로 말 걸어보기</h3>
   <div style="margin:16px 0">
@@ -1331,6 +1343,7 @@ def ask(prompt):
 
 print(ask("파이썬에서 IndexError 가 나는 이유를 한 문장으로 설명해줘."))</div>
 
+  <p>step1_hello.py를 프로젝트에 저장하고 활성화된 터미널에서 <code class="inline">python step1_hello.py</code>로 실행합니다. 짧은 답변을 받았다면 15장에서 같은 API를 GUI에 연결합니다.</p>
   <h3>응답은 이렇게 생겼습니다</h3>
   <div class="code">{
   "model": "qwen2.5-coder:3b",
@@ -1360,170 +1373,119 @@ print(ask("파이썬에서 IndexError 가 나는 이유를 한 문장으로 설�
 </article>
 
 <article class="chapter" id="ch15" data-no="15">
-  <div class="ch-head"><div class="ch-no">15</div><h2>에러 튜터 앱 만들기</h2></div>
-  <div class="guide">
-    <span class="guide-img llama" role="img" aria-label="엄지를 드는 치비 라마" style="--x:100%;--y:0%"></span>
-    <div class="guide-bubble"><span class="guide-name">라마</span><p>잡담은 못하지만 에러 읽는 건 자신 있어. 이건 내 특기야!</p></div>
-  </div>
-  <p class="sub">에러 로그를 붙여넣으면 <strong>원인·설명·해결책</strong>을 알려주는 나만의 튜터.</p>
+  <div class="ch-head"><div class="ch-no">15</div><h2>Qwen과 에러 튜터 GUI 만들기</h2></div>
+  <div class="guide"><span class="guide-img llama" role="img" aria-label="노트북으로 코딩하는 치비 라마" style="--x:75%;--y:100%"></span><div class="guide-bubble"><span class="guide-name">라마</span><p>원하는 화면을 말해줘. 하나씩 만들고 직접 눌러 보자!</p></div></div>
+  <p class="sub">이미 연결한 <strong>VS Code + Twinny + Qwen 3B</strong>로 PySide6 데스크톱 앱을 바이브코딩합니다. 이번에는 HTML 대신 Python 파일을 만듭니다.</p>
+  <div class="box tip mission"><span class="t">오늘의 완료 기준</span>venv에서 GUI 실행 → 에러 입력·답변 표시 → 분석 중에도 화면 반응 → 실패 안내와 재시도 확인. 위젯 코드를 외우기보다 원하는 화면·동작을 설명하고 검증합니다.</div>
+  <table><tr><th>Qwen의 두 역할</th><th>사용하는 곳</th></tr><tr><td>앱을 만드는 코딩 도우미</td><td>VS Code의 Twinny Chat · qwen2.5-coder:3b</td></tr><tr><td>완성한 앱의 에러 해설 엔진</td><td>PySide6 앱 → localhost:11434/api/chat → 같은 3B 모델</td></tr></table>
+  <p>Qwen이 파일을 자동으로 저장·실행한다고 가정하지 않습니다. <strong>응답의 Python 코드 블록만 복사 → 저장 → VS Code 터미널에서 실행</strong>합니다. 앱을 테스트할 때는 채팅 생성을 마친 뒤 진행하고, 느리면 선택 FIM을 꺼둡니다.</p>
 
-  <div class="box ok">
-    <span class="t">왜 하필 이 앱인가</span>
-    <code class="inline">qwen2.5-coder</code>는 <strong>코드와 에러에 특화</strong>된 모델입니다.
-    잡담은 못하지만 <strong>에러 분석은 잘합니다.</strong>
-    <strong>모델이 잘하는 일을 시키는 것</strong> — 이게 로컬 AI 활용의 핵심입니다.
-  </div>
+  <div class="step"><span class="n">STEP 0 · 준비</span><h3>프로젝트와 가상환경부터 확인</h3>
+  <ol><li>14장에서 만든 <code class="inline">error-tutor</code> 폴더를 VS Code로 엽니다.</li><li>터미널은 <strong>Command Prompt(cmd)</strong>를 선택하고 <code class="inline">.venv</code>를 활성화합니다.</li><li>Twinny Chat은 <code class="inline">qwen2.5-coder:3b</code>. 자동완성용 <code class="inline">1.5b-base</code>와 바꾸지 않습니다.</li></ol>
+  <div class="code"><button class="copy">복사</button>.venv\Scripts\activate.bat
+python -c "import sys; print(sys.executable)"
+python -c "import PySide6, requests; print(PySide6.__version__)"</div>
+  <p>Python 경로가 프로젝트의 <code class="inline">.venv\Scripts\python.exe</code>인지 확인합니다. 준비가 안 됐다면 <a class="jump" href="#14" data-go="14">14장 venv 준비</a>로 돌아갑니다.</p></div>
 
-  <div class="step">
-    <span class="n">STEP 1</span>
-    <h3>역할을 정해준다 — <code class="inline">system</code> 메시지</h3>
-    <p>같은 모델도 <strong>역할을 어떻게 주느냐에 따라 완전히 달라집니다.</strong> 여기가 이 앱의 심장입니다.</p>
-    <div style="margin:14px 0"><a class="dlfile" href="code/step2_tutor.py" download>⬇ step2_tutor.py</a></div>
-    <div class="code"><button class="copy">복사</button>SYSTEM = """당신은 친절한 파이썬 튜터입니다.
-학생이 붙여넣은 에러 메시지를 보고 아래 형식으로만 답하세요.
-
-[원인]
-무엇이 잘못됐는지 한두 문장
-
-[설명]
-왜 이런 일이 생기는지 초보자가 이해할 수 있게
-
-[해결 방법]
-1. 첫 번째 방법
-2. 두 번째 방법
-3. 세 번째 방법
-
-[고친 코드 예시]
-짧은 코드 한 토막
-
-규칙:
-- 한국어로 답하세요.
-- 확실하지 않으면 "확실하지 않습니다"라고 먼저 밝히세요.
-- 형식 밖의 인사말이나 사족은 쓰지 마세요.
-"""</div>
-    <div class="code"><button class="copy">복사</button>"messages": [
-    {"role": "system", "content": SYSTEM},
-    {"role": "user",   "content": error_text},
-]</div>
-    <div class="box tip">
-      <span class="t">작은 모델에는 형식을 정해줘야 합니다</span>
-      <strong>"답변 형식을 대괄호 제목으로 고정"</strong>한 게 핵심입니다.
-      이렇게 안 하면 3B 모델은 답이 매번 다른 모양으로 나와서 앱에 쓸 수 없습니다.<br>
-      <code class="inline">"options": {"temperature": 0.3}</code>도 함께 넣습니다 — <strong>낮추면 형식을 더 잘 지킵니다.</strong>
-    </div>
-  </div>
-
-  <div class="step">
-    <span class="n">STEP 2</span>
-    <h3>화면 만들기 — tkinter</h3>
-    <p>구조는 단순합니다.</p>
-    <div class="code">┌─────────────────────────────┐
-│ 에러 로그를 붙여넣으세요      │
-│ ┌─────────────────────────┐ │  ScrolledText (입력)
-│ │ Traceback ...           │ │
-│ └─────────────────────────┘ │
-│ [    분석하기    ] [지우기]  │  Button
-│ 준비됨                       │  Label (상태)
-│ 튜터의 설명                  │
-│ ┌─────────────────────────┐ │  ScrolledText (출력, 읽기전용)
-│ │ [원인] ...              │ │
-│ └─────────────────────────┘ │
-└─────────────────────────────┘</div>
-    <div class="code"><button class="copy">복사</button>import tkinter as tk
-from tkinter import scrolledtext
-
-root = tk.Tk()
-root.title("파이썬 에러 튜터")
-root.geometry("780x720")
-
-input_box = scrolledtext.ScrolledText(root, height=10, wrap="word")
-input_box.pack(fill="x", padx=14)
-
-analyze_btn = tk.Button(root, text="분석하기", command=on_analyze, height=2)
-analyze_btn.pack(fill="x", padx=14, pady=8)
-
-output_box = scrolledtext.ScrolledText(root, height=18, wrap="word", state="disabled")
-output_box.pack(fill="both", expand=True, padx=14, pady=(0,14))
-
-root.mainloop()</div>
-    <p class="muted">출력창은 <code class="inline">state="disabled"</code>로 두어 사용자가 못 고치게 합니다. 글을 쓸 때만 잠깐 풀어줍니다.</p>
-  </div>
-
-  <div class="step">
-    <span class="n">STEP 3</span>
-    <h3>🔴 창이 얼어붙는 문제 — 이 앱의 가장 중요한 지점</h3>
-    <p>버튼을 누르면 <strong>10~40초</strong> 걸립니다. 그냥 호출하면 그 동안 —</p>
-    <div class="box danger">
-      <span class="t">창이 완전히 멈추고 제목에 "응답 없음"이 붙습니다</span>
-      버튼도 안 눌리고, 창을 움직일 수도 없습니다. <strong>GUI 프로그래밍에서 가장 흔한 함정</strong>이에요.<br><br>
-      원인: tkinter는 <strong>한 줄로 일합니다.</strong> 모델 응답을 기다리는 동안
-      화면을 그리는 일도 같이 멈추는 겁니다.
-    </div>
-    <p><strong>해결: 요청은 다른 일꾼(스레드)에게 보내고, 결과만 화면에 전달합니다.</strong></p>
-    <div class="code"><button class="copy">복사</button>import threading
-
-def on_analyze():                      # 버튼을 누르면
-    analyze_btn.config(state="disabled")   # 중복 클릭 방지
-    set_status("분석 중입니다... (10~40초)")
-    threading.Thread(target=worker, args=(error_text,), daemon=True).start()
-
-def worker(error_text):                # 다른 스레드 - 화면을 직접 건드리면 안 된다
-    answer = ask_tutor(error_text)
-    root.after(0, done, answer)        # 메인 스레드에 넘긴다
-
-def done(answer):                      # 다시 메인 스레드
-    write_output(answer)
-    analyze_btn.config(state="normal")</div>
-    <div class="box warn">
-      <span class="t">규칙 하나만 기억하세요</span>
-      <strong>화면(위젯)은 메인 스레드에서만 건드립니다.</strong>
-      다른 스레드에서 바로 고치면 알 수 없는 오류가 나거나 조용히 깨집니다.
-      그래서 <code class="inline">root.after(0, ...)</code>로 <strong>메인 스레드에 일을 넘깁니다.</strong>
-    </div>
-    <p class="muted">
-      <code class="inline">daemon=True</code>는 "창을 닫으면 이 일꾼도 같이 끝내라"는 뜻입니다.
-      없으면 창을 닫아도 프로그램이 안 끝납니다.
-    </p>
-  </div>
-
-  <div class="step">
-    <span class="n">STEP 4</span>
-    <h3>Ollama가 꺼져 있을 때</h3>
-    <p>사용자는 Ollama를 켜는 걸 잊습니다. <strong>친절한 안내로 바꿔줍니다.</strong></p>
-    <div class="code"><button class="copy">복사</button>try:
-    answer = ask_tutor(error_text)
-except requests.exceptions.ConnectionError:
-    answer = ("모델에 연결할 수 없습니다.\n\n"
-              "· Ollama 가 실행 중인지 확인하세요 (작업표시줄 아이콘)\n"
-              "· 검은 창에서  ollama list  로 모델이 있는지 확인하세요")
-except requests.exceptions.Timeout:
-    answer = "시간이 너무 오래 걸려서 중단했습니다. 에러 로그를 줄여 보세요."</div>
-    <div class="box tip">
-      <span class="t">이게 "프로그램"과 "코드"의 차이입니다</span>
-      돌아가기만 하는 건 코드이고, <strong>남이 실수해도 알려주는 게 프로그램</strong>입니다.
-    </div>
-  </div>
-
-  <h3>완성본</h3>
-  <div style="margin:16px 0"><a class="dlfile" href="code/tutor_app.py" download>⬇ tutor_app.py (완성본)</a></div>
+  <div class="step"><span class="n">STEP 1 · 화면 생성</span><h3>원하는 GUI를 Qwen에게 설명하기</h3>
+  <p>새 Twinny 채팅에 아래 프롬프트를 보냅니다. 우선 <strong>네트워크 요청 없는 화면</strong>으로 버튼과 레이아웃부터 확인합니다.</p>
+  <div class="prompt"><span class="label">프롬프트 1 · GUI부터</span><button class="copy">복사</button>고등학생이 쓸 파이썬 에러 튜터 GUI를 만들어줘.
+환경: Python, venv, PySide6 Qt Widgets. 파일 하나 tutor_app.py.
+- QMainWindow와 레이아웃으로 배치하고 창 크기를 바꾸면 입력/출력 영역도 늘어나게 해줘.
+- 위: 제목과 안내, 에러를 붙여넣는 QPlainTextEdit
+- 가운데: 분석하기, 지우기 버튼과 준비됨/분석 중/완료 상태
+- 아래: 읽기 전용 QPlainTextEdit 결과 영역. 텍스트 선택·복사는 가능하게.
+- 빈 입력은 안내하고, 지우기는 입력·결과·상태를 초기화해줘.
+- 지금은 API를 연결하지 마. 분석하기를 누르면 QTimer.singleShot으로 1초 뒤
+  "[원인] 예시 답변입니다"를 표시해줘. time.sleep은 쓰지 마.
+- 기다리는 중 입력 편집·분석하기·지우기는 막고, 완료 후 다시 사용하게 해줘.
+- 외부 이미지·추가 GUI 라이브러리 없이, 짧고 실행 가능한 전체 코드를 보여줘.
+- QApplication 생성과 if __name__ == "__main__" 실행부를 포함해줘.</div>
+  <ol><li>새 파일을 <code class="inline">tutor_app.py</code>로 저장합니다. 코드 앞뒤의 ``` 표시는 넣지 않습니다.</li><li>프로젝트 폴더의 활성화된 터미널에서 실행합니다.</li></ol>
   <div class="code"><button class="copy">복사</button>python tutor_app.py</div>
+  <div class="box ok"><span class="t">화면 합격 체크</span>빈 입력 안내 / 글 붙여넣기 / 예시 답변 / 결과 복사 / 지우기 / 창 크기 변경을 확인합니다. 지금 보이는 답변은 AI의 실제 분석이 아닙니다. 통과하면 <code class="inline">tutor_app-v1.py</code>로 사본을 보관합니다.</div></div>
 
-  <h3>테스트해볼 에러들</h3>
-  <p>하나씩 붙여넣어 보세요. <strong>답변 품질이 어떻게 다른지</strong> 비교해보는 게 관찰 포인트입니다.</p>
-  <div class="code"><button class="copy">복사</button>IndexError: list index out of range</div>
-  <div class="code"><button class="copy">복사</button>TypeError: unsupported operand type(s) for +: 'int' and 'str'</div>
-  <div class="code"><button class="copy">복사</button>KeyError: 'name'</div>
-  <div class="code"><button class="copy">복사</button>ModuleNotFoundError: No module named 'pandas'</div>
-  <div class="code"><button class="copy">복사</button>IndentationError: expected an indented block after 'if' statement on line 4</div>
+  <div class="step"><span class="n">STEP 2 · 화면 개선</span><h3>“예쁘게”를 구체적인 요구로 바꾸기</h3>
+  <div class="prompt"><span class="label">프롬프트 2 · 레이아웃 수정</span><button class="copy">복사</button>현재 코드의 GUI만 개선해줘. 예시 답변 동작은 유지해줘.
+- 밝은 배경, 진한 글자, 민트색 분석 버튼, 16px 이상 본문 글씨
+- 바깥 여백 20px 이상, 제목/입력/버튼/결과를 구분
+- 입력보다 결과 영역을 더 넓게, 창을 늘리면 레이아웃이 함께 늘어나게
+- 비활성 버튼은 비활성 상태가 보이게, 키보드 Tab 이동도 가능하게
+- 외부 파일 없이 PySide6 스타일시트만 사용
+수정한 전체 Python 코드를 보여줘.
+현재 코드:
+[여기에 tutor_app.py의 전체 내용을 붙여넣기]</div>
+  <p>화면을 닫고 수정 코드를 저장한 뒤 다시 실행합니다. <strong>화면 폭을 줄였을 때 버튼이 잘리지 않는지, 긴 로그를 스크롤할 수 있는지</strong> 확인하세요. 오류가 나면 STEP 5의 수정 요청 틀을 사용합니다.</p></div>
 
-  <div class="box warn">
-    <span class="t">튜터도 틀립니다</span>
-    3B 모델이라 <strong>그럴듯하게 틀린 설명</strong>을 할 수 있습니다
-    (<a class="jump" href="#08" data-go="08">08 채팅 연습 · 연습 5</a>).
-    그래서 <code class="inline">system</code>에 <strong>"확실하지 않으면 밝혀라"</strong>는 규칙을 넣었습니다.
-    <strong>튜터의 말을 검증하는 것까지가 실력</strong>입니다.
-  </div>
+  <div class="step"><span class="n">STEP 3 · 실제 AI 연결</span><h3>예시 답변을 Ollama 응답으로 바꾸기</h3>
+  <div class="prompt"><span class="label">프롬프트 3 · 실제 분석</span><button class="copy">복사</button>현재 PySide6 앱의 예시 답변을 실제 Ollama 요청으로 바꿔줘. GUI 배치는 유지해줘.
+- requests.post로 http://localhost:11434/api/chat 호출
+- model: qwen2.5-coder:3b, stream: False, options: {"temperature": 0.3}
+- messages에 system과 user를 넣고 user 내용은 입력창의 에러 로그
+- system: "친절한 파이썬 튜터로서 [원인], [설명], [해결 방법], [고친 코드 예시] 순서로
+  한국어로 짧게 답하세요. 정보가 부족하면 필요한 코드를 요청하고 불확실성을 밝혀주세요."
+- 연결/읽기 timeout=(5, 300), raise_for_status(), JSON의 message.content 사용
+- HTTP 요청은 QThread의 run에서 실행. run 안에서는 위젯을 읽거나 변경하지 마.
+- 입력 문자열을 스레드에 전달하고 결과/오류는 Signal로 메인 창의 Slot에 전달해줘.
+- QThread 객체는 self.worker에 보관하고 finished 뒤에 정리해줘.
+- 시작 시 입력·분석·지우기를 잠그고 finished 후에 복구해줘.
+- 분석 중 창 닫기는 무시하고 상태 문구로 완료 후 다시 닫으라고 안내해줘.
+- terminate(), GUI 스레드의 wait(), processEvents 반복 호출로 해결하지 마.
+외부 의존성은 PySide6와 requests만. 실행 가능한 전체 코드를 보여줘.
+현재 코드:
+[여기에 화면 테스트를 통과한 전체 코드 붙여넣기]</div>
+  <div class="box tip"><span class="t">왜 QThread와 Signal인가요?</span>화면을 처리하는 메인 스레드가 HTTP 응답까지 기다리면 GUI 반응이 지연됩니다. 요청은 작업 스레드에서 하고, 결과는 Signal로 메인 창에 전달합니다. 학생은 “분석 중에도 화면을 움직이고 결과를 스크롤할 수 있는지”로 확인합니다.</div>
+  <p>닫기 안내는 단순한 수업용 정책입니다. <strong>즉시 취소 기능은 구현하지 않습니다.</strong> QThread의 quit()만으로 진행 중인 requests 호출이 취소되는 것은 아닙니다. timeout도 정확한 전체 분석 제한 시간이 아니라 연결·읽기 대기 제한입니다.</p>
+  <p>같은 형식으로 요청해도 모델이 항상 규칙을 지키는 것은 아닙니다. 답변 형식과 해결책의 정확성은 따로 검증합니다.</p></div>
 
+  <div class="step"><span class="n">STEP 4 · 실패도 설계</span><h3>오류 안내와 재시도 요청하기</h3>
+  <div class="prompt"><span class="label">프롬프트 4 · 오류 처리</span><button class="copy">복사</button>현재 PySide6 에러 튜터의 실패 처리를 개선해줘. 기존 QThread/Signal 구조를 유지해줘.
+- 연결 실패: Ollama 실행 안내
+- Timeout: 입력을 줄이고 재시도 안내. Timeout을 ConnectionError보다 먼저 처리
+- HTTP 404: ollama list에서 qwen2.5-coder:3b 확인 안내
+- 그 외 HTTP 오류: 상태 코드와 재시도 안내
+- 잘못된 JSON, message.content 누락, 빈 답변: 응답 형식 오류 안내
+- 실패해도 worker 종료 후 입력·분석하기·지우기가 다시 사용 가능해야 함
+- 오류/결과 텍스트를 Signal로 보내고 메인 창의 Slot에서만 화면 변경
+수정한 전체 코드를 보여줘.
+현재 코드:
+[여기에 전체 코드 붙여넣기]</div>
+  <p>원하는 안내가 실제로 나오는지 시험합니다. 예를 들어 <strong>Ollama를 종료하기 전에 이 프롬프트의 코드 응답을 받아 저장</strong>하고 앱에서 연결 실패를 테스트합니다. 이후 Ollama를 다시 켜고 재시도하세요. Ollama가 꺼져 있으면 Twinny의 Qwen 채팅도 사용할 수 없습니다.</p></div>
+
+  <div class="step"><span class="n">STEP 5 · 실행 → 관찰 → 수정</span><h3>이제 내가 GUI 테스터</h3>
+  <table><tr><th>시험</th><th>예상 결과</th></tr>
+    <tr><td>빈 입력에서 분석</td><td>입력 안내, 네트워크 요청 없음</td></tr>
+    <tr><td>정상 에러 로그 입력</td><td>분석 중 표시 후 결과 출력, 결과 선택·복사 가능</td></tr>
+    <tr><td>분석 중 창 이동·크기 조정</td><td>화면 반응 유지. 입력·분석·지우기는 잠금</td></tr>
+    <tr><td>분석 버튼 연속 클릭</td><td>요청은 하나만 실행</td></tr>
+    <tr><td>분석 중 창 닫기</td><td>강제 종료·QThread 경고 없이 상태 안내. 완료 후 다시 닫기 가능</td></tr>
+    <tr><td>Ollama 종료 후 분석 → 다시 켜서 재시도</td><td>연결 실패 안내 → 버튼 복구 → 다음 요청 성공</td></tr>
+    <tr><td>완료 후 지우기</td><td>입력·결과 초기화, 준비됨 상태</td></tr>
+  </table>
+  <details><summary>선택 · 느린 응답과 HTTP 오류를 재현하려면</summary><p>원본을 보관한 테스트 사본에서 교사와 확인합니다. 느린 응답은 작업 스레드의 요청 함수를 잠시 고정 지연·고정 답변으로 대체해 GUI 반응을 봅니다. HTTP 404는 테스트 사본의 MODEL을 존재하지 않는 이름으로 바꿔 확인합니다. 타임아웃·잘못된 JSON은 교사용 모의 응답 테스트로 확인하며, 0.001초 같은 짧은 timeout만으로 재현을 보장하지 않습니다. 완료 후 실제 요청 설정으로 복구합니다.</p></details>
+  <div class="prompt"><span class="label">수정 요청 틀 · 한 문제씩</span><button class="copy">복사</button>현재 PySide6 앱에서 아래 문제 하나를 고쳐줘.
+실행: .venv의 python tutor_app.py
+조작 순서: [무엇을 입력하고 어떤 버튼을 눌렀는지]
+예상 결과: [기대했던 화면/동작]
+실제 결과: [화면 상태 또는 VS Code 터미널의 Traceback]
+유지할 것: [이미 잘 되는 기능과 GUI 배치]
+QThread/Signal 구조와 venv 환경을 유지하고, 바뀐 이유를 짧게 설명한 뒤 전체 코드를 보여줘.
+현재 코드:
+[전체 코드 붙여넣기]</div>
+  <p>새 요청 전 앱 창을 닫고 저장합니다. 실행 중이면 완료 후 닫습니다. 대화가 길어지거나 반복되면 새 채팅에 <strong>현재 코드와 한 가지 수정 요청</strong>을 전달합니다. 생성 결과를 저장할 때 성공 버전 사본을 유지하세요.</p></div>
+
+  <h3>설명도 검증하기</h3>
+  <div class="code"><button class="copy">복사</button>nums = [10, 20, 30]
+print(nums[5])
+
+IndexError: list index out of range</div>
+  <p>튜터가 리스트의 인덱스 범위를 설명하는지 확인하고, 제안한 수정 코드의 출력이 의도에 맞는지 따로 실행합니다. 에러 한 줄만으로 맥락이 부족하면 주변 코드도 추가하세요.</p>
+  <h3>막혔을 때만 참고 완성본과 비교</h3>
+  <p>먼저 내가 만든 GUI로 테스트합니다. 참고본은 레이아웃·QThread·오류 처리를 비교하는 용도입니다. 학생 생성물이 참고본과 똑같을 필요는 없습니다.</p>
+  <p><a class="dlfile" href="code/tutor_app.py" download>PySide6 참고 완성본 받기</a> <a href="code/requirements.txt" download>requirements.txt 받기</a></p>
+  <p>같은 프로젝트에 받아 활성화된 venv에서 <code class="inline">python -m pip install -r requirements.txt</code> 후 실행합니다. 기존 파일은 덮어쓰기 전에 다른 이름으로 보관하세요.</p>
+  <div class="box ok"><span class="t">남길 기록</span>GUI 생성 프롬프트 / 내가 바꾼 화면 요구 / 테스트 3개 / 수정 전후 결과 / “화면 처리와 모델 요청을 분리하는 이유” 한 문장. <a href="worksheet.html" target="_blank" rel="noopener">활동지</a>에서 앱 이름을 에러 튜터로 적고, 구조 설명란에는 QThread·Signal 역할도 적습니다.</div>
+  <p class="muted">참고: <a href="https://doc.qt.io/qtforpython-6/gettingstarted.html" target="_blank" rel="noopener">Qt for Python 시작하기</a> · <a href="https://doc.qt.io/qtforpython-6/PySide6/QtCore/QThread.html" target="_blank" rel="noopener">QThread 공식 문서</a></p>
   <div class="pager"><button class="pg prev" data-go="14">← 파이썬으로 붙이기</button><button class="pg next" data-go="16">내 앱 만들기 →</button></div>
 </article>
 
@@ -1535,10 +1497,10 @@ except requests.exceptions.Timeout:
   </div>
   <p class="sub">튜터 앱을 <strong>내 주제로 바꿉니다.</strong> 고칠 곳은 생각보다 적습니다.</p>
 
-  <h3>바꿀 곳은 딱 두 군데</h3>
+  <h3>기존 GUI를 Qwen과 내 주제로 바꾸기</h3>
   <table>
     <tr><th style="width:28%">바꿀 것</th><th>어디</th></tr>
-    <tr class="hi"><td><strong>① SYSTEM 문구</strong></td><td>역할과 답변 형식 — <strong>여기가 90%입니다</strong></td></tr>
+    <tr class="hi"><td><strong>① SYSTEM 문구</strong></td><td>역할과 답변 형식 — 입력 예제로 검증합니다</td></tr>
     <tr><td><strong>② 화면 라벨</strong></td><td><code class="inline">"에러 로그를 붙여넣으세요"</code>, <code class="inline">"튜터의 설명"</code>, 창 제목</td></tr>
   </table>
   <p>구조·스레드·오류 처리는 <strong>그대로 재사용</strong>합니다.</p>
@@ -1586,25 +1548,24 @@ except requests.exceptions.Timeout:
     형식 고정 · 불확실성 고백 · 사족 제거 — 하나라도 빠지면 출력이 흔들립니다.
   </div>
 
-  <h3>단계별로 이렇게 진행하세요</h3>
-  <ol>
-    <li><strong>주제 정하기</strong> — 메뉴판에서 하나</li>
-    <li><strong>SYSTEM 먼저 손보기</strong> — GUI는 건드리지 말고 <code class="inline">step2_tutor.py</code>(콘솔)에서 답변 품질부터 맞춥니다</li>
-    <li><strong>3번 이상 고쳐보기</strong> — 형식이 안 지켜지면 규칙을 더 구체적으로</li>
-    <li><strong>GUI에 옮기기</strong> — <code class="inline">tutor_app.py</code>의 SYSTEM과 라벨만 교체</li>
-    <li><strong>실패 케이스 찾기</strong> — 내 앱이 못 하는 입력을 하나 찾아 기록</li>
-  </ol>
-  <div class="box ok">
-    <span class="t">2번을 건너뛰지 마세요</span>
-    GUI에서 바로 프롬프트를 고치면 <strong>고칠 때마다 창을 껐다 켜야</strong> 해서 시간이 두 배로 듭니다.
-    <strong>콘솔에서 품질을 맞춘 뒤 GUI로 옮기는 것</strong>이 실무 순서입니다.
-  </div>
+  <h3>VS Code 채팅으로 주제 바꾸기</h3>
+  <ol><li>15장에서 완성한 PySide6 앱의 동작 버전을 보관합니다.</li><li>Twinny의 3B 채팅에 현재 전체 코드와 아래 요청을 보냅니다.</li><li>같은 venv에서 실행하고 정상 입력·빈 입력·연속 클릭을 다시 확인합니다.</li><li>답변 품질이 부족하면 한 가지 요구씩 바꿉니다. 필요하면 <a href="code/step2_tutor.py" download>콘솔 예제</a>에서 system 문구만 비교합니다.</li></ol>
+  <div class="prompt"><button class="copy">복사</button>현재 PySide6 앱을 [주제]로 바꿔줘.
+입력: [입력 예시]
+답변 형식: [원하는 항목]
+창 제목과 입력/결과 안내를 주제에 맞게 바꿔줘.
+venv, qwen2.5-coder:3b API, QThread/Signal, 중복 요청 방지, 종료 안내는 유지해줘.
+불확실한 설명은 단정하지 않도록 system 문구를 정해줘.
+수정한 전체 Python 코드를 보여줘.
+현재 코드:
+[내 앱의 전체 코드]</div>
+  <div class="box tip"><span class="t">화면과 답변을 따로 확인하세요</span>GUI가 잘 동작해도 설명이 틀릴 수 있습니다. 실제 입력 예제의 예상 답변과 모델 출력을 비교하고, 한 번 이상 개선한 뒤 같은 예제로 재검증합니다.</div>
 
   <h3>활동지에 적을 것</h3>
   <ol>
     <li>내가 만든 앱은 무엇인가</li>
-    <li>SYSTEM 문구를 <strong>몇 번 고쳤나</strong>, 무엇을 바꿨을 때 가장 좋아졌나</li>
-    <li>잘 되는 입력 하나 / <strong>끝까지 안 되는 입력 하나</strong></li>
+    <li>GUI·SYSTEM 수정 요청에 어떤 조건을 넣었고, 결과가 어떻게 달라졌나</li>
+    <li>정상 입력과 실패·예외 상황을 포함한 테스트 3개 및 재검증 결과</li>
     <li>이 앱을 <strong>클라우드 AI로 만들면 무엇이 달라질까</strong></li>
   </ol>
 

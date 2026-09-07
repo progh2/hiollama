@@ -29,7 +29,9 @@
 | `check-env.bat` | GPU·드라이버·디스크·설치 상태 사전 점검 |
 | `code/step1_hello.py` | Ollama API 최소 호출 |
 | `code/step2_tutor.py` | system 메시지로 튜터 역할 부여 |
-| `code/tutor_app.py` | 다음 차시 tkinter + threading 에러 튜터 |
+| `tests/test_tutor_app.py` | Qt offscreen GUI·HTTP 계약 검증 |
+| `code/requirements.txt` | PySide6·requests 설치 범위 |
+| `code/tutor_app.py` | 다음 차시 PySide6 + QThread/Signal 에러 튜터 참고 완성본 |
 | `assets/llama-expressions.png` | 치비 라마 10표정 스프라이트 시트. CSS로 각 칸 표시 |
 
 01 PC 점검에서 배치 파일을 받습니다. 배치 파일은 **CP949 + CRLF**를 유지해야 하며, `index.html`의 소스 보기에도 같은 내용을 반영합니다. cmd 기반으로 동작하고 NVIDIA 점검에는 `nvidia-smi`를 사용합니다. 보안 정책에 따라 실행이 제한될 수 있습니다.
@@ -44,19 +46,28 @@
 
 설치 파일·두 모델의 `blobs` + `manifests`·Twinny는 사전 배포합니다. 05·06 상세 이론과 FIM은 선택, 14–16 파이썬은 다음 차시입니다. 필수 채팅 실험은 08의 연습 1·5입니다.
 
-## 리눅스에서 다음 차시 코드 실행
+## 다음 차시 — Qwen + VS Code로 PySide6 GUI 바이브코딩
 
-Debian/Ubuntu에서 배포판 패키지를 사용할 수 있습니다.
+14장에서 프로젝트별 venv를 만들고 API를 확인합니다. 15장은 화면 생성 프롬프트 → GUI 개선 → 실제 Ollama 연결 → QThread/Signal로 응답성 유지 → 오류 처리·재검증 순서입니다. 16장에서는 같은 앱을 다른 주제로 확장합니다. 완성본 다운로드는 막혔을 때의 비교 자료입니다.
 
-```bash
-sudo apt install python3-tk python3-requests
+Windows의 프로젝트 폴더에서 VS Code **Command Prompt(cmd)** 터미널을 사용합니다.
+
+```bat
+py -m venv .venv
+.venv\Scripts\activate.bat
+python -m pip install -r code/requirements.txt
+python code/tutor_app.py
 ```
 
-Ollama 설치 후:
+위 명령은 저장소 루트 기준입니다. 학생이 `tutor_app.py`, `requirements.txt`를 별도 프로젝트에 내려받았다면 `code/`를 빼고 실행합니다. Python 확장을 쓰면 `.venv` 인터프리터도 선택합니다. 터미널을 새로 열면 다시 활성화합니다.
+
+Linux/macOS에서는:
 
 ```bash
-ollama pull qwen2.5-coder:3b
-python3 code/tutor_app.py
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r code/requirements.txt
+python code/tutor_app.py
 ```
 
-외부 관리 Python 환경에서는 시스템 `pip` 대신 배포판 패키지 또는 가상환경을 사용합니다.
+Debian/Ubuntu에서는 `python3-venv`와 GUI 실행용 시스템 라이브러리가 필요할 수 있습니다. 패키지는 venv에 설치하며, `.venv` 폴더는 PC별로 생성하고 공유하지 않습니다. 참고 앱은 분석 중 창 닫기를 보류하고 완료 후 다시 닫도록 안내합니다. 즉시 요청 취소 기능은 포함하지 않습니다.

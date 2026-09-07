@@ -89,3 +89,22 @@ console.log(add(2, 3));
 로컬 Chromium에서 17개 챕터 이동, 1280px/390px 화면(선택 자료 펼침 포함)의 가로 넘침 없음, 자료 링크, 오프라인 본문·게임 실행을 확인했습니다. 예제의 승패 9가지 조합·점수·초기화, 활동지 임시 저장·복원·텍스트 다운로드·PDF 출력·삭제도 확인했습니다. JavaScript 실행 오류는 없었습니다. 배치 파일은 CP949/CRLF와 본문 소스 일치를 확인했습니다.
 
 이 검증은 Windows 배치 실행이나 RTX 2060에서의 모델 추론·Twinny FIM 품질 검증을 포함하지 않습니다. 해당 항목은 위 리허설에서 확인합니다.
+
+
+## 다음 차시 운영 변경 · 2026-09-08
+
+14–16장은 **기존 Qwen + VS Code로 PySide6 GUI를 바이브코딩**하는 실습입니다. venv 생성·패키지 설치는 수업 전에 준비하고, 새 cmd 터미널에서 재활성화하도록 안내합니다. Python·PySide6 호환성과 학교 PC에서의 실제 GUI 실행을 확인하세요. 기존 tkinter 코드는 PySide6 참고본으로 교체했습니다.
+
+- 학생은 먼저 API 없는 화면을 생성하고 창 크기·입출력·버튼 상태를 확인합니다.
+- 이후 requests 호출을 QThread.run으로 옮기고 결과를 Signal → 메인 창 Slot으로 전달하게 요청합니다.
+- 분석 중 지우기·입력 편집·중복 요청을 막고, 창 닫기는 안내 후 보류합니다. 작업 중 QThread 파괴나 강제 terminate로 해결하지 않습니다.
+- Ollama 연결 실패 시험은 수정 코드를 먼저 받은 뒤 서버를 종료해서 합니다. 서버가 꺼지면 Twinny 채팅도 멈추므로 시험 후 다시 켭니다.
+- 참고본은 구조 비교·복귀용이며 학생 생성물이 동일한 코드일 필요는 없습니다.
+- 설치 후 `python -m pip freeze`로 검증된 PC의 정확한 패키지 버전을 별도 기록합니다. requirements.txt는 허용 범위이며 버전 고정 파일이 아닙니다.
+- 오프라인 설치는 같은 Windows/Python/아키텍처의 준비 PC에서 `python -m pip download -r requirements.txt -d wheels`로 의존성을 함께 확보하고, 학생 venv에서 `python -m pip install --no-index --find-links wheels -r requirements.txt`로 설치합니다. venv 폴더 자체는 배포하지 않습니다.
+
+### PySide6 참고본 검증 · 2026-09-08
+
+임시 venv의 Python 3.13 / PySide6 6.11.2 / requests 2.34.2에서 Qt offscreen 테스트를 실행했습니다. 빈 입력, 느린 작업 중 이벤트 루프 반응·중복 방지·닫기 보류, 오류별 안내·재시도, HTTP 요청 형식과 잘못된 응답 처리를 4개 테스트로 확인했습니다. 실행 명령은 venv에서 `python -m unittest discover -s tests -v`입니다. 고정 답변으로 GUI 화면도 확인했습니다.
+
+이 검증은 모의 HTTP 응답을 사용했으며 Windows 교육장 PC의 실제 Qwen 응답 시간·품질은 별도 리허설 대상입니다. 생성 프롬프트가 매번 같은 코드를 만든다는 보장은 없으므로 학생 생성물도 본문의 체크리스트로 검증합니다.
