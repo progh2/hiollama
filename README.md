@@ -1,78 +1,62 @@
 # 로컬 LLM으로 바이브코딩 시작하기
 
-100분 수업용 실습 자료. **RTX 2060(6GB) / Windows 데스크톱 / VS Code** 환경 기준.
+고등학교 2학년 대상 **100분 실습**. RTX 2060 6GB / Windows / VS Code + Twinny 환경을 기준으로 합니다.
 
-👉 **[실습 페이지 열기](https://progh2.github.io/hiollama/)**
+**[실습 페이지 열기](https://progh2.github.io/hiollama/)**
 
-## 구성
+학생은 HTML 앱 하나를 실행하고, 기능 3개를 확인한 뒤 근거를 들어 한 번 이상 개선합니다. 로컬 AI 구조 설명, 구체적인 요청, 실행 결과 검증이 학습 목표입니다.
+
+## 모델 구성
+
+| 용도 | 모델 | 운영 |
+|---|---|---|
+| 채팅·코드 생성·수정 | `qwen2.5-coder:3b` | 필수 |
+| 커서 앞뒤 코드 자동완성(FIM) | `qwen2.5-coder:1.5b-base` | 선택 체험 |
+
+교사가 위 조합의 VS Code 연결·실행을 확인했습니다. 정확한 버전과 FIM 템플릿, 반복 수정 품질·동시 사용 속도는 [교사용 안내](TEACHER.md)의 수업 전 점검표에 기록합니다. 1.5B 채팅에서 관찰한 반복 응답을 FIM 실패로 일반화하지 않습니다. Qwen3.5로 교체하지 않습니다.
+
+두 모델의 다운로드 합계는 약 2.9GB이며 실행 VRAM과 다릅니다. 모델 응답 후 `ollama ps`로 GPU/CPU 배치를 확인합니다. 느리면 FIM을 끄고 3B 채팅만 사용합니다.
+
+## 자료
 
 | 파일 | 용도 |
 |---|---|
-| `index.html` | 실습 페이지 (이론 → 설치 → 바이브코딩). 단일 파일, 외부 CDN 없음 |
-| `check-env.bat` | 학생 PC 사전 점검 — 더블클릭 실행 (GPU·VRAM·드라이버·디스크·VS Code·Ollama) |
-| `code/step1_hello.py` | requests 로 Ollama API 최소 호출 |
-| `code/step2_tutor.py` | system 메시지로 튜터 역할 부여 (콘솔) |
-| `code/tutor_app.py` | **에러 튜터 GUI 앱** — tkinter + threading 완성본 |
-| `assets/guide-*.png` | 마스코트 '라마' 5포즈 (hello/teach/think/wow/ok) |
+| `index.html` | 학생용 실습, 00–13 본 수업·참고 / 14–16 다음 차시, 총 17개 챕터 |
+| `LESSON_PLAN.md` | 교사용 수업계획서 — 학생·교사 상호작용, 평가, 참고 문헌·영상 |
+| `TEACHER.md` | 사전 배포, 시간표, 설정 기록, 검증·복귀 절차 |
+| `worksheet.html` | 작성 후 인쇄/PDF 또는 텍스트 다운로드하는 활동지 |
+| `code/game_starter.html` | 오프라인 가위바위보 예제·복귀용 출발 코드 |
+| `check-env.bat` | GPU·드라이버·디스크·설치 상태 사전 점검 |
+| `code/step1_hello.py` | Ollama API 최소 호출 |
+| `code/step2_tutor.py` | system 메시지로 튜터 역할 부여 |
+| `code/tutor_app.py` | 다음 차시 tkinter + threading 에러 튜터 |
+| `assets/llama-expressions.png` | 치비 라마 10표정 스프라이트 시트. CSS로 각 칸 표시 |
 
-실습 페이지 `06 PC 점검` 챕터에서 바로 내려받을 수 있습니다.
+01 PC 점검에서 배치 파일을 받습니다. 배치 파일은 **CP949 + CRLF**를 유지해야 하며, `index.html`의 소스 보기에도 같은 내용을 반영합니다. cmd 기반으로 동작하고 NVIDIA 점검에는 `nvidia-smi`를 사용합니다. 보안 정책에 따라 실행이 제한될 수 있습니다.
 
-> **순수 cmd 배치입니다.** PowerShell 실행 정책·백신·관리자 권한 문제를 피하려고
-> 윈도우 기본 명령(`reg`/`dir`/`where`/`netstat`)만 사용합니다.
-> 한국어 Windows 콘솔에서 바로 읽히도록 **CP949 + CRLF**로 저장되어 있으니
-> 편집 시 인코딩을 유지하세요.
+페이지·활동지·예제는 외부 CDN 없이 동작합니다. 오프라인 배포 시 HTML뿐 아니라 `assets`, `code`, 배치 파일과 교사용 안내까지 폴더 구조 그대로 복사하세요.
 
-## 리눅스에서 실습 코드 실행
+[교사용 수업계획서](LESSON_PLAN.md)에서 단계별 발문·학생 반응·피드백과 참고 영상을 확인할 수 있습니다.
 
-Debian/Ubuntu 기준. `requests` 는 배포판에 따라 이미 있을 수 있습니다.
+## 100분 운영
+
+0–8 미션·시연 / 8–20 준비 확인 / 20–32 핵심 개념·실험 / 32–42 채팅 연결 / 42–62 함께 제작 / 62–82 개인 제작 / 82–92 짝 테스트·개선 / 92–100 공유·활동지.
+
+설치 파일·두 모델의 `blobs` + `manifests`·Twinny는 사전 배포합니다. 05·06 상세 이론과 FIM은 선택, 14–16 파이썬은 다음 차시입니다. 필수 채팅 실험은 08의 연습 1·5입니다.
+
+## 리눅스에서 다음 차시 코드 실행
+
+Debian/Ubuntu에서 배포판 패키지를 사용할 수 있습니다.
 
 ```bash
 sudo apt install python3-tk python3-requests
-curl -fsSL https://ollama.com/install.sh | sh
+```
+
+Ollama 설치 후:
+
+```bash
 ollama pull qwen2.5-coder:3b
+python3 code/tutor_app.py
 ```
 
-> Debian 13 은 PEP 668 외부 관리 환경이라 `pip install` 이 막힙니다.
-> `apt` 를 쓰거나 `python3 -m venv` 로 가상환경을 만드세요.
-
-## 환경 전제
-
-- **GPU**: RTX 2060 6GB (NVIDIA 드라이버 551.61 이상)
-- **모델**: `qwen2.5-coder:3b` (1.9GB) — 코딩 전용, 6GB에 여유롭게 적재
-- **VS Code**: 1.127 이상 + 공식 Ollama 확장 (GitHub 로그인·Copilot 구독 불필요)
-- 모델 확보는 두 경로를 모두 안내: **넷클래스/USB 사전 배포**(`blobs` + `manifests`, 권장) 또는 `ollama pull qwen2.5-coder:3b` 직접 다운로드
-
-> ⚠️ `gemma4:e2b`는 이름이 "2B"지만 실제 용량 **7.2GB** (MatFormer, effective 파라미터 표기) + thinking 모드로 매우 느림 → 6GB 카드에 부적합
-
-## 챕터 구성 (14장)
-
-```
-00 시작하기
-준비   01 PC 점검 · 02 설치와 모델 받기      <- 다운로드를 먼저 걸어둠
-개념   03 LLM이 뭔가요 · 04 왜 내 PC에서? · 05 모델 고르는 법
-       06 내 PC에 맞추기 · 07 Ollama란       <- 받는 동안 이론
-실습   08 채팅 연습 · 09 VS Code 연결(Twinny)
-       10 바이브코딩 · 11 내 것 만들기
-마무리 12 문제 해결 · 13 정리
-심화   14 파이썬으로 붙이기 · 15 에러 튜터 앱 · 16 내 앱 만들기   <- 다음 차시
-```
-
-설치·다운로드가 5~20분 걸려서 **먼저 시작만 걸어두고 이론을 진행**하는 순서입니다.
-
-## 심화 차시 — 파이썬 GUI
-
-`qwen2.5-coder`가 **코드·에러 분석에 특화**된 점을 활용해, 에러 로그를 붙여넣으면
-원인·설명·해결책을 알려주는 **tkinter GUI 앱**을 만듭니다.
-
-교육 포인트:
-- `system` 메시지로 역할·답변 형식 고정 (작은 모델을 앱에 쓰는 핵심 장치)
-- **GUI 멈춤 문제** → `threading` + `root.after()` (교과서 GUI 단원 심화)
-- 예외별 친절한 안내 (ConnectionError / Timeout)
-- 확장: SYSTEM 문구만 바꿔 정규식 해설기·SQL 해설기·커밋 메시지 생성기 등으로
-
-## 수업 설계 메모
-
-- 실습 과제는 **단일 HTML 파일 웹앱** — 의존성 설치 0, 브라우저에서 즉시 확인
-- 프롬프트에 **"외부 라이브러리·CDN 금지"** 필수 (없으면 빈 화면 사고 다발)
-- 활동지에 **"끝까지 안 된 것"**을 필수 항목으로 → 작은 모델의 한계를 학습 소재로 전환
-- `12 문제 해결`은 실수업에서 실제로 터진 사례 기반 (윈도우 업데이트로 Ollama 미기동, 다운로드 중단, 인사말 무한 반복)
+외부 관리 Python 환경에서는 시스템 `pip` 대신 배포판 패키지 또는 가상환경을 사용합니다.

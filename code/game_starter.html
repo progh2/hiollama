@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>라마와 가위바위보 · 출발용 예제</title>
+<style>
+*{box-sizing:border-box}body{margin:0;padding:24px;font-family:system-ui,'Malgun Gothic',sans-serif;background:#eef7f5;color:#183342;line-height:1.7}main{max-width:660px;margin:32px auto;padding:28px;background:white;border:1px solid #caddda;border-radius:24px}h1{font-size:clamp(24px,5vw,32px);margin:0}.tag{color:#246b61;font-weight:700}.choices{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0}button{font:inherit;padding:12px 22px;border:2px solid #246b61;border-radius:14px;background:#fff;color:#183342;cursor:pointer}button:hover{background:#e2f6f0}button:focus-visible{outline:3px solid #d78300;outline-offset:3px}.choices button{flex:1;min-width:100px}.result{min-height:100px;padding:18px;background:#edf4ff;border-radius:14px;font-weight:700}.score{display:flex;flex-wrap:wrap;gap:20px;font-size:18px}summary{cursor:pointer;font-weight:700}a{color:#245da0}.muted{font-size:14px;color:#526670}
+</style>
+</head>
+<body><main>
+<p class="tag">LOCAL AI LAB · 출발용 예제</p><h1>라마와 가위바위보</h1>
+<p>버튼을 누르고 결과를 확인해 보세요. 파일을 내려받으면 인터넷 없이도 동작합니다.</p>
+<div class="choices" aria-label="내 선택"><button data-choice="가위">✌️ 가위</button><button data-choice="바위">✊ 바위</button><button data-choice="보">✋ 보</button></div>
+<div class="result" id="result" role="status" aria-live="polite">가위, 바위, 보 중 하나를 골라 주세요.</div>
+<p class="score"><span>승리 <b id="wins">0</b></span><span>패배 <b id="losses">0</b></span><span>무승부 <b id="draws">0</b></span></p>
+<button id="reset">점수 초기화</button>
+<details><summary>내가 확인할 것 · 바꿔 볼 것</summary><ol><li>같은 패면 무승부인지 확인합니다.</li><li>가위 → 보, 보 → 바위, 바위 → 가위 순으로 이기는지 봅니다.</li><li>해당 점수만 1 증가하고 초기화하면 모두 0인지 봅니다.</li></ol><p>도전: 5판이 끝나면 최종 결과를 보여주기. 기존 동작 파일은 따로 보관하고 수정하세요.</p></details>
+<p class="muted">점수는 이 페이지를 새로고침하면 초기화됩니다. 이 예제에는 외부 라이브러리·서버 요청이 없습니다.</p>
+<p><a href="../index.html#10">실습으로 돌아가기</a></p>
+</main>
+<script>
+const choices = ['가위', '바위', '보'];
+const beats = {가위: '보', 바위: '가위', 보: '바위'};
+let score = {wins: 0, losses: 0, draws: 0};
+function outcome(player, computer) {
+  if (player === computer) return 'draws';
+  return beats[player] === computer ? 'wins' : 'losses';
+}
+function renderScore() {
+  for (const key of Object.keys(score)) document.getElementById(key).textContent = score[key];
+}
+document.querySelectorAll('[data-choice]').forEach(button => {
+  button.addEventListener('click', () => {
+    const player = button.dataset.choice;
+    const computer = choices[Math.floor(Math.random() * choices.length)];
+    const result = outcome(player, computer);
+    score[result] += 1;
+    document.getElementById('result').textContent = `나: ${player} · 라마: ${computer} — ${ {wins:'내가 이겼어요!',losses:'라마가 이겼어요!',draws:'무승부!'}[result] }`;
+    renderScore();
+  });
+});
+document.getElementById('reset').addEventListener('click', () => {
+  score = {wins: 0, losses: 0, draws: 0};
+  renderScore();
+  document.getElementById('result').textContent = '점수를 초기화했어요. 다시 골라 주세요.';
+});
+</script></body></html>

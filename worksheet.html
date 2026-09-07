@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>만들고 확인하는 AI 실습 · 활동지</title>
+<style>
+*{box-sizing:border-box}body{font-family:system-ui,'Malgun Gothic',sans-serif;line-height:1.65;color:#183342;background:#eef5f7;margin:0;padding:24px}main{max-width:850px;margin:auto;background:white;border:1px solid #cbdde4;border-radius:20px;padding:28px}h1{font-size:28px;margin:0}h2{font-size:20px;margin-top:28px}.tag{color:#246b61;font-weight:bold}label{display:block;font-weight:600;margin-top:14px}input,textarea{display:block;width:100%;font:inherit;padding:10px;border:1px solid #8cabb7;border-radius:8px;background:#fff;color:#183342;margin-top:5px}textarea{min-height:96px;resize:vertical}button,a{font:inherit}button{padding:10px 16px;border:1px solid #246b61;border-radius:9px;color:white;background:#246b61;cursor:pointer}a{color:#245da0}.actions{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0}.hint{color:#526670;font-size:14px}.test{border-left:4px solid #81bfb0;padding-left:16px;margin:22px 0}.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}:focus-visible{outline:3px solid #d78300;outline-offset:3px}@media(max-width:560px){body{padding:10px}main{padding:18px}.pair{grid-template-columns:1fr}}@media print{body{padding:0;background:white}main{max-width:none;border:0;padding:0}.actions,.back,.hint{display:none}input,textarea{border:0;border-bottom:1px solid #999;border-radius:0;padding:3px}textarea{resize:none;overflow:visible;min-height:65px}h2{break-after:avoid}.test,label{break-inside:avoid}h1{font-size:22px}}
+</style></head><body><main>
+<p class="tag">고2 · 100분 LOCAL AI LAB</p><h1>만들고, 확인하고, 개선하기</h1>
+<p>AI의 답변을 그대로 믿기보다 실행 결과로 판단한 과정을 남겨 주세요.</p>
+<p class="hint">입력은 가능한 경우 이 브라우저에 임시 저장됩니다. 공용 PC에서는 제출 후 지워 주세요. 제출 전 반드시 텍스트로 내려받거나 인쇄/PDF로 저장하세요.</p>
+<form id="worksheet">
+<div class="pair"><label>학번·이름<input name="student" autocomplete="off"></label><label>앱 이름<input name="app" autocomplete="off"></label></div>
+<h2>1. 무엇을 만들었나요?</h2>
+<label>누가, 언제 쓰는 앱인가요?<textarea name="purpose"></textarea></label>
+<label>처음 쓴 프롬프트 — 기능·조건·완료 기준<textarea name="prompt" placeholder="HTML 파일 하나 / 외부 라이브러리 없이 / 기능 두 개 / 완료 기준"></textarea></label>
+<label>내가 사용한 모델과 역할<input name="models" value="채팅: qwen2.5-coder:3b / 자동완성(사용했다면): qwen2.5-coder:1.5b-base"></label>
+<h2>2. 짝과 기능 3개 확인하기</h2>
+<p>정상 동작, 빈 입력, 초기화나 반복 조작을 골라 보세요. 오류가 없었다면 확인한 성공 결과를 기록합니다.</p>
+<div class="test"><label>테스트 1 · 조작 순서<input name="test1_action"></label><label>예상 결과 → 실제 결과<textarea name="test1_result"></textarea></label></div>
+<div class="test"><label>테스트 2 · 조작 순서<input name="test2_action"></label><label>예상 결과 → 실제 결과<textarea name="test2_result"></textarea></label></div>
+<div class="test"><label>테스트 3 · 조작 순서<input name="test3_action"></label><label>예상 결과 → 실제 결과<textarea name="test3_result"></textarea></label></div>
+<h2>3. 근거를 들어 한 번 이상 개선하기</h2>
+<label>발견한 문제 또는 개선할 점과 그 이유<textarea name="problem"></textarea></label>
+<label>수정 요청에 쓴 프롬프트<textarea name="revision"></textarea></label>
+<label>수정 후 같은 테스트를 다시 한 결과<textarea name="retest"></textarea></label>
+<h2>4. 내가 판단한 것</h2>
+<label>VS Code → Ollama → 모델의 역할을 내 말로 설명하기<textarea name="structure"></textarea></label>
+<label>잘 된 점·남은 한계, 로컬 AI를 쓰고 싶은 상황<textarea name="reflection"></textarea></label>
+</form>
+<div class="actions"><button type="button" id="download">텍스트 내려받기</button><button type="button" id="print">인쇄 / PDF 저장</button><button type="button" id="clear">공용 PC 기록 지우기</button></div>
+<p id="status" role="status" aria-live="polite" class="hint"></p><p class="back"><a href="index.html#11">실습으로 돌아가기</a></p>
+</main><script>
+const form = document.getElementById('worksheet');
+const fields = [...form.querySelectorAll('input,textarea')];
+const storageKey = 'hiollama-worksheet-v1';
+const status = document.getElementById('status');
+function expand(field) { if(field.tagName === 'TEXTAREA') { field.style.height = 'auto'; field.style.height = field.scrollHeight + 'px'; } }
+try {
+  const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
+  fields.forEach(field => { if(typeof saved[field.name] === 'string') field.value = saved[field.name]; });
+} catch { status.textContent = '이 환경에서는 임시 저장을 사용할 수 없습니다. 작성 후 내려받아 주세요.'; }
+fields.forEach(expand);
+form.addEventListener('input', event => {
+  expand(event.target);
+  try { localStorage.setItem(storageKey, JSON.stringify(Object.fromEntries(fields.map(f => [f.name, f.value])))); status.textContent = '이 브라우저에 임시 저장했습니다. 제출용 파일도 내려받아 주세요.'; }
+  catch { status.textContent = '임시 저장 실패 — 제출 전 텍스트로 내려받아 주세요.'; }
+});
+document.getElementById('download').onclick = () => {
+  const text = '만들고, 확인하고, 개선하기 — 활동지\n\n' + fields.map(f => f.parentElement.firstChild.textContent.trim() + '\n' + f.value).join('\n\n');
+  const url = URL.createObjectURL(new Blob(['\ufeff' + text], {type:'text/plain;charset=utf-8'}));
+  const a = document.createElement('a'); a.href = url; a.download = 'AI-실습-활동지.txt'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  status.textContent = '다운로드한 파일에 내용이 담겼는지 확인하세요.';
+};
+document.getElementById('print').onclick = () => window.print();
+window.addEventListener('beforeprint', () => fields.forEach(expand));
+document.getElementById('clear').onclick = () => {
+  if(!confirm('제출용 파일을 저장했나요? 이 PC의 활동지 입력과 임시 저장을 지웁니다.')) return;
+  fields.forEach(f => {f.value = ''; expand(f);});
+  try { localStorage.removeItem(storageKey); status.textContent = '입력과 임시 저장을 지웠습니다.'; }
+  catch { status.textContent = '화면 입력을 지웠습니다. 브라우저 저장소 삭제는 확인할 수 없습니다.'; }
+};
+</script></body></html>

@@ -53,7 +53,7 @@ if !DMAJ! LSS 551 goto :drvbad
 if !DMIN! GEQ 61 goto :drvok
 goto :drvbad
 :drvok
-call :ok "드라이버 551.61 이상 - GPU 가속 사용 가능"
+call :ok "드라이버 사전 기준 충족 - 실제 GPU 사용은 ollama ps 확인"
 goto :gpudone
 :drvbad
 call :warn "드라이버가 551.61 미만입니다"
@@ -75,11 +75,11 @@ call :hd "3. 권장 모델"
 if "!HASGPU!"=="0" (
   call :say "  GPU 확인 실패 - 조교에게 문의하세요."
 ) else if !VRAMGB! GEQ 11 (
-  call :ok "VRAM !VRAMGB!GB : 7B 급까지 여유. qwen2.5-coder:7b 권장"
+  call :ok "VRAM !VRAMGB!GB : 수업 채팅 qwen2.5-coder:3b 사용"
 ) else if !VRAMGB! GEQ 5 (
-  call :ok "VRAM !VRAMGB!GB : qwen2.5-coder:3b + 1.5b-base 권장 (합 2.9GB)"
+  call :ok "VRAM !VRAMGB!GB : 채팅 3b / 자동완성 1.5b-base (실행 메모리 별도 확인)"
 ) else if !VRAMGB! GEQ 3 (
-  call :warn "VRAM !VRAMGB!GB : qwen2.5-coder:1.5b 사용 (1.0GB)"
+  call :warn "VRAM !VRAMGB!GB : FIM 끄고 3b 채팅 확인. 어려우면 조교에게 문의"
 ) else (
   call :warn "VRAM !VRAMGB!GB : GPU 가속이 어렵습니다. 조교에게 문의하세요."
 )
@@ -119,9 +119,9 @@ for /f "delims=" %%v in ('ollama --version 2^>nul') do call :say "  %%v"
 
 netstat -ano 2>nul | find ":11434" | find "LISTENING" >nul
 if errorlevel 1 (
-  call :warn "설치는 됐으나 서버가 응답하지 않음 - 시작 메뉴에서 Ollama 실행"
+  call :warn "설치는 됐으나 11434 포트가 열리지 않음 - 시작 메뉴에서 Ollama 실행"
 ) else (
-  call :ok "서버 동작 중 (127.0.0.1:11434)"
+  call :ok "11434 포트 열림 - 아래 모델 목록과 실제 답변도 확인"
   call :say "  보유 모델:"
   ollama list > "%TMPL%" 2>nul
   for /f "usebackq skip=1 tokens=*" %%m in ("%TMPL%") do call :say "    %%m"
@@ -133,7 +133,7 @@ if defined OLLAMA_MODELS (
   call :say "  모델 경로 : %USERPROFILE%\.ollama\models"
 )
 if defined OLLAMA_KV_CACHE_TYPE (
-  call :ok "KV 캐시 설정됨 (%OLLAMA_KV_CACHE_TYPE%)"
+  call :ok "현재 cmd 환경의 KV 설정 (%OLLAMA_KV_CACHE_TYPE%) - 서버 적용 별도 확인"
 ) else (
   call :say "  [안내] OLLAMA_KV_CACHE_TYPE 미설정 - 설치 STEP 3 참고"
 )
@@ -143,7 +143,7 @@ rem ============================================================
 call :hd "점검 완료"
 call :say "  결과 파일 : %LOG%"
 echo.
-echo   [OK] 만 있으면 통과입니다.
+echo   사전 점검 완료. 모델 답변과 ollama ps 까지 확인하세요.
 echo   [경고] 가 있으면 그 줄을 조교에게 보여주세요.
 echo.
 pause
