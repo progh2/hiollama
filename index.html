@@ -1410,27 +1410,53 @@ python -c "import tkinter, requests; print(tkinter.TkVersion)"</div>
   <p>새 Twinny 채팅에 아래 프롬프트를 보냅니다. 우선 <strong>네트워크 요청 없는 화면</strong>으로 버튼과 레이아웃부터 확인합니다.</p>
   <div class="prompt"><span class="label">프롬프트 1 · GUI부터</span><button class="copy">복사</button>고등학생이 쓸 파이썬 에러 튜터 GUI를 만들어줘.
 환경: Python 표준 라이브러리 tkinter만 사용. 파일 하나 tutor_app.py.
+
+화면 구성:
 - tk.Tk 창 하나. 창 크기를 바꾸면 입력/출력 영역도 함께 늘어나게 해줘.
 - 위: 제목 라벨과 에러를 붙여넣는 scrolledtext.ScrolledText 입력창
 - 가운데: 분석하기, 지우기 버튼과 준비됨/분석 중/완료 상태 라벨
 - 아래: 읽기 전용(state="disabled") ScrolledText 결과 영역. 텍스트 선택·복사는 가능하게.
+
+동작:
 - 빈 입력은 안내하고, 지우기는 입력·결과·상태를 초기화해줘.
 - 지금은 API를 연결하지 마. 분석하기를 누르면 root.after(1000, ...)로 1초 뒤
   "[원인] 예시 답변입니다"를 표시해줘. time.sleep은 쓰지 마.
 - 기다리는 중 입력 편집·분석하기·지우기는 막고, 완료 후 다시 사용하게 해줘.
-- 외부 이미지·추가 GUI 라이브러리 없이, 짧고 실행 가능한 전체 코드를 보여줘.
-- if __name__ == "__main__" 에서 mainloop()를 실행해줘.</div>
+
+실수 방지 규칙 (꼭 지켜):
+- 위젯 변수 이름은 input_box, output_box, analyze_btn, clear_btn, status 로 고정해줘.
+- 클래스 없이 함수와 전역 변수로 단순하게 써줘.
+- import 는 tkinter 와 tkinter.scrolledtext 만. tkinter에 없는 옵션을 지어내지 마.
+- 버튼은 command=함수이름 처럼 괄호 없이 연결해줘.
+- 배치는 pack 만 사용하고 grid 와 섞지 마.
+- 글 상자 읽기는 input_box.get("1.0", "end"), 지우기는 delete("1.0", "end").
+- 결과창에 쓸 때는 state="normal" 로 풀고 쓴 뒤 다시 "disabled" 로 잠가줘.
+- 마지막 줄은 mainloop() 하나. 그 뒤에 다른 코드를 두지 마.
+- 짧고 실행 가능한 전체 코드를 보여줘. 외부 이미지·추가 GUI 라이브러리 금지.</div>
   <ol><li>새 파일을 <code class="inline">tutor_app.py</code>로 저장합니다. 코드 앞뒤의 ``` 표시는 넣지 않습니다.</li><li>프로젝트 폴더의 활성화된 터미널에서 실행합니다.</li></ol>
   <div class="code"><button class="copy">복사</button>python tutor_app.py</div>
+  <div class="box warn"><span class="t">실행 전 30초 — Qwen이 자주 틀리는 곳만 훑어보세요</span>
+  <table style="margin:10px 0 0">
+    <tr><th style="width:46%">코드에서 찾을 것</th><th>고치는 법</th></tr>
+    <tr><td><code class="inline">command=함수이름()</code> 처럼 <strong>괄호가 붙어 있다</strong></td><td>괄호 삭제. 붙어 있으면 시작하자마자 실행되고 버튼은 죽습니다</td></tr>
+    <tr><td><code class="inline">from tkinter import scrolledtext</code> 가 없다</td><td>import 줄 추가</td></tr>
+    <tr><td>한 창에서 <code class="inline">pack</code> 과 <code class="inline">grid</code> 가 섞여 있다</td><td>"배치를 pack으로 통일해줘" 재요청</td></tr>
+    <tr><td><code class="inline">mainloop()</code> 뒤에 코드가 더 있다</td><td>그 코드는 실행 안 됩니다 — 위로 옮기기</td></tr>
+    <tr><td>결과창에 쓰기 전에 <code class="inline">state="normal"</code> 이 없다</td><td>잠긴 채로 쓰면 <strong>오류 없이 조용히 무시</strong>됩니다 — "결과창은 normal로 풀고 쓴 뒤 다시 disabled로 잠가줘" 재요청</td></tr>
+  </table></div>
   <div class="box ok"><span class="t">화면 합격 체크</span>빈 입력 안내 / 글 붙여넣기 / 예시 답변 / 결과 복사 / 지우기 / 창 크기 변경을 확인합니다. 지금 보이는 답변은 AI의 실제 분석이 아닙니다. 통과하면 <code class="inline">tutor_app-v1.py</code>로 사본을 보관합니다.</div></div>
 
   <div class="step"><span class="n">STEP 2 · 화면 개선</span><h3>“예쁘게”를 구체적인 요구로 바꾸기</h3>
   <div class="prompt"><span class="label">프롬프트 2 · 레이아웃 수정</span><button class="copy">복사</button>현재 코드의 GUI만 개선해줘. 예시 답변 동작은 유지해줘.
-- 밝은 배경, 진한 글자, 민트색 분석 버튼, 16px 이상 본문 글씨
-- 바깥 여백 20px 이상, 제목/입력/버튼/결과를 구분
+- 밝은 배경, 진한 글자, 민트색 분석 버튼, 큰 본문 글씨
+- 바깥 여백을 넉넉히, 제목/입력/버튼/결과를 구분
 - 입력보다 결과 영역을 더 넓게, 창을 늘리면 레이아웃이 함께 늘어나게
-- 비활성 버튼은 비활성 상태가 보이게, 키보드 Tab 이동도 가능하게
-- 외부 파일 없이 tkinter 위젯 옵션(bg, fg, font)만 사용
+
+실수 방지 규칙 (꼭 지켜):
+- 위젯 이름(input_box, output_box, analyze_btn, clear_btn, status)과 동작은 바꾸지 말고 옵션만 손대줘.
+- 색은 bg="#ffffff" fg="#222222" 처럼 16진수로, 글씨는 font=("맑은 고딕", 12) 형식으로.
+- 여백은 pack의 padx, pady 숫자로. "20px" 같은 문자열 단위나 CSS 문법을 쓰지 마.
+- tkinter에 없는 옵션(스타일시트, border-radius 등)을 지어내지 마.
 수정한 전체 Python 코드를 보여줘.
 현재 코드:
 [여기에 tutor_app.py의 전체 내용을 붙여넣기]</div>
@@ -1444,13 +1470,20 @@ python -c "import tkinter, requests; print(tkinter.TkVersion)"</div>
 - system: "친절한 파이썬 튜터로서 [원인], [설명], [해결 방법], [고친 코드 예시] 순서로
   한국어로 짧게 답하세요. 정보가 부족하면 필요한 코드를 요청하고 불확실성을 밝혀주세요."
 - 연결/읽기 timeout=(5, 300), raise_for_status(), JSON의 message.content 사용
-- HTTP 요청은 threading.Thread(daemon=True)의 함수 안에서 실행.
-  그 함수 안에서는 위젯을 읽거나 바꾸지 말고, 결과/오류 문자열을 변수에 저장만 해줘.
-- 메인 쪽은 root.after(100, ...)로 그 변수를 반복 확인해서, 결과가 오면 화면에 표시해줘.
-- 스레드 객체는 self.worker에 보관하고 결과 처리 후 None으로 정리해줘.
+- 함수는 세 개로 나눠줘:
+  ask_tutor(error_text): requests 호출만 하고 답변 문자열을 return
+  on_analyze(): 버튼용. 입력 확인 → 잠금 → 스레드 시작 → root.after(100, poll)
+  poll(): 전역 pending 변수를 확인해 결과가 있으면 화면에 표시하고 잠금 해제
+- HTTP 요청은 threading.Thread(target=..., daemon=True)의 함수 안에서 실행.
+  그 함수 안에서는 위젯을 읽거나 바꾸지 말고, 결과/오류 문자열을 pending 에 저장만 해줘.
+- pending 이 아직 없으면 poll 이 root.after(100, poll) 로 자신을 다시 예약해줘.
+- requests.post 는 json= 파라미터를 사용해줘 (data= 와 json.dumps 조합 금지).
+- 위젯 이름(input_box, output_box, analyze_btn, clear_btn, status)은 그대로 유지해줘.
 - 시작 시 입력·분석·지우기를 잠그고 결과 표시 후에 복구해줘.
-- 분석 중 창 닫기(WM_DELETE_WINDOW)는 무시하고 상태 문구로 완료 후 다시 닫으라고 안내해줘.
+- 분석 중 창 닫기(root.protocol("WM_DELETE_WINDOW", ...))는 무시하고
+  상태 문구로 완료 후 다시 닫으라고 안내해줘.
 - 스레드 안에서 위젯이나 tkinter 함수를 부르지 마. time.sleep으로 기다리지도 마.
+- 클래스 없이, self 없이 전역 변수로 써줘.
 외부 의존성은 requests만. 실행 가능한 전체 코드를 보여줘.
 현재 코드:
 [여기에 화면 테스트를 통과한 전체 코드 붙여넣기]</div>
@@ -1460,6 +1493,9 @@ python -c "import tkinter, requests; print(tkinter.TkVersion)"</div>
 
   <div class="step"><span class="n">STEP 4 · 실패도 설계</span><h3>오류 안내와 재시도 요청하기</h3>
   <div class="prompt"><span class="label">프롬프트 4 · 오류 처리</span><button class="copy">복사</button>현재 tkinter 에러 튜터의 실패 처리를 개선해줘. 기존 스레드 + after 폴링 구조를 유지해줘.
+- try/except 는 스레드에서 ask_tutor 를 부르는 곳 한 군데에만 넣어줘.
+- 예외 이름은 정확히: requests.exceptions.Timeout, requests.exceptions.ConnectionError,
+  requests.exceptions.HTTPError. 존재하지 않는 예외 이름을 지어내지 마.
 - 연결 실패: Ollama 실행 안내
 - Timeout: 입력을 줄이고 재시도 안내. Timeout을 ConnectionError보다 먼저 처리
 - HTTP 404: ollama list에서 qwen2.5-coder:3b 확인 안내
@@ -1487,7 +1523,7 @@ python -c "import tkinter, requests; print(tkinter.TkVersion)"</div>
 실행: .venv의 python tutor_app.py
 조작 순서: [무엇을 입력하고 어떤 버튼을 눌렀는지]
 예상 결과: [기대했던 화면/동작]
-실제 결과: [화면 상태 또는 VS Code 터미널의 Traceback]
+실제 결과: [화면 상태, 또는 Traceback의 마지막 3~4줄을 그대로 붙여넣기]
 유지할 것: [이미 잘 되는 기능과 GUI 배치]
 스레드 + after 폴링 구조와 venv 환경을 유지하고, 바뀐 이유를 짧게 설명한 뒤 전체 코드를 보여줘.
 현재 코드:
@@ -1573,8 +1609,9 @@ IndexError: list index out of range</div>
   <div class="prompt"><button class="copy">복사</button>현재 tkinter 앱을 [주제]로 바꿔줘.
 입력: [입력 예시]
 답변 형식: [원하는 항목]
-창 제목과 입력/결과 안내를 주제에 맞게 바꿔줘.
-venv, qwen2.5-coder:3b API, 스레드 + after 폴링, 중복 요청 방지, 종료 안내는 유지해줘.
+바꿀 것은 두 가지뿐이야: ① system 문구 ② 창 제목과 입력/결과 안내 라벨.
+위젯 이름·함수 구조·스레드 + after 폴링·중복 요청 방지·종료 안내·
+qwen2.5-coder:3b API 설정은 한 글자도 바꾸지 마.
 불확실한 설명은 단정하지 않도록 system 문구를 정해줘.
 수정한 전체 Python 코드를 보여줘.
 현재 코드:
