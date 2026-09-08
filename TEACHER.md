@@ -93,18 +93,22 @@ console.log(add(2, 3));
 
 ## 다음 차시 운영 변경 · 2026-09-08
 
-14–16장은 **기존 Qwen + VS Code로 PySide6 GUI를 바이브코딩**하는 실습입니다. venv 생성·패키지 설치는 수업 전에 준비하고, 새 cmd 터미널에서 재활성화하도록 안내합니다. Python·PySide6 호환성과 학교 PC에서의 실제 GUI 실행을 확인하세요. 기존 tkinter 코드는 PySide6 참고본으로 교체했습니다.
+14–16장은 **기존 Qwen + VS Code로 tkinter GUI를 바이브코딩**하는 실습입니다. venv 생성은 수업 전에 준비하고, 새 cmd 터미널에서 재활성화하도록 안내합니다. GUI는 기본 내장 tkinter라 별도 설치가 없고, `pip install` 전에 `pip setuptools wheel` 업그레이드를 먼저 실행합니다(일부 PC에서 설치 모듈 오류 방지).
+
+> **PySide6 → tkinter 전환 사유 (2026-09-08 실수업 확인)** — Qwen 3B가 PySide6 코드를
+> 실행 가능하게 생성하지 못해 실습이 진행되지 않았습니다. tkinter는 학습 데이터가 많아
+> 3B 모델도 안정적으로 다룹니다. 같은 이유가 해소되기 전에는 Qt 계열로 되돌리지 마세요.
 
 - 학생은 먼저 API 없는 화면을 생성하고 창 크기·입출력·버튼 상태를 확인합니다.
-- 이후 requests 호출을 QThread.run으로 옮기고 결과를 Signal → 메인 창 Slot으로 전달하게 요청합니다.
-- 분석 중 지우기·입력 편집·중복 요청을 막고, 창 닫기는 안내 후 보류합니다. 작업 중 QThread 파괴나 강제 terminate로 해결하지 않습니다.
+- 이후 requests 호출을 작업 스레드(threading.Thread)로 옮기고, 결과는 변수에 저장 → 메인 스레드의 `root.after(100, ...)` 폴링으로 화면에 반영하게 요청합니다. 스레드에서 위젯이나 tkinter 함수를 직접 부르면 안 됩니다.
+- 분석 중 지우기·입력 편집·중복 요청을 막고, 창 닫기는 안내 후 보류합니다. 파이썬 스레드는 강제 종료가 불가하므로 daemon 스레드 + 완료 대기로 처리합니다.
 - Ollama 연결 실패 시험은 수정 코드를 먼저 받은 뒤 서버를 종료해서 합니다. 서버가 꺼지면 Twinny 채팅도 멈추므로 시험 후 다시 켭니다.
 - 참고본은 구조 비교·복귀용이며 학생 생성물이 동일한 코드일 필요는 없습니다.
 - 설치 후 `python -m pip freeze`로 검증된 PC의 정확한 패키지 버전을 별도 기록합니다. requirements.txt는 허용 범위이며 버전 고정 파일이 아닙니다.
 - 오프라인 설치는 같은 Windows/Python/아키텍처의 준비 PC에서 `python -m pip download -r requirements.txt -d wheels`로 의존성을 함께 확보하고, 학생 venv에서 `python -m pip install --no-index --find-links wheels -r requirements.txt`로 설치합니다. venv 폴더 자체는 배포하지 않습니다.
 
-### PySide6 참고본 검증 · 2026-09-08
+### tkinter 참고본 검증 · 2026-09-08
 
-임시 venv의 Python 3.13 / PySide6 6.11.2 / requests 2.34.2에서 Qt offscreen 테스트를 실행했습니다. 빈 입력, 느린 작업 중 이벤트 루프 반응·중복 방지·닫기 보류, 오류별 안내·재시도, HTTP 요청 형식과 잘못된 응답 처리를 4개 테스트로 확인했습니다. 실행 명령은 venv에서 `python -m unittest discover -s tests -v`입니다. 고정 답변으로 GUI 화면도 확인했습니다.
+Debian Python 3.13 / Tk 8.6 / requests 2.32에서 Xvfb 가상 디스플레이로 테스트를 실행했습니다. 빈 입력, 느린 작업 중 이벤트 루프 반응·중복 방지·닫기 보류, 오류별 안내·재시도, HTTP 요청 형식과 잘못된 응답 처리를 4개 테스트로 확인했습니다(전부 통과). 실행 명령은 저장소 루트에서 `python -m unittest discover -s tests -v`(리눅스 헤드리스는 `xvfb-run -a` 접두), 고정 답변으로 GUI 화면 캡처도 확인했습니다. 이식 과정에서 "작업 스레드가 root.after를 직접 호출"하는 기존 패턴이 스레드 규칙 위반으로 확인되어(테스트에서 RuntimeError) 변수 저장 + 메인 스레드 폴링으로 교체했습니다.
 
 이 검증은 모의 HTTP 응답을 사용했으며 Windows 교육장 PC의 실제 Qwen 응답 시간·품질은 별도 리허설 대상입니다. 생성 프롬프트가 매번 같은 코드를 만든다는 보장은 없으므로 학생 생성물도 본문의 체크리스트로 검증합니다.

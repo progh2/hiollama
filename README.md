@@ -29,9 +29,9 @@
 | `check-env.bat` | GPU·드라이버·디스크·설치 상태 사전 점검 |
 | `code/step1_hello.py` | Ollama API 최소 호출 |
 | `code/step2_tutor.py` | system 메시지로 튜터 역할 부여 |
-| `tests/test_tutor_app.py` | Qt offscreen GUI·HTTP 계약 검증 |
-| `code/requirements.txt` | PySide6·requests 설치 범위 |
-| `code/tutor_app.py` | 다음 차시 PySide6 + QThread/Signal 에러 튜터 참고 완성본 |
+| `tests/test_tutor_app.py` | tkinter GUI·HTTP 계약 검증 (리눅스는 `xvfb-run -a` 필요) |
+| `code/requirements.txt` | requests 설치 범위 (GUI는 기본 내장 tkinter) |
+| `code/tutor_app.py` | 다음 차시 tkinter + 스레드/after 폴링 에러 튜터 참고 완성본 |
 | `assets/llama-expressions.png` | 치비 라마 10표정 스프라이트 시트. CSS로 각 칸 표시 |
 
 01 PC 점검에서 배치 파일을 받습니다. 배치 파일은 **CP949 + CRLF**를 유지해야 하며, `index.html`의 소스 보기에도 같은 내용을 반영합니다. cmd 기반으로 동작하고 NVIDIA 점검에는 `nvidia-smi`를 사용합니다. 보안 정책에 따라 실행이 제한될 수 있습니다.
@@ -46,9 +46,14 @@
 
 설치 파일·두 모델의 `blobs` + `manifests`·Twinny는 사전 배포합니다. 05·06 상세 이론과 FIM은 선택, 14–16 파이썬은 다음 차시입니다. 필수 채팅 실험은 08의 연습 1·5입니다.
 
-## 다음 차시 — Qwen + VS Code로 PySide6 GUI 바이브코딩
+## 다음 차시 — Qwen + VS Code로 tkinter GUI 바이브코딩
 
-14장에서 프로젝트별 venv를 만들고 API를 확인합니다. 15장은 화면 생성 프롬프트 → GUI 개선 → 실제 Ollama 연결 → QThread/Signal로 응답성 유지 → 오류 처리·재검증 순서입니다. 16장에서는 같은 앱을 다른 주제로 확장합니다. 완성본 다운로드는 막혔을 때의 비교 자료입니다.
+14장에서 프로젝트별 venv를 만들고 API를 확인합니다. 15장은 화면 생성 프롬프트 → GUI 개선 → 실제 Ollama 연결 → 스레드 + after 폴링으로 응답성 유지 → 오류 처리·재검증 순서입니다. 16장에서는 같은 앱을 다른 주제로 확장합니다. 완성본 다운로드는 막혔을 때의 비교 자료입니다.
+
+> **왜 PySide6가 아니라 tkinter인가** — 실수업에서 Qwen 3B가 PySide6 코드를 실행되게
+> 만들지 못했습니다(학습 데이터 부족). tkinter는 예제가 많아 3B로도 안정적이고,
+> 기본 내장이라 설치 실패 변수도 사라집니다. 이 이유가 확인되기 전에는 다시 Qt 계열로
+> 바꾸지 마세요. venv에서 `pip install` 전에 `pip setuptools wheel` 업그레이드는 유지합니다.
 
 Windows의 프로젝트 폴더에서 VS Code **Command Prompt(cmd)** 터미널을 사용합니다.
 

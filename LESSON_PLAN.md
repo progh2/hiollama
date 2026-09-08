@@ -135,19 +135,19 @@
 - 학생 작품 공유 시에는 작성자 동의와 학교 운영 방침에 따라 공개 범위를 정합니다. 이 저장소에는 수업 자료만 배포하고 학생 제출 파일은 넣지 않습니다.
 
 
-## 9. 다음 차시 확장 계획 — PySide6 GUI 바이브코딩 (2026-09-08)
+## 9. 다음 차시 확장 계획 — tkinter GUI 바이브코딩 (2026-09-08)
 
 기존 100분 웹앱 수업과 별도인 **50분 확장안**입니다. Python·venv·패키지 사전 설치가 완료된 조건이며, 지연되면 두 차시로 나눕니다. 모델은 기존 3B Chat을 유지하고 FIM은 선택으로 둡니다.
 
 | 시간 | 교사의 발문·지원 | 학생의 활동·상호작용 | 확인할 증거 |
 |---|---|---|---|
-| 0–5분 | “지금 실행하는 Python은 어느 폴더에 있지?” | .venv를 활성화하고 sys.executable·PySide6 import 확인 | 프로젝트 가상환경 경로 |
-| 5–15분 | “사용자가 무엇을 입력하고 어디서 답변을 볼까?” | Qwen에게 PySide6 GUI 요청. 짝과 입력·출력·버튼 배치를 비교 | API 없는 예시 답변 화면 실행 |
+| 0–5분 | “지금 실행하는 Python은 어느 폴더에 있지?” | .venv를 활성화하고 sys.executable·tkinter import 확인 | 프로젝트 가상환경 경로 |
+| 5–15분 | “사용자가 무엇을 입력하고 어디서 답변을 볼까?” | Qwen에게 tkinter GUI 요청. 짝과 입력·출력·버튼 배치를 비교 | API 없는 예시 답변 화면 실행 |
 | 15–22분 | “예쁘게 대신 어떤 크기·색·여백이 필요할까?” | GUI 요구를 구체화해 수정하고 창 크기·긴 텍스트 테스트 | 레이아웃 수정 전후 |
-| 22–35분 | “답을 기다릴 때도 화면은 반응해야 하지 않을까?” | QThread/Signal을 포함한 API 연결 프롬프트 전달. 같은 Qwen이 개발 도우미와 앱 엔진 역할을 맡음을 설명 | 분석 중 창 이동·크기 변경, 완료 후 결과 |
+| 22–35분 | “답을 기다릴 때도 화면은 반응해야 하지 않을까?” | 스레드 + after 폴링을 포함한 API 연결 프롬프트 전달. 같은 Qwen이 개발 도우미와 앱 엔진 역할을 맡음을 설명 | 분석 중 창 이동·크기 변경, 완료 후 결과 |
 | 35–45분 | “실패하면 다시 쓸 수 있을까? 분석 중 닫으면?” | 오류 안내·중복 방지·닫기 보류를 시험. Ollama 중단 시험 후 재실행 | 실패 후 버튼 복구·재시도 |
 | 45–50분 | “내가 요구한 GUI 동작 중 무엇을 확인했니?” | 프롬프트·테스트 3개·개선 근거 공유 | 앱 .py와 활동지. .venv는 제출하지 않음 |
 
 필수 완성 기준은 입력·결과 GUI, 실제 API 요청, 반응성, 실패 후 재시도입니다. 꾸미기는 지연 시 생략합니다. 학생에게 위젯 문법 암기보다 “요청은 작업 스레드, 화면 갱신은 메인 스레드”의 역할과 검증 결과를 설명하게 합니다.
 
-추가 공식 레퍼런스: [Python venv](https://docs.python.org/3/library/venv.html), [Qt for Python 시작하기](https://doc.qt.io/qtforpython-6/gettingstarted.html), [QThread와 Signal](https://doc.qt.io/qtforpython-6/PySide6/QtCore/QThread.html), [Requests 오류 처리](https://requests.readthedocs.io/en/latest/user/quickstart/#errors-and-exceptions). 설치·스레드 사용법 확인용이며 학생에게 전체 정독을 요구하지 않습니다.
+추가 공식 레퍼런스: [Python venv](https://docs.python.org/3/library/venv.html), [tkinter](https://docs.python.org/ko/3/library/tkinter.html), [threading](https://docs.python.org/ko/3/library/threading.html), [Requests 오류 처리](https://requests.readthedocs.io/en/latest/user/quickstart/#errors-and-exceptions). 설치·스레드 사용법 확인용이며 학생에게 전체 정독을 요구하지 않습니다.

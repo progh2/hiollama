@@ -1,30 +1,32 @@
-"""Qwen + VS Code 바이브코딩 실습의 PySide6 참고 완성본.
+"""Qwen + VS Code 바이브코딩 실습의 tkinter 참고 완성본.
 
-프로젝트 폴더에서 venv 활성화 후:
-    python -m pip install -r requirements.txt
-    python tutor_app.py
-Ollama 실행 + qwen2.5-coder:3b 모델이 필요합니다.
+에러 로그를 붙여넣으면 로컬 LLM(qwen2.5-coder:3b)이 원인·설명·해결책을 알려줍니다.
+tkinter는 파이썬에 기본 포함이라 추가 GUI 설치가 없습니다.
+
+실행:  python tutor_app.py   (venv 활성화 + Ollama 실행 상태에서)
 """
-import sys
+import threading
+import tkinter as tk
+from tkinter import scrolledtext
 
 import requests
-from PySide6.QtCore import QThread, Signal, Slot
-from PySide6.QtWidgets import (
-    QApplication, QHBoxLayout, QLabel, QMainWindow, QPlainTextEdit,
-    QPushButton, QVBoxLayout, QWidget,
-)
 
 MODEL = "qwen2.5-coder:3b"
 URL = "http://localhost:11434/api/chat"
-SYSTEM = """당신은 고등학생을 돕는 친절한 파이썬 튜터입니다.
-에러와 주변 코드를 읽고 [원인], [설명], [해결 방법], [고친 코드 예시] 순서로
-한국어로 짧게 답하세요. 모르는 정보는 추측으로 단정하지 말고 필요한 코드를 요청하세요.
-불확실하면 불확실하다고 밝히세요. 인사말은 생략하세요.
-"""
+
+SYSTEM = (
+    "친절한 파이썬 튜터로서 [원인], [설명], [해결 방법], [고친 코드 예시] 순서로 "
+    "한국어로 짧게 답하세요. 정보가 부족하면 필요한 코드를 요청하고 "
+    "확실하지 않으면 \"확실하지 않습니다\"라고 먼저 밝히세요. "
+    "형식 밖의 인사말이나 사족은 쓰지 마세요."
+)
 
 
 def ask_tutor(error_text):
-    """GUI와 분리된 HTTP 요청. timeout은 연결/읽기 대기 제한입니다."""
+    """로컬 LLM에 물어보고 답변 문자열을 돌려준다.
+
+    실패 시 requests 예외 또는 ValueError/KeyError(응답 형식 오류)를 던진다.
+    """
     with requests.post(
         URL,
         json={
@@ -36,150 +38,158 @@ def ask_tutor(error_text):
             "stream": False,
             "options": {"temperature": 0.3},
         },
-        timeout=(5, 300),
+        timeout=(5, 300),  # (연결, 읽기) 초
     ) as response:
         response.raise_for_status()
-        answer = response.json()["message"]["content"]
-    if not isinstance(answer, str) or not answer.strip():
-        raise ValueError("모델의 답변이 비어 있거나 문자열이 아닙니다.")
-    return answer
+        data = response.json()
+        content = data["message"]["content"]  # 없으면 KeyError
+    if not isinstance(content, str) or not content.strip():
+        raise ValueError("응답 형식 오류: message.content가 비어 있습니다")
+    return content
 
 
-class AnalysisThread(QThread):
-    """run에서만 HTTP를 호출하고 위젯은 건드리지 않습니다."""
-    result = Signal(str, bool)
+class TutorApp:
+    """에러 튜터 창. 위젯 배치와 상태 전환을 담당한다."""
 
-    def __init__(self, error_text, parent=None):
-        super().__init__(parent)
-        self.error_text = error_text
+    def __init__(self, root=None):
+        self.root = root or tk.Tk()
+        self.root.title(f"파이썬 에러 튜터  ({MODEL})")
+        self.root.geometry("780x720")
+        self.root.minsize(560, 520)
+        self.worker = None    # 분석 중이면 Thread, 아니면 None
+        self._pending = None  # 작업 스레드가 넣어 두는 (답변, 성공 여부)
 
-    def run(self):
-        try:
-            answer = ask_tutor(self.error_text)
-        except requests.exceptions.Timeout:
-            self.result.emit("응답 대기 시간이 초과됐습니다. 입력을 줄인 뒤 다시 시도하세요.", False)
-        except requests.exceptions.ConnectionError:
-            self.result.emit("Ollama에 연결할 수 없습니다. Ollama를 실행하고 다시 시도하세요.", False)
-        except requests.exceptions.HTTPError as err:
-            code = err.response.status_code if err.response is not None else "알 수 없음"
-            hint = (f"ollama list에서 {MODEL} 모델을 확인하세요."
-                    if code == 404 else "Ollama 상태를 확인한 뒤 다시 시도하세요.")
-            self.result.emit(f"서버 오류 (HTTP {code}). {hint}", False)
-        except (ValueError, KeyError, TypeError):
-            self.result.emit("응답 형식을 읽을 수 없습니다. 모델과 Ollama 버전을 확인하세요.", False)
-        except requests.exceptions.RequestException as err:
-            self.result.emit(f"요청에 실패했습니다 ({type(err).__name__}). 연결 설정을 확인하세요.", False)
-        except Exception as err:
-            self.result.emit(f"예상하지 못한 오류 ({type(err).__name__}): {err}", False)
-        else:
-            self.result.emit(answer, True)
+        tk.Label(self.root, text="에러 로그를 붙여넣으세요",
+                 font=("맑은 고딕", 11, "bold"), anchor="w"
+                 ).pack(fill="x", padx=14, pady=(14, 4))
 
+        self.input_box = scrolledtext.ScrolledText(
+            self.root, height=10, wrap="word", font=("Consolas", 10))
+        self.input_box.pack(fill="x", padx=14)
 
-class TutorWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.worker = None  # finished까지 참조를 유지합니다.
-        self.setWindowTitle("라마의 파이썬 에러 튜터")
-        self.resize(820, 760)
-        self.setMinimumSize(560, 560)
-        central = QWidget()
-        self.setCentralWidget(central)
-        layout = QVBoxLayout(central)
-        layout.setContentsMargins(24, 24, 24, 24)
-        layout.setSpacing(12)
-        title = QLabel("함께 읽고, 원인을 찾아보자")
-        title.setObjectName("title")
-        layout.addWidget(title)
-        layout.addWidget(QLabel(f"로컬 모델: {MODEL} · 답변은 실행 결과로 확인하세요"))
-        input_label = QLabel("에러 로그와 주변 코드")
-        layout.addWidget(input_label)
-        self.input_box = QPlainTextEdit()
-        input_label.setBuddy(self.input_box)
-        self.input_box.setPlaceholderText("Traceback과 오류가 난 줄 주변 코드를 붙여넣으세요.")
-        layout.addWidget(self.input_box, 1)
-        buttons = QHBoxLayout()
-        self.analyze_btn = QPushButton("분석하기")
-        self.clear_btn = QPushButton("지우기")
-        self.analyze_btn.clicked.connect(self.on_analyze)
-        self.clear_btn.clicked.connect(self.on_clear)
-        buttons.addWidget(self.analyze_btn, 1)
-        buttons.addWidget(self.clear_btn)
-        layout.addLayout(buttons)
-        self.status = QLabel("준비됨")
-        self.status.setWordWrap(True)
-        layout.addWidget(self.status)
-        output_label = QLabel("튜터의 설명 · 복사해서 직접 검증하세요")
-        layout.addWidget(output_label)
-        self.output_box = QPlainTextEdit()
-        self.output_box.setReadOnly(True)
-        output_label.setBuddy(self.output_box)
-        layout.addWidget(self.output_box, 2)
-        self.setStyleSheet("""
-            QWidget { background: #f3f8f7; color: #193b38; font-size: 15px; }
-            QLabel#title { font-size: 23px; font-weight: bold; }
-            QPlainTextEdit { background: white; border: 1px solid #88aaa5;
-                border-radius: 10px; padding: 10px; }
-            QPushButton { background: #246b61; color: white; border: 2px solid #246b61;
-                border-radius: 10px; padding: 10px; }
-            QPushButton:focus { border-color: #da9800; }
-            QPushButton:disabled { background: #d6e1df; color: #536b67; border-color: #d6e1df; }
-        """)
+        btn_row = tk.Frame(self.root)
+        btn_row.pack(fill="x", padx=14, pady=8)
+        self.analyze_btn = tk.Button(
+            btn_row, text="분석하기", command=self.on_analyze,
+            height=2, font=("맑은 고딕", 11, "bold"))
+        self.analyze_btn.pack(side="left", fill="x", expand=True)
+        self.clear_btn = tk.Button(
+            btn_row, text="지우기", command=self.on_clear, height=2, width=10)
+        self.clear_btn.pack(side="left", padx=(8, 0))
 
-    @Slot()
+        self.status = tk.Label(self.root, text="준비됨", anchor="w", fg="#5C6B85")
+        self.status.pack(fill="x", padx=14)
+
+        tk.Label(self.root, text="튜터의 설명",
+                 font=("맑은 고딕", 11, "bold"), anchor="w"
+                 ).pack(fill="x", padx=14, pady=(10, 4))
+        self.output_box = scrolledtext.ScrolledText(
+            self.root, height=18, wrap="word", font=("맑은 고딕", 10),
+            state="disabled")
+        self.output_box.pack(fill="both", expand=True, padx=14, pady=(0, 14))
+
+        # 닫기 버튼도 우리가 처리한다 (분석 중 종료 방지)
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
+
+    # ---------------- 동작 ----------------
     def on_analyze(self):
-        if self.worker is not None:
+        if self.worker is not None:      # 중복 클릭 방지
             return
-        error_text = self.input_box.toPlainText().strip()
+        error_text = self.input_box.get("1.0", "end").strip()
         if not error_text:
-            self.status.setText("에러 로그를 먼저 입력하세요.")
-            self.input_box.setFocus()
+            self.set_status("에러 로그를 먼저 입력해 주세요.", "#B4700A")
             return
-        self.input_box.setReadOnly(True)
-        self.analyze_btn.setEnabled(False)
-        self.clear_btn.setEnabled(False)
-        self.output_box.clear()
-        self.status.setText("분석 중… 응답을 기다리고 있어요.")
-        self.worker = AnalysisThread(error_text, self)
-        self.worker.result.connect(self.on_result)
-        self.worker.finished.connect(self.on_finished)
+        self.set_busy(True)
+        self.set_status("분석 중입니다... (10~40초)", "#B4700A")
+        self.write_output("")
+        self.worker = threading.Thread(
+            target=self._work, args=(error_text,), daemon=True)
         self.worker.start()
+        self.root.after(100, self._poll)  # 메인 스레드가 결과를 살핀다
 
-    @Slot(str, bool)
-    def on_result(self, answer, ok):
-        self.output_box.setPlainText(answer)
-        self.status.setText("완료 · 설명과 고친 코드를 직접 확인하세요." if ok else "실패 · 안내를 확인하고 다시 시도하세요.")
+    def _work(self, error_text):
+        """작업 스레드. 여기서는 위젯을 직접 건드리지 않는다."""
+        try:
+            answer, ok = ask_tutor(error_text), True
+        except requests.exceptions.Timeout:            # ConnectionError보다 먼저
+            answer, ok = ("대기 시간이 초과되었습니다.\n"
+                          "에러 로그를 줄여서 다시 시도해 보세요."), False
+        except requests.exceptions.ConnectionError:
+            answer, ok = ("모델에 연결할 수 없습니다.\n\n"
+                          "· Ollama가 실행 중인지 확인하세요 (작업표시줄 아이콘)\n"
+                          "· 확인 후 분석하기를 다시 눌러 주세요"), False
+        except requests.exceptions.HTTPError as err:
+            code = getattr(getattr(err, "response", None), "status_code", "?")
+            if code == 404:
+                answer = ("HTTP 404: 모델을 찾지 못했습니다.\n"
+                          "검은 창에서 ollama list 로 qwen2.5-coder:3b가 "
+                          "있는지 확인하세요.")
+            else:
+                answer = f"HTTP {code} 오류가 났습니다. 잠시 후 다시 시도해 보세요."
+            ok = False
+        except (ValueError, KeyError):
+            answer, ok = ("응답 형식 오류: 모델의 답을 읽지 못했습니다.\n"
+                          "다시 시도해 보세요."), False
+        except Exception as err:                       # noqa: BLE001
+            answer, ok = f"예상하지 못한 오류입니다.\n\n{type(err).__name__}: {err}", False
+        # 작업 스레드는 결과를 저장만 한다. 위젯은 절대 건드리지 않는다.
+        self._pending = (answer, ok)
 
-    @Slot()
-    def on_finished(self):
-        worker = self.worker
-        self.worker = None
-        self.input_box.setReadOnly(False)
-        self.analyze_btn.setEnabled(True)
-        self.clear_btn.setEnabled(True)
-        if worker is not None:
-            worker.deleteLater()
-
-    @Slot()
-    def on_clear(self):
-        if self.worker is not None:
+    def _poll(self):
+        """메인 스레드에서 0.1초마다 결과가 도착했는지 확인한다."""
+        if self._pending is None:
+            try:
+                self.root.after(100, self._poll)
+            except tk.TclError:
+                pass  # 창이 이미 닫힌 경우
             return
-        self.input_box.clear()
-        self.output_box.clear()
-        self.status.setText("준비됨")
-        self.input_box.setFocus()
+        answer, ok = self._pending
+        self._pending = None
+        self._done(answer, ok)
 
-    def closeEvent(self, event):
-        # 동기 requests 호출은 quit()만으로 취소되지 않습니다.
-        # 실행 중 QThread를 파괴하지 않고 완료 후 닫도록 안내합니다.
-        if self.worker is not None:
-            self.status.setText("분석이 진행 중입니다. 응답 또는 오류 안내가 나온 뒤 다시 닫아주세요.")
-            event.ignore()
-        else:
-            event.accept()
+    def _done(self, answer, ok):
+        self.worker = None
+        self.write_output(answer)
+        self.set_busy(False)
+        self.set_status("완료" if ok else "실패 - 안내를 확인하세요",
+                        "#1F9D57" if ok else "#C0392B")
+
+    def on_clear(self):
+        if self.worker is not None:      # 분석 중에는 무시
+            return
+        self.input_box.delete("1.0", "end")
+        self.write_output("")
+        self.set_status("준비됨")
+
+    def on_close(self):
+        if self.worker is not None:      # 분석 중 종료 방지
+            self.set_status("분석이 끝난 뒤 다시 닫아 주세요.", "#B4700A")
+            return
+        self.root.destroy()
+
+    # ---------------- 화면 도우미 ----------------
+    def set_busy(self, busy):
+        state = "disabled" if busy else "normal"
+        self.input_box.config(state=state)
+        self.analyze_btn.config(state=state)
+        self.clear_btn.config(state=state)
+
+    def write_output(self, text):
+        self.output_box.config(state="normal")
+        self.output_box.delete("1.0", "end")
+        self.output_box.insert("1.0", text)
+        self.output_box.config(state="disabled")
+
+    def set_status(self, text, color="#5C6B85"):
+        self.status.config(text=text, fg=color)
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = TutorWindow()
-    window.show()
-    sys.exit(app.exec())
+    app = TutorApp()
+    app.input_box.insert(
+        "1.0",
+        'Traceback (most recent call last):\n'
+        '  File "test.py", line 3, in <module>\n'
+        '    print(nums[5])\n'
+        'IndexError: list index out of range')
+    app.root.mainloop()
